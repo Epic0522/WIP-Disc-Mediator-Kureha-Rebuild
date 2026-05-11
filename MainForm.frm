@@ -552,23 +552,28 @@ Private Sub cmdAddTrack_Click()
 End Sub
 
 Private Sub cmdAnalyzeDisc_Click()
-    ShowPlaceholder "Analyze Disc UI is scaffolded but not wired yet."
+    DiscAnalyzeForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
+    DiscAnalyzeForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdCopyDisc_Click()
-    ShowPlaceholder "Copy Disc UI is scaffolded but not wired yet."
+    DiscCopyForm.LoadPreview cboMediaType.Text
+    DiscCopyForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdEraseDisc_Click()
-    ShowPlaceholder "Erase Disc UI is scaffolded but not wired yet."
+    DiscEraseForm.LoadPreview cboMediaType.Text
+    DiscEraseForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdImageRead_Click()
-    ShowPlaceholder "Image Read UI is scaffolded but not wired yet."
+    DiscReadForm.LoadPreview cboMediaType.Text
+    DiscReadForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdImageWrite_Click()
-    ShowPlaceholder "Image Write UI is scaffolded but not wired yet."
+    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
+    DiscWriteForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdMoveTrackDown_Click()
@@ -596,7 +601,8 @@ Private Sub cmdProperties_Click()
 End Sub
 
 Private Sub cmdReadTracks_Click()
-    ShowPlaceholder "Track reading UI is scaffolded but not wired yet."
+    TrackRippingForm.LoadPreview TrackCount()
+    TrackRippingForm.Show vbModal, Me
 End Sub
 
 Private Sub cmdRemoveEntry_Click()
@@ -678,7 +684,8 @@ Private Sub cmdTrackProperties_Click()
 End Sub
 
 Private Sub cmdWriteDisc_Click()
-    ShowPlaceholder "Disc write UI is scaffolded but not wired yet."
+    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
+    DiscWriteForm.Show vbModal, Me
 End Sub
 
 Private Sub Form_Load()
@@ -776,7 +783,8 @@ Private Sub mnuFileWriteDisc_Click()
 End Sub
 
 Private Sub mnuHelpAbout_Click()
-    MsgBox "Kureha VB6 Rebuild" & vbCrLf & "UI-first reconstruction build", vbInformation, "About"
+    AboutInformationForm.LoadPreview "Version 0.1"
+    AboutInformationForm.Show vbModal, Me
 End Sub
 
 Private Sub mnuCompositionAddFile_Click()
@@ -996,6 +1004,41 @@ Private Sub SeedSampleTracks()
     mTrackEntries.Add entry
     Set mCurrentTrack = entry
 End Sub
+
+Private Function TrackCount() As Long
+    TrackCount = mTrackEntries.Count
+End Function
+
+Private Function ProjectHasCdText() As Boolean
+    Dim i As Long
+    Dim entry As TrackEntry
+
+    For i = 1 To mTrackEntries.Count
+        Set entry = mTrackEntries.Item(i)
+
+        If entry.EnglishText.LanguageEnabled Then
+            If entry.EnglishText.TitleEnabled And Trim$(entry.EnglishText.Title) <> "" Then
+                ProjectHasCdText = True
+                Exit Function
+            End If
+            If entry.EnglishText.PerformerEnabled And Trim$(entry.EnglishText.Performer) <> "" Then
+                ProjectHasCdText = True
+                Exit Function
+            End If
+        End If
+
+        If entry.JapaneseText.LanguageEnabled Then
+            If entry.JapaneseText.TitleEnabled And Trim$(entry.JapaneseText.Title) <> "" Then
+                ProjectHasCdText = True
+                Exit Function
+            End If
+            If entry.JapaneseText.PerformerEnabled And Trim$(entry.JapaneseText.Performer) <> "" Then
+                ProjectHasCdText = True
+                Exit Function
+            End If
+        End If
+    Next i
+End Function
 
 Private Sub SelectFileIndex(ByVal index As Long)
     If index >= 0 And index < lstFiles.ListCount Then

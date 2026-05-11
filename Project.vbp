@@ -1,6 +1,13 @@
 Type=Exe
 Form=MainForm.frm
 Form=PropertyTrackForm.frm
+Form=DiscWriteForm.frm
+Form=DiscReadForm.frm
+Form=DiscCopyForm.frm
+Form=DiscEraseForm.frm
+Form=DiscAnalyzeForm.frm
+Form=TrackRippingForm.frm
+Form=AboutInformationForm.frm
 Module=MainModule; MainModule.bas
 Class=TOCTrack; TOCTrack.cls
 Class=TOCRawTrack; TOCRawTrack.cls
@@ -36,4 +43,5 @@ Unattended=0
 Retained=0
 ThreadPerObject=0
 MaxNumberOfThreads=1
+
 
