@@ -18,7 +18,14 @@
 # Keep the reconstructed DLL workspace as a whole folder
 !DLL/
 !DLL/**
+!DLL_stub/
+!DLL_stub/**
 
 # But still ignore Finder metadata inside it
 DLL/.DS_Store
 DLL/**/.DS_Store
+DLL_stub/.DS_Store
+DLL_stub/**/.DS_Store
+
+# Keep the original vendor DLLs local-only
+DLL_orig/
