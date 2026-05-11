@@ -1,0 +1,840 @@
+
+==== GetEngineVersion 1000cc60-1000cc70 ====
+1000cc60 <.text+0xbc60>:
+1000cc60:	b8 69 29 00 00       	mov    eax,0x2969
+1000cc65:	c3                   	ret
+1000cc66:	90                   	nop
+1000cc67:	90                   	nop
+1000cc68:	90                   	nop
+1000cc69:	90                   	nop
+1000cc6a:	90                   	nop
+1000cc6b:	90                   	nop
+1000cc6c:	90                   	nop
+1000cc6d:	90                   	nop
+1000cc6e:	90                   	nop
+1000cc6f:	90                   	nop
+
+==== Initialize 1000cc70-1000ccd0 ====
+1000cc70 <.text+0xbc70>:
+1000cc70:	56                   	push   esi
+1000cc71:	68 30 dd 00 00       	push   0xdd30
+1000cc76:	e8 5d 66 00 00       	call   0x100132d8
+1000cc7b:	8b f0                	mov    esi,eax
+1000cc7d:	83 c4 04             	add    esp,0x4
+1000cc80:	85 f6                	test   esi,esi
+1000cc82:	74 3c                	je     0x1000ccc0
+1000cc84:	57                   	push   edi
+1000cc85:	8b ce                	mov    ecx,esi
+1000cc87:	e8 84 67 ff ff       	call   0x10003410
+1000cc8c:	8d be c4 a1 00 00    	lea    edi,[esi+0xa1c4]
+1000cc92:	8b cf                	mov    ecx,edi
+1000cc94:	e8 87 61 00 00       	call   0x10012e20
+1000cc99:	8d 8e 10 dd 00 00    	lea    ecx,[esi+0xdd10]
+1000cc9f:	e8 7c 19 00 00       	call   0x1000e620
+1000cca4:	8b cf                	mov    ecx,edi
+1000cca6:	c7 06 14 d5 01 10    	mov    DWORD PTR [esi],0x1001d514
+1000ccac:	c7 86 94 a1 00 00 10 	mov    DWORD PTR [esi+0xa194],0x1001d510
+1000ccb3:	d5 01 10 
+1000ccb6:	e8 95 61 00 00       	call   0x10012e50
+1000ccbb:	8b c6                	mov    eax,esi
+1000ccbd:	5f                   	pop    edi
+1000ccbe:	5e                   	pop    esi
+1000ccbf:	c3                   	ret
+1000ccc0:	33 c0                	xor    eax,eax
+1000ccc2:	5e                   	pop    esi
+1000ccc3:	c3                   	ret
+1000ccc4:	90                   	nop
+1000ccc5:	90                   	nop
+1000ccc6:	90                   	nop
+1000ccc7:	90                   	nop
+1000ccc8:	90                   	nop
+1000ccc9:	90                   	nop
+1000ccca:	90                   	nop
+1000cccb:	90                   	nop
+1000cccc:	90                   	nop
+1000cccd:	90                   	nop
+1000ccce:	90                   	nop
+1000cccf:	90                   	nop
+
+==== Terminate 1000ccd0-1000ccf0 ====
+1000ccd0 <.text+0xbcd0>:
+1000ccd0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000ccd4:	85 c9                	test   ecx,ecx
+1000ccd6:	74 06                	je     0x1000ccde
+1000ccd8:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000ccda:	6a 01                	push   0x1
+1000ccdc:	ff 10                	call   DWORD PTR [eax]
+1000ccde:	c2 04 00             	ret    0x4
+1000cce1:	90                   	nop
+1000cce2:	90                   	nop
+1000cce3:	90                   	nop
+1000cce4:	90                   	nop
+1000cce5:	90                   	nop
+1000cce6:	90                   	nop
+1000cce7:	90                   	nop
+1000cce8:	90                   	nop
+1000cce9:	90                   	nop
+1000ccea:	90                   	nop
+1000cceb:	90                   	nop
+1000ccec:	90                   	nop
+1000cced:	90                   	nop
+1000ccee:	90                   	nop
+1000ccef:	90                   	nop
+
+==== GetRemoteHosts 1000ccf0-1000cd40 ====
+1000ccf0 <.text+0xbcf0>:
+1000ccf0:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+1000ccf4:	56                   	push   esi
+1000ccf5:	85 c0                	test   eax,eax
+1000ccf7:	57                   	push   edi
+1000ccf8:	7c 39                	jl     0x1000cd33
+1000ccfa:	3d ff ff 00 00       	cmp    eax,0xffff
+1000ccff:	7f 32                	jg     0x1000cd33
+1000cd01:	8b 4c 24 20          	mov    ecx,DWORD PTR [esp+0x20]
+1000cd05:	8b 54 24 1c          	mov    edx,DWORD PTR [esp+0x1c]
+1000cd09:	8b 74 24 0c          	mov    esi,DWORD PTR [esp+0xc]
+1000cd0d:	51                   	push   ecx
+1000cd0e:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+1000cd12:	52                   	push   edx
+1000cd13:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+1000cd17:	8b 3e                	mov    edi,DWORD PTR [esi]
+1000cd19:	51                   	push   ecx
+1000cd1a:	50                   	push   eax
+1000cd1b:	83 ec 0c             	sub    esp,0xc
+1000cd1e:	8b cc                	mov    ecx,esp
+1000cd20:	52                   	push   edx
+1000cd21:	e8 fa b9 ff ff       	call   0x10008720
+1000cd26:	8b ce                	mov    ecx,esi
+1000cd28:	ff 97 04 01 00 00    	call   DWORD PTR [edi+0x104]
+1000cd2e:	5f                   	pop    edi
+1000cd2f:	5e                   	pop    esi
+1000cd30:	c2 18 00             	ret    0x18
+1000cd33:	5f                   	pop    edi
+1000cd34:	33 c0                	xor    eax,eax
+1000cd36:	5e                   	pop    esi
+1000cd37:	c2 18 00             	ret    0x18
+1000cd3a:	90                   	nop
+1000cd3b:	90                   	nop
+1000cd3c:	90                   	nop
+1000cd3d:	90                   	nop
+1000cd3e:	90                   	nop
+1000cd3f:	90                   	nop
+
+==== Open 1000cd40-1000cdb0 ====
+1000cd40 <.text+0xbd40>:
+1000cd40:	83 ec 08             	sub    esp,0x8
+1000cd43:	a1 74 0e 02 10       	mov    eax,ds:0x10020e74
+1000cd48:	8a 15 7a 0e 02 10    	mov    dl,BYTE PTR ds:0x10020e7a
+1000cd4e:	66 8b 0d 78 0e 02 10 	mov    cx,WORD PTR ds:0x10020e78
+1000cd55:	56                   	push   esi
+1000cd56:	8b 74 24 10          	mov    esi,DWORD PTR [esp+0x10]
+1000cd5a:	89 44 24 04          	mov    DWORD PTR [esp+0x4],eax
+1000cd5e:	8a 44 24 14          	mov    al,BYTE PTR [esp+0x14]
+1000cd62:	88 54 24 0a          	mov    BYTE PTR [esp+0xa],dl
+1000cd66:	8b 16                	mov    edx,DWORD PTR [esi]
+1000cd68:	57                   	push   edi
+1000cd69:	66 89 4c 24 0c       	mov    WORD PTR [esp+0xc],cx
+1000cd6e:	04 41                	add    al,0x41
+1000cd70:	6a 00                	push   0x0
+1000cd72:	8b ce                	mov    ecx,esi
+1000cd74:	88 44 24 10          	mov    BYTE PTR [esp+0x10],al
+1000cd78:	ff 92 00 01 00 00    	call   DWORD PTR [edx+0x100]
+1000cd7e:	8b 3e                	mov    edi,DWORD PTR [esi]
+1000cd80:	83 ec 0c             	sub    esp,0xc
+1000cd83:	8d 44 24 14          	lea    eax,[esp+0x14]
+1000cd87:	8b cc                	mov    ecx,esp
+1000cd89:	50                   	push   eax
+1000cd8a:	e8 91 b9 ff ff       	call   0x10008720
+1000cd8f:	8b ce                	mov    ecx,esi
+1000cd91:	ff 57 04             	call   DWORD PTR [edi+0x4]
+1000cd94:	5f                   	pop    edi
+1000cd95:	25 ff 00 00 00       	and    eax,0xff
+1000cd9a:	5e                   	pop    esi
+1000cd9b:	83 c4 08             	add    esp,0x8
+1000cd9e:	c2 08 00             	ret    0x8
+1000cda1:	90                   	nop
+1000cda2:	90                   	nop
+1000cda3:	90                   	nop
+1000cda4:	90                   	nop
+1000cda5:	90                   	nop
+1000cda6:	90                   	nop
+1000cda7:	90                   	nop
+1000cda8:	90                   	nop
+1000cda9:	90                   	nop
+1000cdaa:	90                   	nop
+1000cdab:	90                   	nop
+1000cdac:	90                   	nop
+1000cdad:	90                   	nop
+1000cdae:	90                   	nop
+1000cdaf:	90                   	nop
+
+==== OpenEx 1000cdb0-1000cdf0 ====
+1000cdb0 <.text+0xbdb0>:
+1000cdb0:	56                   	push   esi
+1000cdb1:	8b 74 24 08          	mov    esi,DWORD PTR [esp+0x8]
+1000cdb5:	57                   	push   edi
+1000cdb6:	6a 01                	push   0x1
+1000cdb8:	8b 06                	mov    eax,DWORD PTR [esi]
+1000cdba:	8b ce                	mov    ecx,esi
+1000cdbc:	ff 90 00 01 00 00    	call   DWORD PTR [eax+0x100]
+1000cdc2:	8b 3e                	mov    edi,DWORD PTR [esi]
+1000cdc4:	83 ec 0c             	sub    esp,0xc
+1000cdc7:	8b 54 24 1c          	mov    edx,DWORD PTR [esp+0x1c]
+1000cdcb:	8b cc                	mov    ecx,esp
+1000cdcd:	52                   	push   edx
+1000cdce:	e8 4d b9 ff ff       	call   0x10008720
+1000cdd3:	8b ce                	mov    ecx,esi
+1000cdd5:	ff 57 04             	call   DWORD PTR [edi+0x4]
+1000cdd8:	5f                   	pop    edi
+1000cdd9:	25 ff 00 00 00       	and    eax,0xff
+1000cdde:	5e                   	pop    esi
+1000cddf:	c2 08 00             	ret    0x8
+1000cde2:	90                   	nop
+1000cde3:	90                   	nop
+1000cde4:	90                   	nop
+1000cde5:	90                   	nop
+1000cde6:	90                   	nop
+1000cde7:	90                   	nop
+1000cde8:	90                   	nop
+1000cde9:	90                   	nop
+1000cdea:	90                   	nop
+1000cdeb:	90                   	nop
+1000cdec:	90                   	nop
+1000cded:	90                   	nop
+1000cdee:	90                   	nop
+1000cdef:	90                   	nop
+
+==== Close 1000cdf0-1000ce10 ====
+1000cdf0 <.text+0xbdf0>:
+1000cdf0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cdf4:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cdf6:	ff 50 08             	call   DWORD PTR [eax+0x8]
+1000cdf9:	25 ff 00 00 00       	and    eax,0xff
+1000cdfe:	c2 04 00             	ret    0x4
+1000ce01:	90                   	nop
+1000ce02:	90                   	nop
+1000ce03:	90                   	nop
+1000ce04:	90                   	nop
+1000ce05:	90                   	nop
+1000ce06:	90                   	nop
+1000ce07:	90                   	nop
+1000ce08:	90                   	nop
+1000ce09:	90                   	nop
+1000ce0a:	90                   	nop
+1000ce0b:	90                   	nop
+1000ce0c:	90                   	nop
+1000ce0d:	90                   	nop
+1000ce0e:	90                   	nop
+1000ce0f:	90                   	nop
+
+==== GetDeviceName 1000ce10-1000cec0 ====
+1000ce10 <.text+0xbe10>:
+1000ce10:	83 ec 18             	sub    esp,0x18
+1000ce13:	8d 4c 24 00          	lea    ecx,[esp+0x0]
+1000ce17:	e8 d4 b8 ff ff       	call   0x100086f0
+1000ce1c:	8b 54 24 20          	mov    edx,DWORD PTR [esp+0x20]
+1000ce20:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+1000ce24:	52                   	push   edx
+1000ce25:	8d 54 24 10          	lea    edx,[esp+0x10]
+1000ce29:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000ce2b:	52                   	push   edx
+1000ce2c:	ff 50 10             	call   DWORD PTR [eax+0x10]
+1000ce2f:	50                   	push   eax
+1000ce30:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+1000ce34:	e8 f7 c2 ff ff       	call   0x10009130
+1000ce39:	8d 4c 24 0c          	lea    ecx,[esp+0xc]
+1000ce3d:	e8 ae b9 ff ff       	call   0x100087f0
+1000ce42:	8d 4c 24 00          	lea    ecx,[esp+0x0]
+1000ce46:	e8 b5 ba ff ff       	call   0x10008900
+1000ce4b:	8b 4c 24 28          	mov    ecx,DWORD PTR [esp+0x28]
+1000ce4f:	0f bf c0             	movsx  eax,ax
+1000ce52:	3b c8                	cmp    ecx,eax
+1000ce54:	7e 4a                	jle    0x1000cea0
+1000ce56:	56                   	push   esi
+1000ce57:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+1000ce5b:	e8 a0 ba ff ff       	call   0x10008900
+1000ce60:	0f bf c8             	movsx  ecx,ax
+1000ce63:	51                   	push   ecx
+1000ce64:	8d 4c 24 08          	lea    ecx,[esp+0x8]
+1000ce68:	e8 43 c2 ff ff       	call   0x100090b0
+1000ce6d:	8b 74 24 2c          	mov    esi,DWORD PTR [esp+0x2c]
+1000ce71:	50                   	push   eax
+1000ce72:	56                   	push   esi
+1000ce73:	e8 78 60 00 00       	call   0x10012ef0
+1000ce78:	83 c4 0c             	add    esp,0xc
+1000ce7b:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+1000ce7f:	e8 7c ba ff ff       	call   0x10008900
+1000ce84:	0f bf d0             	movsx  edx,ax
+1000ce87:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+1000ce8b:	c6 04 32 00          	mov    BYTE PTR [edx+esi*1],0x0
+1000ce8f:	e8 5c b9 ff ff       	call   0x100087f0
+1000ce94:	b8 01 00 00 00       	mov    eax,0x1
+1000ce99:	5e                   	pop    esi
+1000ce9a:	83 c4 18             	add    esp,0x18
+1000ce9d:	c2 10 00             	ret    0x10
+1000cea0:	8d 4c 24 00          	lea    ecx,[esp+0x0]
+1000cea4:	e8 47 b9 ff ff       	call   0x100087f0
+1000cea9:	33 c0                	xor    eax,eax
+1000ceab:	83 c4 18             	add    esp,0x18
+1000ceae:	c2 10 00             	ret    0x10
+1000ceb1:	90                   	nop
+1000ceb2:	90                   	nop
+1000ceb3:	90                   	nop
+1000ceb4:	90                   	nop
+1000ceb5:	90                   	nop
+1000ceb6:	90                   	nop
+1000ceb7:	90                   	nop
+1000ceb8:	90                   	nop
+1000ceb9:	90                   	nop
+1000ceba:	90                   	nop
+1000cebb:	90                   	nop
+1000cebc:	90                   	nop
+1000cebd:	90                   	nop
+1000cebe:	90                   	nop
+1000cebf:	90                   	nop
+
+==== ClearTOCStructure 1000cec0-1000ced0 ====
+1000cec0 <.text+0xbec0>:
+1000cec0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cec4:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cec6:	ff 90 f4 00 00 00    	call   DWORD PTR [eax+0xf4]
+1000cecc:	c2 04 00             	ret    0x4
+1000cecf:	90                   	nop
+
+==== GetTOCStructure 1000ced0-1000cef0 ====
+1000ced0 <.text+0xbed0>:
+1000ced0:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000ced4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000ced8:	52                   	push   edx
+1000ced9:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cedd:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cedf:	52                   	push   edx
+1000cee0:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cee4:	52                   	push   edx
+1000cee5:	ff 90 f8 00 00 00    	call   DWORD PTR [eax+0xf8]
+1000ceeb:	c2 10 00             	ret    0x10
+1000ceee:	90                   	nop
+1000ceef:	90                   	nop
+
+==== SetTOCStructure 1000cef0-1000cf10 ====
+1000cef0 <.text+0xbef0>:
+1000cef0:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cef4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cef8:	52                   	push   edx
+1000cef9:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cefd:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000ceff:	52                   	push   edx
+1000cf00:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cf04:	52                   	push   edx
+1000cf05:	ff 90 fc 00 00 00    	call   DWORD PTR [eax+0xfc]
+1000cf0b:	c2 10 00             	ret    0x10
+1000cf0e:	90                   	nop
+1000cf0f:	90                   	nop
+
+==== GetFirstLBA 1000cf10-1000cf20 ====
+1000cf10 <.text+0xbf10>:
+1000cf10:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf14:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf16:	ff 90 bc 00 00 00    	call   DWORD PTR [eax+0xbc]
+1000cf1c:	c2 04 00             	ret    0x4
+1000cf1f:	90                   	nop
+
+==== GetLastLBA 1000cf20-1000cf30 ====
+1000cf20 <.text+0xbf20>:
+1000cf20:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf24:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf26:	ff 90 c0 00 00 00    	call   DWORD PTR [eax+0xc0]
+1000cf2c:	c2 04 00             	ret    0x4
+1000cf2f:	90                   	nop
+
+==== SetBufferingBlockLength 1000cf30-1000cf50 ====
+1000cf30 <.text+0xbf30>:
+1000cf30:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf34:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000cf38:	52                   	push   edx
+1000cf39:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf3b:	ff 90 c4 00 00 00    	call   DWORD PTR [eax+0xc4]
+1000cf41:	c2 08 00             	ret    0x8
+1000cf44:	90                   	nop
+1000cf45:	90                   	nop
+1000cf46:	90                   	nop
+1000cf47:	90                   	nop
+1000cf48:	90                   	nop
+1000cf49:	90                   	nop
+1000cf4a:	90                   	nop
+1000cf4b:	90                   	nop
+1000cf4c:	90                   	nop
+1000cf4d:	90                   	nop
+1000cf4e:	90                   	nop
+1000cf4f:	90                   	nop
+
+==== ReadStart 1000cf50-1000cf70 ====
+1000cf50 <.text+0xbf50>:
+1000cf50:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf54:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf58:	52                   	push   edx
+1000cf59:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf5d:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf5f:	52                   	push   edx
+1000cf60:	ff 90 0c 01 00 00    	call   DWORD PTR [eax+0x10c]
+1000cf66:	c2 0c 00             	ret    0xc
+1000cf69:	90                   	nop
+1000cf6a:	90                   	nop
+1000cf6b:	90                   	nop
+1000cf6c:	90                   	nop
+1000cf6d:	90                   	nop
+1000cf6e:	90                   	nop
+1000cf6f:	90                   	nop
+
+==== ReadLBA 1000cf70-1000cf90 ====
+1000cf70 <.text+0xbf70>:
+1000cf70:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf74:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf78:	52                   	push   edx
+1000cf79:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf7d:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf7f:	52                   	push   edx
+1000cf80:	ff 90 d0 00 00 00    	call   DWORD PTR [eax+0xd0]
+1000cf86:	25 ff 00 00 00       	and    eax,0xff
+1000cf8b:	c2 0c 00             	ret    0xc
+1000cf8e:	90                   	nop
+1000cf8f:	90                   	nop
+
+==== ReadLBADummy 1000cf90-1000cfb0 ====
+1000cf90 <.text+0xbf90>:
+1000cf90:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf94:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cf98:	52                   	push   edx
+1000cf99:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cf9d:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cf9f:	52                   	push   edx
+1000cfa0:	ff 90 d4 00 00 00    	call   DWORD PTR [eax+0xd4]
+1000cfa6:	25 ff 00 00 00       	and    eax,0xff
+1000cfab:	c2 0c 00             	ret    0xc
+1000cfae:	90                   	nop
+1000cfaf:	90                   	nop
+
+==== ReadEnd 1000cfb0-1000cfd0 ====
+1000cfb0 <.text+0xbfb0>:
+1000cfb0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cfb4:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cfb6:	ff 90 cc 00 00 00    	call   DWORD PTR [eax+0xcc]
+1000cfbc:	25 ff 00 00 00       	and    eax,0xff
+1000cfc1:	c2 04 00             	ret    0x4
+1000cfc4:	90                   	nop
+1000cfc5:	90                   	nop
+1000cfc6:	90                   	nop
+1000cfc7:	90                   	nop
+1000cfc8:	90                   	nop
+1000cfc9:	90                   	nop
+1000cfca:	90                   	nop
+1000cfcb:	90                   	nop
+1000cfcc:	90                   	nop
+1000cfcd:	90                   	nop
+1000cfce:	90                   	nop
+1000cfcf:	90                   	nop
+
+==== WriteStart 1000cfd0-1000cff0 ====
+1000cfd0 <.text+0xbfd0>:
+1000cfd0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cfd4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cfd8:	52                   	push   edx
+1000cfd9:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000cfdd:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cfdf:	52                   	push   edx
+1000cfe0:	ff 90 10 01 00 00    	call   DWORD PTR [eax+0x110]
+1000cfe6:	c2 0c 00             	ret    0xc
+1000cfe9:	90                   	nop
+1000cfea:	90                   	nop
+1000cfeb:	90                   	nop
+1000cfec:	90                   	nop
+1000cfed:	90                   	nop
+1000cfee:	90                   	nop
+1000cfef:	90                   	nop
+
+==== WriteLBA 1000cff0-1000d020 ====
+1000cff0 <.text+0xbff0>:
+1000cff0:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cff4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000cff8:	52                   	push   edx
+1000cff9:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000cffd:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000cfff:	52                   	push   edx
+1000d000:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000d004:	52                   	push   edx
+1000d005:	ff 90 dc 00 00 00    	call   DWORD PTR [eax+0xdc]
+1000d00b:	25 ff 00 00 00       	and    eax,0xff
+1000d010:	c2 10 00             	ret    0x10
+1000d013:	90                   	nop
+1000d014:	90                   	nop
+1000d015:	90                   	nop
+1000d016:	90                   	nop
+1000d017:	90                   	nop
+1000d018:	90                   	nop
+1000d019:	90                   	nop
+1000d01a:	90                   	nop
+1000d01b:	90                   	nop
+1000d01c:	90                   	nop
+1000d01d:	90                   	nop
+1000d01e:	90                   	nop
+1000d01f:	90                   	nop
+
+==== WriteFlush 1000d020-1000d040 ====
+1000d020 <.text+0xc020>:
+1000d020:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d024:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d028:	85 d2                	test   edx,edx
+1000d02a:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d02c:	0f 95 c2             	setne  dl
+1000d02f:	52                   	push   edx
+1000d030:	ff 90 e4 00 00 00    	call   DWORD PTR [eax+0xe4]
+1000d036:	25 ff 00 00 00       	and    eax,0xff
+1000d03b:	c2 08 00             	ret    0x8
+1000d03e:	90                   	nop
+1000d03f:	90                   	nop
+
+==== WriteEnd 1000d040-1000d060 ====
+1000d040 <.text+0xc040>:
+1000d040:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d044:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d048:	85 d2                	test   edx,edx
+1000d04a:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d04c:	0f 95 c2             	setne  dl
+1000d04f:	52                   	push   edx
+1000d050:	ff 90 e0 00 00 00    	call   DWORD PTR [eax+0xe0]
+1000d056:	25 ff 00 00 00       	and    eax,0xff
+1000d05b:	c2 08 00             	ret    0x8
+1000d05e:	90                   	nop
+1000d05f:	90                   	nop
+
+==== GetLastWroteLBA 1000d060-1000d070 ====
+1000d060 <.text+0xc060>:
+1000d060:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d064:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d066:	ff 90 e8 00 00 00    	call   DWORD PTR [eax+0xe8]
+1000d06c:	c2 04 00             	ret    0x4
+1000d06f:	90                   	nop
+
+==== LoadTray 1000d070-1000d090 ====
+1000d070 <.text+0xc070>:
+1000d070:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d074:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d078:	85 d2                	test   edx,edx
+1000d07a:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d07c:	0f 95 c2             	setne  dl
+1000d07f:	52                   	push   edx
+1000d080:	ff 50 14             	call   DWORD PTR [eax+0x14]
+1000d083:	25 ff 00 00 00       	and    eax,0xff
+1000d088:	c2 08 00             	ret    0x8
+1000d08b:	90                   	nop
+1000d08c:	90                   	nop
+1000d08d:	90                   	nop
+1000d08e:	90                   	nop
+1000d08f:	90                   	nop
+
+==== IsReady 1000d090-1000d0b0 ====
+1000d090 <.text+0xc090>:
+1000d090:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d094:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d096:	ff 50 18             	call   DWORD PTR [eax+0x18]
+1000d099:	25 ff 00 00 00       	and    eax,0xff
+1000d09e:	c2 04 00             	ret    0x4
+1000d0a1:	90                   	nop
+1000d0a2:	90                   	nop
+1000d0a3:	90                   	nop
+1000d0a4:	90                   	nop
+1000d0a5:	90                   	nop
+1000d0a6:	90                   	nop
+1000d0a7:	90                   	nop
+1000d0a8:	90                   	nop
+1000d0a9:	90                   	nop
+1000d0aa:	90                   	nop
+1000d0ab:	90                   	nop
+1000d0ac:	90                   	nop
+1000d0ad:	90                   	nop
+1000d0ae:	90                   	nop
+1000d0af:	90                   	nop
+
+==== GetMediaType 1000d0b0-1000d0c0 ====
+1000d0b0 <.text+0xc0b0>:
+1000d0b0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d0b4:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d0b6:	ff 50 1c             	call   DWORD PTR [eax+0x1c]
+1000d0b9:	c2 04 00             	ret    0x4
+1000d0bc:	90                   	nop
+1000d0bd:	90                   	nop
+1000d0be:	90                   	nop
+1000d0bf:	90                   	nop
+
+==== GetMediaFamilyType 1000d0c0-1000d0d0 ====
+1000d0c0 <.text+0xc0c0>:
+1000d0c0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d0c4:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d0c6:	ff 50 20             	call   DWORD PTR [eax+0x20]
+1000d0c9:	c2 04 00             	ret    0x4
+1000d0cc:	90                   	nop
+1000d0cd:	90                   	nop
+1000d0ce:	90                   	nop
+1000d0cf:	90                   	nop
+
+==== LockUnlock 1000d0d0-1000d0f0 ====
+1000d0d0 <.text+0xc0d0>:
+1000d0d0:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d0d4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d0d8:	85 d2                	test   edx,edx
+1000d0da:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d0dc:	0f 95 c2             	setne  dl
+1000d0df:	52                   	push   edx
+1000d0e0:	ff 50 24             	call   DWORD PTR [eax+0x24]
+1000d0e3:	25 ff 00 00 00       	and    eax,0xff
+1000d0e8:	c2 08 00             	ret    0x8
+1000d0eb:	90                   	nop
+1000d0ec:	90                   	nop
+1000d0ed:	90                   	nop
+1000d0ee:	90                   	nop
+1000d0ef:	90                   	nop
+
+==== Erase 1000d0f0-1000d110 ====
+1000d0f0 <.text+0xc0f0>:
+1000d0f0:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d0f4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d0f8:	85 d2                	test   edx,edx
+1000d0fa:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d0fc:	0f 95 c2             	setne  dl
+1000d0ff:	52                   	push   edx
+1000d100:	ff 50 2c             	call   DWORD PTR [eax+0x2c]
+1000d103:	25 ff 00 00 00       	and    eax,0xff
+1000d108:	c2 08 00             	ret    0x8
+1000d10b:	90                   	nop
+1000d10c:	90                   	nop
+1000d10d:	90                   	nop
+1000d10e:	90                   	nop
+1000d10f:	90                   	nop
+
+==== IsSupportMedia 1000d110-1000d130 ====
+1000d110 <.text+0xc110>:
+1000d110:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d114:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d118:	52                   	push   edx
+1000d119:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d11b:	ff 50 38             	call   DWORD PTR [eax+0x38]
+1000d11e:	25 ff 00 00 00       	and    eax,0xff
+1000d123:	c2 08 00             	ret    0x8
+1000d126:	90                   	nop
+1000d127:	90                   	nop
+1000d128:	90                   	nop
+1000d129:	90                   	nop
+1000d12a:	90                   	nop
+1000d12b:	90                   	nop
+1000d12c:	90                   	nop
+1000d12d:	90                   	nop
+1000d12e:	90                   	nop
+1000d12f:	90                   	nop
+
+==== IsReadSupport 1000d130-1000d150 ====
+1000d130 <.text+0xc130>:
+1000d130:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d134:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d138:	52                   	push   edx
+1000d139:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d13b:	ff 50 3c             	call   DWORD PTR [eax+0x3c]
+1000d13e:	25 ff 00 00 00       	and    eax,0xff
+1000d143:	c2 08 00             	ret    0x8
+1000d146:	90                   	nop
+1000d147:	90                   	nop
+1000d148:	90                   	nop
+1000d149:	90                   	nop
+1000d14a:	90                   	nop
+1000d14b:	90                   	nop
+1000d14c:	90                   	nop
+1000d14d:	90                   	nop
+1000d14e:	90                   	nop
+1000d14f:	90                   	nop
+
+==== IsWriteSupport 1000d150-1000d170 ====
+1000d150 <.text+0xc150>:
+1000d150:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d154:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d158:	52                   	push   edx
+1000d159:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d15b:	ff 50 40             	call   DWORD PTR [eax+0x40]
+1000d15e:	25 ff 00 00 00       	and    eax,0xff
+1000d163:	c2 08 00             	ret    0x8
+1000d166:	90                   	nop
+1000d167:	90                   	nop
+1000d168:	90                   	nop
+1000d169:	90                   	nop
+1000d16a:	90                   	nop
+1000d16b:	90                   	nop
+1000d16c:	90                   	nop
+1000d16d:	90                   	nop
+1000d16e:	90                   	nop
+1000d16f:	90                   	nop
+
+==== IsDiscEmpty 1000d170-1000d190 ====
+1000d170 <.text+0xc170>:
+1000d170:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d174:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d176:	ff 50 44             	call   DWORD PTR [eax+0x44]
+1000d179:	25 ff 00 00 00       	and    eax,0xff
+1000d17e:	c2 04 00             	ret    0x4
+1000d181:	90                   	nop
+1000d182:	90                   	nop
+1000d183:	90                   	nop
+1000d184:	90                   	nop
+1000d185:	90                   	nop
+1000d186:	90                   	nop
+1000d187:	90                   	nop
+1000d188:	90                   	nop
+1000d189:	90                   	nop
+1000d18a:	90                   	nop
+1000d18b:	90                   	nop
+1000d18c:	90                   	nop
+1000d18d:	90                   	nop
+1000d18e:	90                   	nop
+1000d18f:	90                   	nop
+
+==== ResetSense 1000d190-1000d1a0 ====
+1000d190 <.text+0xc190>:
+1000d190:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d194:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d196:	ff 50 48             	call   DWORD PTR [eax+0x48]
+1000d199:	c2 04 00             	ret    0x4
+1000d19c:	90                   	nop
+1000d19d:	90                   	nop
+1000d19e:	90                   	nop
+1000d19f:	90                   	nop
+
+==== SetECCMode 1000d1a0-1000d1c0 ====
+1000d1a0 <.text+0xc1a0>:
+1000d1a0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1a4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d1a8:	52                   	push   edx
+1000d1a9:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1ad:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d1af:	85 d2                	test   edx,edx
+1000d1b1:	0f 95 c2             	setne  dl
+1000d1b4:	52                   	push   edx
+1000d1b5:	ff 50 4c             	call   DWORD PTR [eax+0x4c]
+1000d1b8:	25 ff 00 00 00       	and    eax,0xff
+1000d1bd:	c2 0c 00             	ret    0xc
+
+==== SetReadSpeed 1000d1c0-1000d1e0 ====
+1000d1c0 <.text+0xc1c0>:
+1000d1c0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1c4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d1c8:	85 d2                	test   edx,edx
+1000d1ca:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d1cc:	0f 95 c2             	setne  dl
+1000d1cf:	52                   	push   edx
+1000d1d0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1d4:	52                   	push   edx
+1000d1d5:	ff 50 50             	call   DWORD PTR [eax+0x50]
+1000d1d8:	25 ff 00 00 00       	and    eax,0xff
+1000d1dd:	c2 0c 00             	ret    0xc
+
+==== SetWriteSpeed 1000d1e0-1000d200 ====
+1000d1e0 <.text+0xc1e0>:
+1000d1e0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1e4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d1e8:	85 d2                	test   edx,edx
+1000d1ea:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d1ec:	0f 95 c2             	setne  dl
+1000d1ef:	52                   	push   edx
+1000d1f0:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d1f4:	52                   	push   edx
+1000d1f5:	ff 50 54             	call   DWORD PTR [eax+0x54]
+1000d1f8:	25 ff 00 00 00       	and    eax,0xff
+1000d1fd:	c2 0c 00             	ret    0xc
+
+==== GetWriteSpeed 1000d200-1000d220 ====
+1000d200 <.text+0xc200>:
+1000d200:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d204:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d208:	52                   	push   edx
+1000d209:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+1000d20d:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d20f:	52                   	push   edx
+1000d210:	ff 50 58             	call   DWORD PTR [eax+0x58]
+1000d213:	c2 0c 00             	ret    0xc
+1000d216:	90                   	nop
+1000d217:	90                   	nop
+1000d218:	90                   	nop
+1000d219:	90                   	nop
+1000d21a:	90                   	nop
+1000d21b:	90                   	nop
+1000d21c:	90                   	nop
+1000d21d:	90                   	nop
+1000d21e:	90                   	nop
+1000d21f:	90                   	nop
+
+==== CheckWriteMode 1000d220-1000d250 ====
+1000d220 <.text+0xc220>:
+1000d220:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000d224:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d228:	52                   	push   edx
+1000d229:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000d22d:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d22f:	85 d2                	test   edx,edx
+1000d231:	0f 95 c2             	setne  dl
+1000d234:	52                   	push   edx
+1000d235:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+1000d239:	52                   	push   edx
+1000d23a:	ff 90 14 01 00 00    	call   DWORD PTR [eax+0x114]
+1000d240:	25 ff 00 00 00       	and    eax,0xff
+1000d245:	c2 10 00             	ret    0x10
+1000d248:	90                   	nop
+1000d249:	90                   	nop
+1000d24a:	90                   	nop
+1000d24b:	90                   	nop
+1000d24c:	90                   	nop
+1000d24d:	90                   	nop
+1000d24e:	90                   	nop
+1000d24f:	90                   	nop
+
+==== GetSCSIErrorStatus 1000d250-1000d260 ====
+1000d250 <.text+0xc250>:
+1000d250:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d254:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d256:	ff 50 5c             	call   DWORD PTR [eax+0x5c]
+1000d259:	c2 04 00             	ret    0x4
+1000d25c:	90                   	nop
+1000d25d:	90                   	nop
+1000d25e:	90                   	nop
+1000d25f:	90                   	nop
+
+==== SetWriteCacheBufferSize 1000d260-1000d280 ====
+1000d260 <.text+0xc260>:
+1000d260:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d264:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+1000d268:	52                   	push   edx
+1000d269:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d26b:	ff 90 ec 00 00 00    	call   DWORD PTR [eax+0xec]
+1000d271:	c2 08 00             	ret    0x8
+1000d274:	90                   	nop
+1000d275:	90                   	nop
+1000d276:	90                   	nop
+1000d277:	90                   	nop
+1000d278:	90                   	nop
+1000d279:	90                   	nop
+1000d27a:	90                   	nop
+1000d27b:	90                   	nop
+1000d27c:	90                   	nop
+1000d27d:	90                   	nop
+1000d27e:	90                   	nop
+1000d27f:	90                   	nop
+
+==== GetUsedWriteCacheBufferSize 1000d280-1000d2a0 ====
+1000d280 <.text+0xc280>:
+1000d280:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+1000d284:	8b 01                	mov    eax,DWORD PTR [ecx]
+1000d286:	ff 90 f0 00 00 00    	call   DWORD PTR [eax+0xf0]
+1000d28c:	c2 04 00             	ret    0x4
+1000d28f:	90                   	nop
+1000d290:	81 c1 c4 a1 00 00    	add    ecx,0xa1c4
+1000d296:	e9 b5 5b 00 00       	jmp    0x10012e50
+1000d29b:	90                   	nop
+1000d29c:	90                   	nop
+1000d29d:	90                   	nop
+1000d29e:	90                   	nop
+1000d29f:	90                   	nop

@@ -1,0 +1,32 @@
+LIBRARY Zenki.dll
+EXPORTS
+    GetEngineVersion=_GetEngineVersion@0 @1
+    Initialize=_Initialize@0 @2
+    Terminate=_Terminate@4 @3
+    GetTOCStructure=_GetTOCStructure@16 @4
+    InitISOFS=_InitISOFS@8 @5
+    ClearISO=_ClearISO@4 @6
+    IsISOEmpty=_IsISOEmpty@4 @7
+    AddISOFile=_AddISOFile@12 @8
+    AddISODummyFile=_AddISODummyFile@20 @9
+    MakeISODirectory=_MakeISODirectory@16 @10
+    GetISONewFileDirectoryName=_GetISONewFileDirectoryName@12 @11
+    ChangeISODirectory=_ChangeISODirectory@8 @12
+    RemoveISOFile=_RemoveISOFile@8 @13
+    RenameISOFile=_RenameISOFile@12 @14
+    ChangeISOProperties=_ChangeISOProperties@16 @15
+    GetISOCurrentDirectory=_GetISOCurrentDirectory@12 @16
+    FindISOFirstFile=_FindISOFirstFile@8 @17
+    FindISONextFile=_FindISONextFile@8 @18
+    ClearTrack=_ClearTrack@4 @19
+    AddTrack=_AddTrack@20 @20
+    ResetTrack=_ResetTrack@24 @21
+    RemoveTrack=_RemoveTrack@8 @22
+    GetTrackCount=_GetTrackCount@4 @23
+    GetTrackInformation=_GetTrackInformation@12 @24
+    ReadStart=_ReadStart@8 @25
+    Read=_Read@12 @26
+    ReadEnd=_ReadEnd@4 @27
+    EnabledTrackText=_EnabledTrackText@8 @28
+    SetTrackText=_SetTrackText@20 @29
+    GetTrackText=_GetTrackText@24 @30

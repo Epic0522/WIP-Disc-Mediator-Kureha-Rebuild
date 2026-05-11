@@ -14,3 +14,11 @@
 !*.frx
 !*.vbp
 !*.vbw
+
+# Keep the reconstructed DLL workspace as a whole folder
+!DLL/
+!DLL/**
+
+# But still ignore Finder metadata inside it
+DLL/.DS_Store
+DLL/**/.DS_Store

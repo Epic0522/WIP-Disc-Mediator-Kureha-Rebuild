@@ -1,0 +1,660 @@
+
+==== GetEngineVersion 10011b20-10011b30 ====
+10011b20 <.text+0x10b20>:
+10011b20:	b8 a7 28 00 00       	mov    eax,0x28a7
+10011b25:	c3                   	ret
+10011b26:	cc                   	int3
+10011b27:	cc                   	int3
+10011b28:	cc                   	int3
+10011b29:	cc                   	int3
+10011b2a:	cc                   	int3
+10011b2b:	cc                   	int3
+10011b2c:	cc                   	int3
+10011b2d:	cc                   	int3
+10011b2e:	cc                   	int3
+10011b2f:	cc                   	int3
+
+==== Initialize 10011b30-10011b80 ====
+10011b30 <.text+0x10b30>:
+10011b30:	56                   	push   esi
+10011b31:	68 18 3e 00 00       	push   0x3e18
+10011b36:	e8 f1 07 00 00       	call   0x1001232c
+10011b3b:	8b f0                	mov    esi,eax
+10011b3d:	83 c4 04             	add    esp,0x4
+10011b40:	85 f6                	test   esi,esi
+10011b42:	74 31                	je     0x10011b75
+10011b44:	57                   	push   edi
+10011b45:	8b ce                	mov    ecx,esi
+10011b47:	e8 84 f9 fe ff       	call   0x100014d0
+10011b4c:	8d be c8 02 00 00    	lea    edi,[esi+0x2c8]
+10011b52:	8b cf                	mov    ecx,edi
+10011b54:	c7 06 b4 e7 01 10    	mov    DWORD PTR [esi],0x1001e7b4
+10011b5a:	e8 91 fa ff ff       	call   0x100115f0
+10011b5f:	8b cf                	mov    ecx,edi
+10011b61:	e8 aa f7 ff ff       	call   0x10011310
+10011b66:	5f                   	pop    edi
+10011b67:	c7 86 14 3e 00 00 00 	mov    DWORD PTR [esi+0x3e14],0x0
+10011b6e:	00 00 00 
+10011b71:	8b c6                	mov    eax,esi
+10011b73:	5e                   	pop    esi
+10011b74:	c3                   	ret
+10011b75:	33 c0                	xor    eax,eax
+10011b77:	5e                   	pop    esi
+10011b78:	c3                   	ret
+10011b79:	cc                   	int3
+10011b7a:	cc                   	int3
+10011b7b:	cc                   	int3
+10011b7c:	cc                   	int3
+10011b7d:	cc                   	int3
+10011b7e:	cc                   	int3
+10011b7f:	cc                   	int3
+
+==== Terminate 10011b80-10011ba0 ====
+10011b80 <.text+0x10b80>:
+10011b80:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011b84:	85 c9                	test   ecx,ecx
+10011b86:	74 0c                	je     0x10011b94
+10011b88:	8b 01                	mov    eax,DWORD PTR [ecx]
+10011b8a:	c7 44 24 04 01 00 00 	mov    DWORD PTR [esp+0x4],0x1
+10011b91:	00 
+10011b92:	ff 20                	jmp    DWORD PTR [eax]
+10011b94:	c2 04 00             	ret    0x4
+10011b97:	cc                   	int3
+10011b98:	cc                   	int3
+10011b99:	cc                   	int3
+10011b9a:	cc                   	int3
+10011b9b:	cc                   	int3
+10011b9c:	cc                   	int3
+10011b9d:	cc                   	int3
+10011b9e:	cc                   	int3
+10011b9f:	cc                   	int3
+
+==== GetTOCStructure 10011ba0-10011bc0 ====
+10011ba0 <.text+0x10ba0>:
+10011ba0:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
+10011ba4:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
+10011ba8:	8b 54 24 08          	mov    edx,DWORD PTR [esp+0x8]
+10011bac:	50                   	push   eax
+10011bad:	51                   	push   ecx
+10011bae:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
+10011bb2:	52                   	push   edx
+10011bb3:	e8 a8 fd ff ff       	call   0x10011960
+10011bb8:	c2 10 00             	ret    0x10
+10011bbb:	cc                   	int3
+10011bbc:	cc                   	int3
+10011bbd:	cc                   	int3
+10011bbe:	cc                   	int3
+10011bbf:	cc                   	int3
+
+==== InitISOFS 10011bc0-10011be0 ====
+10011bc0 <.text+0x10bc0>:
+10011bc0:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011bc4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011bc8:	50                   	push   eax
+10011bc9:	e8 82 9d ff ff       	call   0x1000b950
+10011bce:	0f b6 c0             	movzx  eax,al
+10011bd1:	c2 08 00             	ret    0x8
+10011bd4:	cc                   	int3
+10011bd5:	cc                   	int3
+10011bd6:	cc                   	int3
+10011bd7:	cc                   	int3
+10011bd8:	cc                   	int3
+10011bd9:	cc                   	int3
+10011bda:	cc                   	int3
+10011bdb:	cc                   	int3
+10011bdc:	cc                   	int3
+10011bdd:	cc                   	int3
+10011bde:	cc                   	int3
+10011bdf:	cc                   	int3
+
+==== ClearISO 10011be0-10011bf0 ====
+10011be0 <.text+0x10be0>:
+10011be0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011be4:	e8 37 9a ff ff       	call   0x1000b620
+10011be9:	c2 04 00             	ret    0x4
+10011bec:	cc                   	int3
+10011bed:	cc                   	int3
+10011bee:	cc                   	int3
+10011bef:	cc                   	int3
+
+==== IsISOEmpty 10011bf0-10011c00 ====
+10011bf0 <.text+0x10bf0>:
+10011bf0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011bf4:	e8 27 7b ff ff       	call   0x10009720
+10011bf9:	0f b6 c0             	movzx  eax,al
+10011bfc:	c2 04 00             	ret    0x4
+10011bff:	cc                   	int3
+
+==== AddISODummyFile 10011c00-10011c60 ====
+10011c00 <.text+0x10c00>:
+10011c00:	83 ec 08             	sub    esp,0x8
+10011c03:	53                   	push   ebx
+10011c04:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011c08:	e8 c3 38 ff ff       	call   0x100054d0
+10011c0d:	8b 44 24 20          	mov    eax,DWORD PTR [esp+0x20]
+10011c11:	8b 54 24 1c          	mov    edx,DWORD PTR [esp+0x1c]
+10011c15:	83 ec 08             	sub    esp,0x8
+10011c18:	89 44 24 10          	mov    DWORD PTR [esp+0x10],eax
+10011c1c:	8b c4                	mov    eax,esp
+10011c1e:	c7 00 24 e2 01 10    	mov    DWORD PTR [eax],0x1001e224
+10011c24:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10011c28:	52                   	push   edx
+10011c29:	8b 54 24 20          	mov    edx,DWORD PTR [esp+0x20]
+10011c2d:	89 48 04             	mov    DWORD PTR [eax+0x4],ecx
+10011c30:	8b 44 24 24          	mov    eax,DWORD PTR [esp+0x24]
+10011c34:	50                   	push   eax
+10011c35:	83 ec 0c             	sub    esp,0xc
+10011c38:	8b cc                	mov    ecx,esp
+10011c3a:	52                   	push   edx
+10011c3b:	e8 50 3c ff ff       	call   0x10005890
+10011c40:	8b 4c 24 2c          	mov    ecx,DWORD PTR [esp+0x2c]
+10011c44:	e8 17 a8 ff ff       	call   0x1000c460
+10011c49:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011c4d:	8a d8                	mov    bl,al
+10011c4f:	e8 8c 38 ff ff       	call   0x100054e0
+10011c54:	0f b6 c3             	movzx  eax,bl
+10011c57:	5b                   	pop    ebx
+10011c58:	83 c4 08             	add    esp,0x8
+10011c5b:	c2 14 00             	ret    0x14
+10011c5e:	cc                   	int3
+10011c5f:	cc                   	int3
+
+==== GetISONewFileDirectoryName 10011c60-10011ca0 ====
+10011c60 <.text+0x10c60>:
+10011c60:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10011c64:	83 ec 0c             	sub    esp,0xc
+10011c67:	50                   	push   eax
+10011c68:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011c6c:	51                   	push   ecx
+10011c6d:	8b 4c 24 18          	mov    ecx,DWORD PTR [esp+0x18]
+10011c71:	e8 da 7a ff ff       	call   0x10009750
+10011c76:	8b c8                	mov    ecx,eax
+10011c78:	e8 b3 3e ff ff       	call   0x10005b30
+10011c7d:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+10011c81:	50                   	push   eax
+10011c82:	52                   	push   edx
+10011c83:	e8 38 1a 00 00       	call   0x100136c0
+10011c88:	83 c4 0c             	add    esp,0xc
+10011c8b:	8d 0c 24             	lea    ecx,[esp]
+10011c8e:	e8 9d 3c ff ff       	call   0x10005930
+10011c93:	83 c4 0c             	add    esp,0xc
+10011c96:	c2 0c 00             	ret    0xc
+10011c99:	cc                   	int3
+10011c9a:	cc                   	int3
+10011c9b:	cc                   	int3
+10011c9c:	cc                   	int3
+10011c9d:	cc                   	int3
+10011c9e:	cc                   	int3
+10011c9f:	cc                   	int3
+
+==== ChangeISODirectory 10011ca0-10011cc0 ====
+10011ca0 <.text+0x10ca0>:
+10011ca0:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011ca4:	83 ec 0c             	sub    esp,0xc
+10011ca7:	8b cc                	mov    ecx,esp
+10011ca9:	50                   	push   eax
+10011caa:	e8 e1 3b ff ff       	call   0x10005890
+10011caf:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10011cb3:	e8 88 99 ff ff       	call   0x1000b640
+10011cb8:	0f b6 c0             	movzx  eax,al
+10011cbb:	c2 08 00             	ret    0x8
+10011cbe:	cc                   	int3
+10011cbf:	cc                   	int3
+
+==== RemoveISOFile 10011cc0-10011ce0 ====
+10011cc0 <.text+0x10cc0>:
+10011cc0:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011cc4:	83 ec 0c             	sub    esp,0xc
+10011cc7:	8b cc                	mov    ecx,esp
+10011cc9:	50                   	push   eax
+10011cca:	e8 c1 3b ff ff       	call   0x10005890
+10011ccf:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10011cd3:	e8 c8 9a ff ff       	call   0x1000b7a0
+10011cd8:	0f b6 c0             	movzx  eax,al
+10011cdb:	c2 08 00             	ret    0x8
+10011cde:	cc                   	int3
+10011cdf:	cc                   	int3
+
+==== RenameISOFile 10011ce0-10011d10 ====
+10011ce0 <.text+0x10ce0>:
+10011ce0:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10011ce4:	83 ec 0c             	sub    esp,0xc
+10011ce7:	8b cc                	mov    ecx,esp
+10011ce9:	50                   	push   eax
+10011cea:	e8 a1 3b ff ff       	call   0x10005890
+10011cef:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
+10011cf3:	83 ec 0c             	sub    esp,0xc
+10011cf6:	8b cc                	mov    ecx,esp
+10011cf8:	52                   	push   edx
+10011cf9:	e8 92 3b ff ff       	call   0x10005890
+10011cfe:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+10011d02:	e8 99 ab ff ff       	call   0x1000c8a0
+10011d07:	0f b6 c0             	movzx  eax,al
+10011d0a:	c2 0c 00             	ret    0xc
+10011d0d:	cc                   	int3
+10011d0e:	cc                   	int3
+10011d0f:	cc                   	int3
+
+==== ChangeISOProperties 10011d10-10011d70 ====
+10011d10 <.text+0x10d10>:
+10011d10:	83 ec 08             	sub    esp,0x8
+10011d13:	53                   	push   ebx
+10011d14:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011d18:	e8 b3 37 ff ff       	call   0x100054d0
+10011d1d:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+10011d21:	0f b7 54 24 18       	movzx  edx,WORD PTR [esp+0x18]
+10011d26:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+10011d2a:	83 ec 08             	sub    esp,0x8
+10011d2d:	8b c4                	mov    eax,esp
+10011d2f:	c7 00 24 e2 01 10    	mov    DWORD PTR [eax],0x1001e224
+10011d35:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10011d39:	52                   	push   edx
+10011d3a:	89 48 04             	mov    DWORD PTR [eax+0x4],ecx
+10011d3d:	8b 44 24 20          	mov    eax,DWORD PTR [esp+0x20]
+10011d41:	83 ec 0c             	sub    esp,0xc
+10011d44:	8b cc                	mov    ecx,esp
+10011d46:	50                   	push   eax
+10011d47:	e8 44 3b ff ff       	call   0x10005890
+10011d4c:	8b 4c 24 28          	mov    ecx,DWORD PTR [esp+0x28]
+10011d50:	e8 7b 94 ff ff       	call   0x1000b1d0
+10011d55:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011d59:	8a d8                	mov    bl,al
+10011d5b:	e8 80 37 ff ff       	call   0x100054e0
+10011d60:	0f b6 c3             	movzx  eax,bl
+10011d63:	5b                   	pop    ebx
+10011d64:	83 c4 08             	add    esp,0x8
+10011d67:	c2 10 00             	ret    0x10
+10011d6a:	cc                   	int3
+10011d6b:	cc                   	int3
+10011d6c:	cc                   	int3
+10011d6d:	cc                   	int3
+10011d6e:	cc                   	int3
+10011d6f:	cc                   	int3
+
+==== GetISOCurrentDirectory 10011d70-10011db0 ====
+10011d70 <.text+0x10d70>:
+10011d70:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10011d74:	83 ec 0c             	sub    esp,0xc
+10011d77:	50                   	push   eax
+10011d78:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011d7c:	51                   	push   ecx
+10011d7d:	8b 4c 24 18          	mov    ecx,DWORD PTR [esp+0x18]
+10011d81:	e8 ba 94 ff ff       	call   0x1000b240
+10011d86:	8b c8                	mov    ecx,eax
+10011d88:	e8 a3 3d ff ff       	call   0x10005b30
+10011d8d:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+10011d91:	50                   	push   eax
+10011d92:	52                   	push   edx
+10011d93:	e8 28 19 00 00       	call   0x100136c0
+10011d98:	83 c4 0c             	add    esp,0xc
+10011d9b:	8d 0c 24             	lea    ecx,[esp]
+10011d9e:	e8 8d 3b ff ff       	call   0x10005930
+10011da3:	83 c4 0c             	add    esp,0xc
+10011da6:	c2 0c 00             	ret    0xc
+10011da9:	cc                   	int3
+10011daa:	cc                   	int3
+10011dab:	cc                   	int3
+10011dac:	cc                   	int3
+10011dad:	cc                   	int3
+10011dae:	cc                   	int3
+10011daf:	cc                   	int3
+
+==== FindISONextFile 10011db0-10011dd0 ====
+10011db0 <.text+0x10db0>:
+10011db0:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011db4:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011db8:	50                   	push   eax
+10011db9:	e8 e2 fa ff ff       	call   0x100118a0
+10011dbe:	0f b6 c0             	movzx  eax,al
+10011dc1:	c2 08 00             	ret    0x8
+10011dc4:	cc                   	int3
+10011dc5:	cc                   	int3
+10011dc6:	cc                   	int3
+10011dc7:	cc                   	int3
+10011dc8:	cc                   	int3
+10011dc9:	cc                   	int3
+10011dca:	cc                   	int3
+10011dcb:	cc                   	int3
+10011dcc:	cc                   	int3
+10011dcd:	cc                   	int3
+10011dce:	cc                   	int3
+10011dcf:	cc                   	int3
+
+==== ClearTrack 10011dd0-10011de0 ====
+10011dd0 <.text+0x10dd0>:
+10011dd0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011dd4:	e8 c7 fa fe ff       	call   0x100018a0
+10011dd9:	c2 04 00             	ret    0x4
+10011ddc:	cc                   	int3
+10011ddd:	cc                   	int3
+10011dde:	cc                   	int3
+10011ddf:	cc                   	int3
+
+==== AddTrack 10011de0-10011e10 ====
+10011de0 <.text+0x10de0>:
+10011de0:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+10011de4:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10011de8:	8b 54 24 0c          	mov    edx,DWORD PTR [esp+0xc]
+10011dec:	50                   	push   eax
+10011ded:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10011df1:	51                   	push   ecx
+10011df2:	52                   	push   edx
+10011df3:	83 ec 0c             	sub    esp,0xc
+10011df6:	8b cc                	mov    ecx,esp
+10011df8:	50                   	push   eax
+10011df9:	e8 92 3a ff ff       	call   0x10005890
+10011dfe:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+10011e02:	e8 09 f9 fe ff       	call   0x10001710
+10011e07:	0f b6 c0             	movzx  eax,al
+10011e0a:	c2 14 00             	ret    0x14
+10011e0d:	cc                   	int3
+10011e0e:	cc                   	int3
+10011e0f:	cc                   	int3
+
+==== ResetTrack 10011e10-10011e50 ====
+10011e10 <.text+0x10e10>:
+10011e10:	8b 44 24 18          	mov    eax,DWORD PTR [esp+0x18]
+10011e14:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
+10011e18:	8b 54 24 10          	mov    edx,DWORD PTR [esp+0x10]
+10011e1c:	50                   	push   eax
+10011e1d:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
+10011e21:	51                   	push   ecx
+10011e22:	52                   	push   edx
+10011e23:	83 ec 0c             	sub    esp,0xc
+10011e26:	8b cc                	mov    ecx,esp
+10011e28:	50                   	push   eax
+10011e29:	e8 62 3a ff ff       	call   0x10005890
+10011e2e:	8b 4c 24 20          	mov    ecx,DWORD PTR [esp+0x20]
+10011e32:	51                   	push   ecx
+10011e33:	8b 4c 24 20          	mov    ecx,DWORD PTR [esp+0x20]
+10011e37:	e8 f4 f6 fe ff       	call   0x10001530
+10011e3c:	0f b6 c0             	movzx  eax,al
+10011e3f:	c2 18 00             	ret    0x18
+10011e42:	cc                   	int3
+10011e43:	cc                   	int3
+10011e44:	cc                   	int3
+10011e45:	cc                   	int3
+10011e46:	cc                   	int3
+10011e47:	cc                   	int3
+10011e48:	cc                   	int3
+10011e49:	cc                   	int3
+10011e4a:	cc                   	int3
+10011e4b:	cc                   	int3
+10011e4c:	cc                   	int3
+10011e4d:	cc                   	int3
+10011e4e:	cc                   	int3
+10011e4f:	cc                   	int3
+
+==== RemoveTrack 10011e50-10011e70 ====
+10011e50 <.text+0x10e50>:
+10011e50:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011e54:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011e58:	50                   	push   eax
+10011e59:	e8 02 fa fe ff       	call   0x10001860
+10011e5e:	0f b6 c0             	movzx  eax,al
+10011e61:	c2 08 00             	ret    0x8
+10011e64:	cc                   	int3
+10011e65:	cc                   	int3
+10011e66:	cc                   	int3
+10011e67:	cc                   	int3
+10011e68:	cc                   	int3
+10011e69:	cc                   	int3
+10011e6a:	cc                   	int3
+10011e6b:	cc                   	int3
+10011e6c:	cc                   	int3
+10011e6d:	cc                   	int3
+10011e6e:	cc                   	int3
+10011e6f:	cc                   	int3
+
+==== GetTrackCount 10011e70-10011e80 ====
+10011e70 <.text+0x10e70>:
+10011e70:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011e74:	e8 77 f2 fe ff       	call   0x100010f0
+10011e79:	c2 04 00             	ret    0x4
+10011e7c:	cc                   	int3
+10011e7d:	cc                   	int3
+10011e7e:	cc                   	int3
+10011e7f:	cc                   	int3
+
+==== ReadStart 10011e80-10011ed0 ====
+10011e80 <.text+0x10e80>:
+10011e80:	8b 44 24 08          	mov    eax,DWORD PTR [esp+0x8]
+10011e84:	83 ec 0c             	sub    esp,0xc
+10011e87:	56                   	push   esi
+10011e88:	50                   	push   eax
+10011e89:	8d 4c 24 08          	lea    ecx,[esp+0x8]
+10011e8d:	e8 fe 39 ff ff       	call   0x10005890
+10011e92:	83 ec 0c             	sub    esp,0xc
+10011e95:	8d 54 24 10          	lea    edx,[esp+0x10]
+10011e99:	8b cc                	mov    ecx,esp
+10011e9b:	52                   	push   edx
+10011e9c:	e8 3f 3a ff ff       	call   0x100058e0
+10011ea1:	8b 4c 24 20          	mov    ecx,DWORD PTR [esp+0x20]
+10011ea5:	8d 81 c8 02 00 00    	lea    eax,[ecx+0x2c8]
+10011eab:	50                   	push   eax
+10011eac:	e8 1f fa fe ff       	call   0x100018d0
+10011eb1:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011eb5:	8b f0                	mov    esi,eax
+10011eb7:	e8 74 3a ff ff       	call   0x10005930
+10011ebc:	8b c6                	mov    eax,esi
+10011ebe:	5e                   	pop    esi
+10011ebf:	83 c4 0c             	add    esp,0xc
+10011ec2:	c2 08 00             	ret    0x8
+10011ec5:	cc                   	int3
+10011ec6:	cc                   	int3
+10011ec7:	cc                   	int3
+10011ec8:	cc                   	int3
+10011ec9:	cc                   	int3
+10011eca:	cc                   	int3
+10011ecb:	cc                   	int3
+10011ecc:	cc                   	int3
+10011ecd:	cc                   	int3
+10011ece:	cc                   	int3
+10011ecf:	cc                   	int3
+
+==== Read 10011ed0-10011ef0 ====
+10011ed0 <.text+0x10ed0>:
+10011ed0:	83 7c 24 0c 00       	cmp    DWORD PTR [esp+0xc],0x0
+10011ed5:	8b 4c 24 08          	mov    ecx,DWORD PTR [esp+0x8]
+10011ed9:	0f 95 c0             	setne  al
+10011edc:	50                   	push   eax
+10011edd:	51                   	push   ecx
+10011ede:	8b 4c 24 0c          	mov    ecx,DWORD PTR [esp+0xc]
+10011ee2:	e8 b9 03 ff ff       	call   0x100022a0
+10011ee7:	0f b6 c0             	movzx  eax,al
+10011eea:	c2 0c 00             	ret    0xc
+10011eed:	cc                   	int3
+10011eee:	cc                   	int3
+10011eef:	cc                   	int3
+
+==== ReadEnd 10011ef0-10011f00 ====
+10011ef0 <.text+0x10ef0>:
+10011ef0:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011ef4:	e8 57 07 ff ff       	call   0x10002650
+10011ef9:	c2 04 00             	ret    0x4
+10011efc:	cc                   	int3
+10011efd:	cc                   	int3
+10011efe:	cc                   	int3
+10011eff:	cc                   	int3
+
+==== EnabledTrackText 10011f00-10011f20 ====
+10011f00 <.text+0x10f00>:
+10011f00:	83 7c 24 08 00       	cmp    DWORD PTR [esp+0x8],0x0
+10011f05:	8b 4c 24 04          	mov    ecx,DWORD PTR [esp+0x4]
+10011f09:	0f 95 c0             	setne  al
+10011f0c:	50                   	push   eax
+10011f0d:	e8 ce f1 fe ff       	call   0x100010e0
+10011f12:	0f b6 c0             	movzx  eax,al
+10011f15:	c2 08 00             	ret    0x8
+10011f18:	cc                   	int3
+10011f19:	cc                   	int3
+10011f1a:	cc                   	int3
+10011f1b:	cc                   	int3
+10011f1c:	cc                   	int3
+10011f1d:	cc                   	int3
+10011f1e:	cc                   	int3
+10011f1f:	cc                   	int3
+
+==== SetTrackText 10011f20-10011f50 ====
+10011f20 <.text+0x10f20>:
+10011f20:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+10011f24:	83 ec 0c             	sub    esp,0xc
+10011f27:	8b cc                	mov    ecx,esp
+10011f29:	50                   	push   eax
+10011f2a:	e8 61 39 ff ff       	call   0x10005890
+10011f2f:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+10011f33:	8b 54 24 18          	mov    edx,DWORD PTR [esp+0x18]
+10011f37:	8b 44 24 14          	mov    eax,DWORD PTR [esp+0x14]
+10011f3b:	51                   	push   ecx
+10011f3c:	8b 4c 24 14          	mov    ecx,DWORD PTR [esp+0x14]
+10011f40:	52                   	push   edx
+10011f41:	50                   	push   eax
+10011f42:	e8 c9 f1 fe ff       	call   0x10001110
+10011f47:	c2 14 00             	ret    0x14
+10011f4a:	cc                   	int3
+10011f4b:	cc                   	int3
+10011f4c:	cc                   	int3
+10011f4d:	cc                   	int3
+10011f4e:	cc                   	int3
+10011f4f:	cc                   	int3
+
+==== GetTrackText 10011f50-10011fc0 ====
+10011f50 <.text+0x10f50>:
+10011f50:	83 ec 18             	sub    esp,0x18
+10011f53:	8d 0c 24             	lea    ecx,[esp]
+10011f56:	e8 95 3e ff ff       	call   0x10005df0
+10011f5b:	8b 44 24 28          	mov    eax,DWORD PTR [esp+0x28]
+10011f5f:	8b 4c 24 24          	mov    ecx,DWORD PTR [esp+0x24]
+10011f63:	8b 54 24 20          	mov    edx,DWORD PTR [esp+0x20]
+10011f67:	50                   	push   eax
+10011f68:	51                   	push   ecx
+10011f69:	8b 4c 24 24          	mov    ecx,DWORD PTR [esp+0x24]
+10011f6d:	52                   	push   edx
+10011f6e:	8d 44 24 18          	lea    eax,[esp+0x18]
+10011f72:	50                   	push   eax
+10011f73:	e8 a8 f2 fe ff       	call   0x10001220
+10011f78:	50                   	push   eax
+10011f79:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011f7d:	e8 2e 3c ff ff       	call   0x10005bb0
+10011f82:	8d 4c 24 0c          	lea    ecx,[esp+0xc]
+10011f86:	e8 a5 39 ff ff       	call   0x10005930
+10011f8b:	8b 4c 24 30          	mov    ecx,DWORD PTR [esp+0x30]
+10011f8f:	51                   	push   ecx
+10011f90:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011f94:	e8 97 3b ff ff       	call   0x10005b30
+10011f99:	8b 54 24 30          	mov    edx,DWORD PTR [esp+0x30]
+10011f9d:	50                   	push   eax
+10011f9e:	52                   	push   edx
+10011f9f:	e8 1c 17 00 00       	call   0x100136c0
+10011fa4:	83 c4 0c             	add    esp,0xc
+10011fa7:	8d 0c 24             	lea    ecx,[esp]
+10011faa:	e8 81 39 ff ff       	call   0x10005930
+10011faf:	83 c4 18             	add    esp,0x18
+10011fb2:	c2 18 00             	ret    0x18
+10011fb5:	cc                   	int3
+10011fb6:	cc                   	int3
+10011fb7:	cc                   	int3
+10011fb8:	cc                   	int3
+10011fb9:	cc                   	int3
+10011fba:	cc                   	int3
+10011fbb:	cc                   	int3
+10011fbc:	cc                   	int3
+10011fbd:	cc                   	int3
+10011fbe:	cc                   	int3
+10011fbf:	cc                   	int3
+
+==== AddISOFile 10011fc0-10011ff0 ====
+10011fc0 <.text+0x10fc0>:
+10011fc0:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10011fc4:	83 ec 0c             	sub    esp,0xc
+10011fc7:	8b cc                	mov    ecx,esp
+10011fc9:	50                   	push   eax
+10011fca:	e8 c1 38 ff ff       	call   0x10005890
+10011fcf:	8b 54 24 14          	mov    edx,DWORD PTR [esp+0x14]
+10011fd3:	83 ec 0c             	sub    esp,0xc
+10011fd6:	8b cc                	mov    ecx,esp
+10011fd8:	52                   	push   edx
+10011fd9:	e8 b2 38 ff ff       	call   0x10005890
+10011fde:	8b 4c 24 1c          	mov    ecx,DWORD PTR [esp+0x1c]
+10011fe2:	e8 99 01 00 00       	call   0x10012180
+10011fe7:	0f b6 c0             	movzx  eax,al
+10011fea:	c2 0c 00             	ret    0xc
+10011fed:	cc                   	int3
+10011fee:	cc                   	int3
+10011fef:	cc                   	int3
+
+==== MakeISODirectory 10011ff0-10012050 ====
+10011ff0 <.text+0x10ff0>:
+10011ff0:	83 ec 08             	sub    esp,0x8
+10011ff3:	53                   	push   ebx
+10011ff4:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10011ff8:	e8 d3 34 ff ff       	call   0x100054d0
+10011ffd:	8b 44 24 1c          	mov    eax,DWORD PTR [esp+0x1c]
+10012001:	0f b7 54 24 18       	movzx  edx,WORD PTR [esp+0x18]
+10012006:	89 44 24 08          	mov    DWORD PTR [esp+0x8],eax
+1001200a:	83 ec 08             	sub    esp,0x8
+1001200d:	8b c4                	mov    eax,esp
+1001200f:	c7 00 24 e2 01 10    	mov    DWORD PTR [eax],0x1001e224
+10012015:	8b 4c 24 10          	mov    ecx,DWORD PTR [esp+0x10]
+10012019:	52                   	push   edx
+1001201a:	89 48 04             	mov    DWORD PTR [eax+0x4],ecx
+1001201d:	8b 44 24 20          	mov    eax,DWORD PTR [esp+0x20]
+10012021:	83 ec 0c             	sub    esp,0xc
+10012024:	8b cc                	mov    ecx,esp
+10012026:	50                   	push   eax
+10012027:	e8 64 38 ff ff       	call   0x10005890
+1001202c:	8b 4c 24 28          	mov    ecx,DWORD PTR [esp+0x28]
+10012030:	e8 bb 01 00 00       	call   0x100121f0
+10012035:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+10012039:	8a d8                	mov    bl,al
+1001203b:	e8 a0 34 ff ff       	call   0x100054e0
+10012040:	0f b6 c3             	movzx  eax,bl
+10012043:	5b                   	pop    ebx
+10012044:	83 c4 08             	add    esp,0x8
+10012047:	c2 10 00             	ret    0x10
+1001204a:	cc                   	int3
+1001204b:	cc                   	int3
+1001204c:	cc                   	int3
+1001204d:	cc                   	int3
+1001204e:	cc                   	int3
+1001204f:	cc                   	int3
+
+==== FindISOFirstFile 10012050-10012080 ====
+10012050 <.text+0x11050>:
+10012050:	56                   	push   esi
+10012051:	8b 74 24 08          	mov    esi,DWORD PTR [esp+0x8]
+10012055:	8b ce                	mov    ecx,esi
+10012057:	e8 b4 76 ff ff       	call   0x10009710
+1001205c:	89 86 14 3e 00 00    	mov    DWORD PTR [esi+0x3e14],eax
+10012062:	8b 44 24 0c          	mov    eax,DWORD PTR [esp+0xc]
+10012066:	50                   	push   eax
+10012067:	8b ce                	mov    ecx,esi
+10012069:	e8 32 f8 ff ff       	call   0x100118a0
+1001206e:	0f b6 c0             	movzx  eax,al
+10012071:	5e                   	pop    esi
+10012072:	c2 08 00             	ret    0x8
+10012075:	cc                   	int3
+10012076:	cc                   	int3
+10012077:	cc                   	int3
+10012078:	cc                   	int3
+10012079:	cc                   	int3
+1001207a:	cc                   	int3
+1001207b:	cc                   	int3
+1001207c:	cc                   	int3
+1001207d:	cc                   	int3
+1001207e:	cc                   	int3
+1001207f:	cc                   	int3
+
+==== GetTrackInformation 10012080-100120b0 ====
+10012080 <.text+0x11080>:
+10012080:	81 ec 60 01 00 00    	sub    esp,0x160
+10012086:	56                   	push   esi
+10012087:	8d 4c 24 04          	lea    ecx,[esp+0x4]
+1001208b:	e8 60 3d ff ff       	call   0x10005df0
+10012090:	8d 4c 24 20          	lea    ecx,[esp+0x20]
+10012094:	e8 f7 10 ff ff       	call   0x10003190
+10012099:	8b 84 24 6c 01 00 00 	mov    eax,DWORD PTR [esp+0x16c]
+100120a0:	50                   	push   eax
+100120a1:	8d 8c 24 b8 00 00 00 	lea    ecx,[esp+0xb8]
+100120a8:	51                   	push   ecx
+100120a9:	8b 8c 24 70 01 00 00 	mov    ecx,DWORD PTR [esp+0x170]
