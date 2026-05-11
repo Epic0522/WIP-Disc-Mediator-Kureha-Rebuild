@@ -139,6 +139,18 @@ Begin VB.Form MainForm
          TabIndex        =   14
          Top             =   240
          Width           =   7230
+         Begin VB.PictureBox picUsageGraph
+            Appearance      =   0  'Flat
+            AutoRedraw      =   -1  'True
+            BorderStyle     =   0  'None
+            Height          =   615
+            Left            =   1320
+            ScaleHeight     =   615
+            ScaleWidth      =   2115
+            TabIndex        =   16
+            Top             =   120
+            Width           =   2115
+         End
          Begin VB.Label lblUsageValue
             Alignment       =   2  'Center
             Caption         =   "空き:648.000KiB"
@@ -487,6 +499,34 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Const MIN_CLIENT_WIDTH As Long = 11880
+Private Const MIN_CLIENT_HEIGHT As Long = 7920
+Private Const OUTER_MARGIN As Long = 120
+Private Const INNER_MARGIN As Long = 120
+Private Const SECTION_GAP As Long = 120
+Private Const STATUS_HEIGHT As Long = 255
+Private Const TOOLBAR_HEIGHT As Long = 1035
+Private Const DISC_HEIGHT As Long = 1335
+Private Const FILE_ACTIONS_HEIGHT As Long = 615
+Private Const TRACK_ACTIONS_HEIGHT As Long = 615
+Private Const BUTTON_ROW_HEIGHT As Long = 495
+Private Const BUTTON_TOP As Long = 285
+Private Const HEADER_HEIGHT As Long = 255
+Private Const HEADER_GAP As Long = 180
+Private Const TRACK_HEADER_TOP As Long = 960
+Private Const TRACK_LIST_TOP As Long = 1200
+Private Const TOOL_BUTTON_MIN_WIDTH As Long = 1020
+Private Const TOOL_BUTTON_GAP As Long = 90
+Private Const TRACK_COL_NO As Long = 4
+Private Const TRACK_COL_TITLE As Long = 18
+Private Const TRACK_COL_PERFORMER As Long = 14
+Private Const TRACK_COL_SOURCE As Long = 6
+Private Const TRACK_COL_PREGAP As Long = 8
+Private Const TRACK_COL_DURATION As Long = 8
+Private Const TRACK_COL_POSTGAP As Long = 8
+Private Const TRACK_COL_FLAGS As Long = 4
+Private Const TRACK_COL_GAP As String = "  "
+
 Private mTocInfo As TOCInformation
 Private mTrackEntries As Collection
 Private mFileEntries As Collection
@@ -530,7 +570,12 @@ End Sub
 
 Private Sub cmdAddTrack_Click()
     Dim entry As TrackEntry
+    Dim selectedPath As String
     Dim defaultTitle As String
+    Dim previewKiB As Long
+
+    selectedPath = ShowOpenFileDialog(Me.hWnd, "Audio Files (*.wav;*.mp3;*.m3u)|*.wav;*.mp3;*.m3u", "Open Audio File")
+    If selectedPath = "" Then Exit Sub
 
     Set entry = New TrackEntry
     entry.TrackNo = mTrackEntries.Count + 1
@@ -538,15 +583,22 @@ Private Sub cmdAddTrack_Click()
     entry.EnglishText.TitleEnabled = True
     entry.EnglishText.PerformerEnabled = True
 
-    defaultTitle = Trim$(InputBox$("Track title:", "Add Track", "Track " & Format$(entry.TrackNo, "00")))
+    defaultTitle = FileTitleFromPath(selectedPath)
     If defaultTitle = "" Then defaultTitle = "Track " & Format$(entry.TrackNo, "00")
-
     entry.EnglishText.Title = defaultTitle
     entry.EnglishText.Performer = ""
+    entry.Source = FileTypeLabel(selectedPath)
+    entry.Pregap = "00:02:00"
+    entry.Duration = EstimateTrackDuration(selectedPath)
+    entry.Postgap = "00:00:00"
+    entry.Flags = "DGP"
+    previewKiB = EstimateTrackPreviewKiB(entry.Duration)
+    entry.PreviewKiB = previewKiB
     mTrackEntries.Add entry
     Set mCurrentTrack = entry
 
     RefreshTrackDisplay
+    UpdateCapacityPreview
     SelectTrackIndex mTrackEntries.Count - 1
     lblStatus.Caption = "Added track: " & defaultTitle
 End Sub
@@ -574,6 +626,10 @@ End Sub
 Private Sub cmdImageWrite_Click()
     DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
     DiscWriteForm.Show vbModal, Me
+End Sub
+
+Private Sub cboMediaType_Click()
+    UpdateCapacityPreview
 End Sub
 
 Private Sub cmdMoveTrackDown_Click()
@@ -641,6 +697,7 @@ Private Sub cmdRemoveTrack_Click()
     End If
     RefreshTrackDisplay
     lblStatus.Caption = "Track removed."
+    UpdateCapacityPreview
 End Sub
 
 Private Sub cmdRenameEntry_Click()
@@ -714,20 +771,32 @@ Private Sub Form_Load()
     txtDiscLabel.Text = "VOL_202605111641"
     txtAlbumName.Text = "No Album Name"
 
+    ApplyTheme
     lstDirectories.Font.Name = "MS UI Gothic"
     lstFiles.Font.Name = "MS Gothic"
     lstFiles.Font.Size = 10
     lstTracks.Font.Name = "MS Gothic"
-    lstTracks.Font.Size = 10
+    lstTracks.Font.Size = 9
+    lblTracksHeader.Font.Name = "MS Gothic"
+    lblTracksHeader.Font.Size = 9
 
     SeedDefaultDirectories
 
     SeedSampleFiles
     SeedSampleTracks
 
+    FitWindowToScreen
+    LayoutMainForm
+    lblTracksHeader.Caption = BuildTrackHeaderText()
     RefreshTrackDisplay
     RefreshFileDisplay
+    UpdateCapacityPreview
     lblStatus.Caption = "UI scaffold loaded. Track CD-TEXT editor is wired."
+End Sub
+
+Private Sub Form_Resize()
+    If Me.WindowState = 1 Then Exit Sub
+    LayoutMainForm
 End Sub
 
 Private Sub lstTracks_Click()
@@ -769,6 +838,7 @@ Private Sub mnuFileNew_Click()
     txtAlbumName.Text = "No Album Name"
     RefreshFileDisplay
     RefreshTrackDisplay
+    UpdateCapacityPreview
     lblStatus.Caption = "New project created."
 End Sub
 
@@ -851,6 +921,7 @@ Private Sub mnuTrackClear_Click()
     Set mTrackEntries = New Collection
     Set mCurrentTrack = Nothing
     RefreshTrackDisplay
+    UpdateCapacityPreview
     lblStatus.Caption = "All tracks cleared."
 End Sub
 
@@ -894,6 +965,7 @@ Private Sub RefreshTrackDisplay()
     Dim entry As TrackEntry
 
     lstTracks.Clear
+    lblTracksHeader.Caption = BuildTrackHeaderText()
 
     If mTrackEntries.Count = 0 Then
         txtAlbumName.Text = "No Album Name"
@@ -903,14 +975,7 @@ Private Sub RefreshTrackDisplay()
 
     For i = 1 To mTrackEntries.Count
         Set entry = mTrackEntries.Item(i)
-        lstTracks.AddItem PadRight(Format$(entry.TrackNo, "00"), 9) & _
-            PadRight(entry.DisplayTitle, 28) & _
-            PadRight(entry.DisplayPerformer, 28) & _
-            PadRight(entry.Source, 14) & _
-            PadRight(entry.Pregap, 9) & _
-            PadRight(entry.Duration, 8) & _
-            PadRight(entry.Postgap, 9) & _
-            entry.Flags
+        lstTracks.AddItem BuildTrackRowText(entry)
     Next i
 
     If mCurrentTrack Is Nothing Then Set mCurrentTrack = mTrackEntries.Item(1)
@@ -1006,9 +1071,46 @@ Private Sub SeedSampleTracks()
     entry.JapaneseText.LanguageEnabled = True
     entry.JapaneseText.TitleEnabled = True
     entry.JapaneseText.Title = "Sample JP Title"
+    entry.Pregap = "00:02:00"
+    entry.Duration = "04:01:73"
+    entry.Postgap = "00:00:00"
+    entry.Flags = "DGP"
+    entry.PreviewKiB = EstimateTrackPreviewKiB(entry.Duration)
 
     mTrackEntries.Add entry
     Set mCurrentTrack = entry
+End Sub
+
+Private Sub ApplyTheme()
+    Dim surfaceColor As Long
+    Dim panelColor As Long
+    Dim accentColor As Long
+
+    surfaceColor = RGB(239, 236, 223)
+    panelColor = RGB(233, 228, 212)
+    accentColor = RGB(87, 231, 233)
+
+    Me.BackColor = surfaceColor
+    fraToolbar.BackColor = panelColor
+    fraDisc.BackColor = surfaceColor
+    fraUsage.BackColor = surfaceColor
+    fraExplorer.BackColor = surfaceColor
+    fraDirectories.BackColor = surfaceColor
+    fraFiles.BackColor = surfaceColor
+    fraFileActions.BackColor = surfaceColor
+    fraTrackArea.BackColor = surfaceColor
+    fraTrackActions.BackColor = surfaceColor
+    lblStatus.BackColor = panelColor
+    picUsageGraph.BackColor = surfaceColor
+
+    shpDiscOuter.BorderColor = accentColor
+    shpDiscOuter.FillStyle = 0
+    shpDiscOuter.FillColor = accentColor
+    shpDiscInner.BorderColor = surfaceColor
+    shpDiscInner.FillStyle = 0
+    shpDiscInner.FillColor = surfaceColor
+    shpDiscOuter.Visible = False
+    shpDiscInner.Visible = False
 End Sub
 
 Private Sub SeedDefaultDirectories()
@@ -1018,6 +1120,184 @@ Private Sub SeedDefaultDirectories()
     lstDirectories.AddItem "Data"
     lstDirectories.AddItem "Extras"
     lstDirectories.ListIndex = 0
+End Sub
+
+Private Sub FitWindowToScreen()
+    Dim targetWidth As Long
+    Dim targetHeight As Long
+
+    targetWidth = Me.Width
+    targetHeight = Me.Height
+
+    If targetWidth > Screen.Width - 360 Then
+        targetWidth = Screen.Width - 360
+    End If
+
+    If targetHeight > Screen.Height - 720 Then
+        targetHeight = Screen.Height - 720
+    End If
+
+    If targetWidth < MIN_CLIENT_WIDTH + 240 Then
+        targetWidth = MIN_CLIENT_WIDTH + 240
+    End If
+
+    If targetHeight < MIN_CLIENT_HEIGHT + 480 Then
+        targetHeight = MIN_CLIENT_HEIGHT + 480
+    End If
+
+    Me.Move Me.Left, Me.Top, targetWidth, targetHeight
+End Sub
+
+Private Sub LayoutMainForm()
+    Dim clientW As Long
+    Dim clientH As Long
+    Dim contentW As Long
+    Dim availableH As Long
+    Dim explorerH As Long
+    Dim trackH As Long
+    Dim leftW As Long
+    Dim rightW As Long
+    Dim usageW As Long
+    Dim discLeftW As Long
+
+    If Me.WindowState = 1 Then Exit Sub
+
+    clientW = Me.ScaleWidth
+    clientH = Me.ScaleHeight
+
+    If clientW < MIN_CLIENT_WIDTH Then clientW = MIN_CLIENT_WIDTH
+    If clientH < MIN_CLIENT_HEIGHT Then clientH = MIN_CLIENT_HEIGHT
+
+    contentW = clientW - (OUTER_MARGIN * 2)
+
+    lblStatus.Move 0, clientH - STATUS_HEIGHT, clientW, STATUS_HEIGHT
+
+    fraToolbar.Move 0, 0, clientW, TOOLBAR_HEIGHT
+    LayoutTopButtons
+
+    fraDisc.Move 0, fraToolbar.Top + fraToolbar.Height + SECTION_GAP, clientW, DISC_HEIGHT
+
+    usageW = 5280
+    If usageW > contentW - 4200 Then usageW = contentW - 4200
+    If usageW < 4080 Then usageW = 4080
+    discLeftW = contentW - usageW - INNER_MARGIN
+    If discLeftW < 4140 Then discLeftW = 4140
+
+    txtDiscLabel.Move 1320, 300, discLeftW - 1320, 315
+    cboFileSystem.Left = 1320
+    cboFileSystem.Top = 720
+    cboFileSystem.Width = discLeftW - 1320
+    fraUsage.Move 1320 + discLeftW + INNER_MARGIN, 240, usageW, 855
+    LayoutUsageArea
+
+    availableH = lblStatus.Top - (fraDisc.Top + fraDisc.Height) - (SECTION_GAP * 2)
+    explorerH = (availableH * 62) \ 100
+    If explorerH < 3120 Then explorerH = 3120
+    trackH = availableH - explorerH - SECTION_GAP
+    If trackH < 2040 Then
+        trackH = 2040
+        explorerH = availableH - trackH - SECTION_GAP
+    End If
+    If explorerH < 2640 Then explorerH = 2640
+
+    fraExplorer.Move 0, fraDisc.Top + fraDisc.Height + SECTION_GAP, clientW, explorerH
+    fraTrackArea.Move 0, fraExplorer.Top + fraExplorer.Height + SECTION_GAP, clientW, trackH
+
+    leftW = (contentW * 42) \ 100
+    If leftW < 3600 Then leftW = 3600
+    If leftW > contentW - 4200 Then leftW = contentW - 4200
+    rightW = contentW - leftW - INNER_MARGIN
+
+    fraDirectories.Move OUTER_MARGIN, 360, leftW, fraExplorer.Height - 480
+    lstDirectories.Move 120, 360, fraDirectories.Width - 240, fraDirectories.Height - 480
+
+    fraFiles.Move fraDirectories.Left + fraDirectories.Width + INNER_MARGIN, 360, rightW, fraExplorer.Height - 480
+    fraFileActions.Move 120, 240, fraFiles.Width - 240, FILE_ACTIONS_HEIGHT
+    LayoutFileButtons
+    lblFilesHeader.Move 180, fraFileActions.Top + fraFileActions.Height + HEADER_GAP, fraFiles.Width - 360, HEADER_HEIGHT
+    lstFiles.Move 120, lblFilesHeader.Top + HEADER_GAP, fraFiles.Width - 240, fraFiles.Height - (lblFilesHeader.Top + HEADER_GAP) - 180
+
+    fraTrackActions.Move OUTER_MARGIN, 240, 3135, TRACK_ACTIONS_HEIGHT
+    txtAlbumName.Move fraTrackActions.Left + fraTrackActions.Width + 540, 330, clientW - (fraTrackActions.Left + fraTrackActions.Width + 660) - OUTER_MARGIN, 315
+    lblAlbumNameCaption.Move txtAlbumName.Left, 120, 1335, 255
+    lblTracksHeader.Move 180, TRACK_HEADER_TOP, clientW - 360, HEADER_HEIGHT
+    lstTracks.Move 120, TRACK_LIST_TOP, clientW - 240, fraTrackArea.Height - TRACK_LIST_TOP - 120
+End Sub
+
+Private Sub LayoutTopButtons()
+    Dim availableW As Long
+    Dim buttonW As Long
+    Dim gapW As Long
+    Dim leftPos As Long
+
+    availableW = fraToolbar.Width - 300
+    gapW = TOOL_BUTTON_GAP
+    buttonW = (availableW - (gapW * 7)) \ 8
+    If buttonW < TOOL_BUTTON_MIN_WIDTH Then buttonW = TOOL_BUTTON_MIN_WIDTH
+
+    leftPos = 150
+    MoveToolbarButton cmdWriteDisc, leftPos, buttonW
+    MoveToolbarButton cmdSaveProject, leftPos, buttonW
+    MoveToolbarButton cmdEraseDisc, leftPos, buttonW
+    MoveToolbarButton cmdCopyDisc, leftPos, buttonW
+    MoveToolbarButton cmdImageWrite, leftPos, buttonW
+    MoveToolbarButton cmdImageRead, leftPos, buttonW
+    MoveToolbarButton cmdReadTracks, leftPos, buttonW
+    MoveToolbarButton cmdAnalyzeDisc, leftPos, buttonW
+End Sub
+
+Private Sub MoveToolbarButton(ByRef button As CommandButton, ByRef leftPos As Long, ByVal buttonW As Long)
+    button.Move leftPos, BUTTON_TOP, buttonW, BUTTON_ROW_HEIGHT
+    leftPos = leftPos + buttonW + TOOL_BUTTON_GAP
+End Sub
+
+Private Sub LayoutUsageArea()
+    Dim graphW As Long
+    Dim graphLeft As Long
+    Dim rightBlockLeft As Long
+    Dim rightBlockWidth As Long
+
+    graphLeft = 780
+    graphW = 2220
+    If graphLeft + graphW > fraUsage.Width - 2220 Then
+        graphW = fraUsage.Width - graphLeft - 2220
+    End If
+    If graphW < 1680 Then graphW = 1680
+
+    rightBlockLeft = graphLeft + graphW + 120
+    rightBlockWidth = fraUsage.Width - rightBlockLeft - 180
+    If rightBlockWidth < 1440 Then
+        rightBlockWidth = 1440
+        rightBlockLeft = fraUsage.Width - rightBlockWidth - 180
+    End If
+
+    lblUsageCaption.Move 240, 210, 855, 255
+    lblUsageValue.Alignment = 0
+    lblUsageValue.Move rightBlockLeft, 180, rightBlockWidth, 255
+    cboMediaType.Left = rightBlockLeft
+    cboMediaType.Top = 465
+    cboMediaType.Width = rightBlockWidth
+    picUsageGraph.Move graphLeft, 120, graphW, 615
+End Sub
+
+Private Sub LayoutFileButtons()
+    Dim leftPos As Long
+    Dim buttonW As Long
+    Dim gapW As Long
+
+    gapW = 120
+    buttonW = 915
+    leftPos = 180
+
+    cmdAddFile.Move leftPos, 210, buttonW, 315
+    leftPos = leftPos + buttonW + gapW
+    cmdAddFolder.Move leftPos, 210, buttonW, 315
+    leftPos = leftPos + buttonW + gapW
+    cmdRenameEntry.Move leftPos, 210, buttonW, 315
+    leftPos = leftPos + buttonW + gapW
+    cmdRemoveEntry.Move leftPos, 210, buttonW, 315
+    leftPos = leftPos + buttonW + gapW
+    cmdProperties.Move leftPos, 210, buttonW, 315
 End Sub
 
 Private Sub SaveProjectToPath(ByVal savePath As String)
@@ -1048,7 +1328,7 @@ Private Sub SaveProjectToPath(ByVal savePath As String)
 
     For i = 1 To mTrackEntries.Count
         Set trackEntry = mTrackEntries.Item(i)
-        Print #fileNo, "TRACK|" & CStr(trackEntry.TrackNo) & "|" & EscapeValue(trackEntry.Source) & "|" & EscapeValue(trackEntry.Pregap) & "|" & EscapeValue(trackEntry.Duration) & "|" & EscapeValue(trackEntry.Postgap) & "|" & EscapeValue(trackEntry.Flags)
+        Print #fileNo, "TRACK|" & CStr(trackEntry.TrackNo) & "|" & EscapeValue(trackEntry.Source) & "|" & EscapeValue(trackEntry.Pregap) & "|" & EscapeValue(trackEntry.Duration) & "|" & EscapeValue(trackEntry.Postgap) & "|" & EscapeValue(trackEntry.Flags) & "|" & CStr(trackEntry.PreviewKiB)
         WriteCdTextBlock fileNo, "EN", trackEntry.EnglishText
         WriteCdTextBlock fileNo, "JP", trackEntry.JapaneseText
     Next i
@@ -1110,6 +1390,7 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
                 currentTrack.Duration = UnescapeValue(SafeField(parts, 4))
                 currentTrack.Postgap = UnescapeValue(SafeField(parts, 5))
                 currentTrack.Flags = UnescapeValue(SafeField(parts, 6))
+                currentTrack.PreviewKiB = CLng(Val(SafeField(parts, 7)))
                 mTrackEntries.Add currentTrack
             Case "TEXT"
                 If Not currentTrack Is Nothing Then
@@ -1131,6 +1412,7 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
     End If
     RefreshFileDisplay
     RefreshTrackDisplay
+    UpdateCapacityPreview
     lblStatus.Caption = "Project loaded: " & loadPath
     Exit Sub
 
@@ -1219,6 +1501,23 @@ Private Function UnescapeValue(ByVal value As String) As String
     UnescapeValue = value
 End Function
 
+Private Function FileTitleFromPath(ByVal filePath As String) As String
+    Dim slashPos As Long
+    Dim dotPos As Long
+
+    slashPos = InStrRev(filePath, "\")
+    If slashPos > 0 Then
+        FileTitleFromPath = Mid$(filePath, slashPos + 1)
+    Else
+        FileTitleFromPath = filePath
+    End If
+
+    dotPos = InStrRev(FileTitleFromPath, ".")
+    If dotPos > 1 Then
+        FileTitleFromPath = Left$(FileTitleFromPath, dotPos - 1)
+    End If
+End Function
+
 Private Function TrackCount() As Long
     TrackCount = mTrackEntries.Count
 End Function
@@ -1254,6 +1553,205 @@ Private Function ProjectHasCdText() As Boolean
     Next i
 End Function
 
+Private Sub UpdateCapacityPreview()
+    Dim totalKiB As Long
+    Dim usedKiB As Long
+    Dim freeKiB As Long
+
+    totalKiB = MediaCapacityKiB()
+    usedKiB = ProjectUsedKiB()
+    freeKiB = totalKiB - usedKiB
+    If freeKiB < 0 Then freeKiB = 0
+
+    lblUsageValue.Caption = "空き:" & Format$(freeKiB, "#,##0") & "KiB"
+    DrawUsageGraph usedKiB, totalKiB
+End Sub
+
+Private Function ProjectUsedKiB() As Long
+    Dim i As Long
+    Dim usedFrames As Long
+    Dim totalFrames As Long
+    Dim totalKiB As Long
+    Dim usedKiBDouble As Double
+
+    For i = 1 To mTrackEntries.Count
+        usedFrames = usedFrames + TrackUsedFrames(mTrackEntries.Item(i))
+    Next i
+
+    totalFrames = MediaCapacityFrames()
+    totalKiB = MediaCapacityKiB()
+
+    If totalFrames <= 0 Then Exit Function
+
+    usedKiBDouble = (CDbl(usedFrames) * CDbl(totalKiB)) / CDbl(totalFrames)
+    If usedKiBDouble < 0# Then usedKiBDouble = 0#
+    If usedKiBDouble > 2147483647# Then usedKiBDouble = 2147483647#
+    ProjectUsedKiB = CLng(usedKiBDouble)
+End Function
+
+Private Function MediaCapacityKiB() As Long
+    Select Case cboMediaType.ListIndex
+        Case 1
+            MediaCapacityKiB = 702000
+        Case Else
+            MediaCapacityKiB = 648000
+    End Select
+End Function
+
+Private Function MediaCapacityFrames() As Long
+    Select Case cboMediaType.ListIndex
+        Case 1
+            MediaCapacityFrames = CLng(80) * CLng(60) * CLng(75)
+        Case Else
+            MediaCapacityFrames = CLng(74) * CLng(60) * CLng(75)
+    End Select
+End Function
+
+Private Sub DrawUsageGraph(ByVal usedKiB As Long, ByVal totalKiB As Long)
+    Dim pct As Double
+    Dim cx As Single
+    Dim cy As Single
+    Dim outerRX As Single
+    Dim outerRY As Single
+    Dim innerRX As Single
+    Dim innerRY As Single
+    Dim startAngle As Double
+    Dim angleStep As Double
+    Dim a As Double
+    Dim bgColor As Long
+    Dim ringColor As Long
+    Dim usedColor As Long
+    Dim x1 As Single
+    Dim y1 As Single
+    Dim x2 As Single
+    Dim y2 As Single
+
+    If totalKiB <= 0 Then Exit Sub
+
+    pct = usedKiB / totalKiB
+    If pct < 0 Then pct = 0
+    If pct > 1 Then pct = 1
+
+    bgColor = RGB(239, 236, 223)
+    ringColor = RGB(204, 248, 248)
+    usedColor = RGB(0, 198, 198)
+
+    picUsageGraph.Cls
+    picUsageGraph.FillStyle = 0
+
+    cx = picUsageGraph.ScaleWidth / 2
+    cy = picUsageGraph.ScaleHeight / 2
+    outerRX = (picUsageGraph.ScaleWidth / 2) - 120
+    outerRY = (picUsageGraph.ScaleHeight / 2) - 60
+    innerRX = outerRX * 0.48
+    innerRY = outerRY * 0.48
+    startAngle = -1.57079632679
+    angleStep = 0.05
+
+    For a = 0 To 6.28318530718 Step angleStep
+        x1 = cx + Cos(a) * innerRX
+        y1 = cy + Sin(a) * innerRY
+        x2 = cx + Cos(a) * outerRX
+        y2 = cy + Sin(a) * outerRY
+        picUsageGraph.Line (x1, y1)-(x2, y2), ringColor
+    Next a
+
+    If pct > 0 Then
+        For a = startAngle To startAngle + (6.28318530718 * pct) Step angleStep
+            x1 = cx + Cos(a) * innerRX
+            y1 = cy + Sin(a) * innerRY
+            x2 = cx + Cos(a) * outerRX
+            y2 = cy + Sin(a) * outerRY
+            picUsageGraph.Line (x1, y1)-(x2, y2), usedColor
+        Next a
+    End If
+End Sub
+
+Private Function EstimateTrackPreviewKiB(ByVal durationText As String) As Long
+    Dim totalFrames As Long
+
+    totalFrames = MsfToFrames(durationText)
+    If totalFrames <= 0 Then
+        EstimateTrackPreviewKiB = 0
+    Else
+        EstimateTrackPreviewKiB = CLng((CDbl(totalFrames) * 2352#) / 1024#)
+    End If
+End Function
+
+Private Function EstimateTrackDuration(ByVal filePath As String) As String
+    Dim fileBytes As Double
+    Dim totalSeconds As Long
+    Dim minutesValue As Long
+    Dim secondsValue As Long
+    Dim framesValue As Long
+    Dim extensionText As String
+
+    On Error Resume Next
+    fileBytes = CDbl(FileLen(filePath))
+    On Error GoTo 0
+
+    If fileBytes <= 0# Then
+        EstimateTrackDuration = "00:00:00"
+        Exit Function
+    End If
+
+    extensionText = UCase$(Right$(filePath, 4))
+
+    Select Case extensionText
+        Case ".WAV"
+            totalSeconds = CLng(fileBytes / 176400#)
+        Case ".MP3"
+            totalSeconds = CLng((fileBytes * 8#) / 192000#)
+        Case ".M3U"
+            totalSeconds = 240
+        Case Else
+            totalSeconds = CLng((fileBytes * 8#) / 1411200#)
+    End Select
+
+    If totalSeconds < 1 Then totalSeconds = 1
+
+    minutesValue = totalSeconds \ 60
+    secondsValue = totalSeconds Mod 60
+    framesValue = 0
+    EstimateTrackDuration = Format$(minutesValue, "00") & ":" & Format$(secondsValue, "00") & ":" & Format$(framesValue, "00")
+End Function
+
+Private Function TrackUsedFrames(ByVal entry As TrackEntry) As Long
+    TrackUsedFrames = MsfToFrames(entry.Pregap) + MsfToFrames(entry.Duration) + MsfToFrames(entry.Postgap)
+End Function
+
+Private Function MsfToFrames(ByVal value As String) As Long
+    Dim parts() As String
+    Dim minutesValue As Long
+    Dim secondsValue As Long
+    Dim framesValue As Long
+
+    parts = Split(Trim$(value), ":")
+    If UBound(parts) >= 0 Then minutesValue = Val(parts(0))
+    If UBound(parts) >= 1 Then secondsValue = Val(parts(1))
+    If UBound(parts) >= 2 Then framesValue = Val(parts(2))
+
+    If secondsValue < 0 Then secondsValue = 0
+    If secondsValue > 59 Then secondsValue = 59
+    If framesValue < 0 Then framesValue = 0
+    If framesValue > 74 Then framesValue = 74
+
+    MsfToFrames = ((minutesValue * 60) + secondsValue) * 75 + framesValue
+End Function
+
+Private Function FileTypeLabel(ByVal filePath As String) As String
+    Select Case UCase$(Right$(filePath, 4))
+        Case ".WAV"
+            FileTypeLabel = "WAV"
+        Case ".MP3"
+            FileTypeLabel = "MP3"
+        Case ".M3U"
+            FileTypeLabel = "M3U"
+        Case Else
+            FileTypeLabel = "Audio"
+    End Select
+End Function
+
 Private Sub SelectFileIndex(ByVal index As Long)
     If index >= 0 And index < lstFiles.ListCount Then
         lstFiles.ListIndex = index
@@ -1273,18 +1771,89 @@ Private Sub ShowPlaceholder(ByVal messageText As String)
     MsgBox messageText, vbInformation, "Kureha VB6 Rebuild"
 End Sub
 
+Private Function BuildTrackHeaderText() As String
+    BuildTrackHeaderText = _
+        PadRight("トラ", TRACK_COL_NO) & TRACK_COL_GAP & _
+        PadRight("曲名", TRACK_COL_TITLE) & TRACK_COL_GAP & _
+        PadRight("演奏者", TRACK_COL_PERFORMER) & TRACK_COL_GAP & _
+        PadRight("ソース", TRACK_COL_SOURCE) & TRACK_COL_GAP & _
+        PadRight("Pregap", TRACK_COL_PREGAP) & TRACK_COL_GAP & _
+        PadRight("時間", TRACK_COL_DURATION) & TRACK_COL_GAP & _
+        PadRight("Postgap", TRACK_COL_POSTGAP) & TRACK_COL_GAP & _
+        PadRight("属性", TRACK_COL_FLAGS)
+End Function
+
+Private Function BuildTrackRowText(ByVal entry As TrackEntry) As String
+    BuildTrackRowText = _
+        PadRight(Format$(entry.TrackNo, "00"), TRACK_COL_NO) & TRACK_COL_GAP & _
+        PadRight(entry.DisplayTitle, TRACK_COL_TITLE) & TRACK_COL_GAP & _
+        PadRight(entry.DisplayPerformer, TRACK_COL_PERFORMER) & TRACK_COL_GAP & _
+        PadRight(entry.Source, TRACK_COL_SOURCE) & TRACK_COL_GAP & _
+        PadRight(entry.Pregap, TRACK_COL_PREGAP) & TRACK_COL_GAP & _
+        PadRight(entry.Duration, TRACK_COL_DURATION) & TRACK_COL_GAP & _
+        PadRight(entry.Postgap, TRACK_COL_POSTGAP) & TRACK_COL_GAP & _
+        PadRight(entry.Flags, TRACK_COL_FLAGS)
+End Function
+
 Private Function PadLeft(ByVal value As String, ByVal totalWidth As Long) As String
-    If Len(value) >= totalWidth Then
-        PadLeft = value
+    Dim displayLen As Long
+
+    displayLen = DisplayTextWidth(value)
+
+    If displayLen >= totalWidth Then
+        PadLeft = FitDisplayWidth(value, totalWidth, False)
     Else
-        PadLeft = Space$(totalWidth - Len(value)) & value
+        PadLeft = Space$(totalWidth - displayLen) & value
     End If
 End Function
 
 Private Function PadRight(ByVal value As String, ByVal totalWidth As Long) As String
-    If Len(value) >= totalWidth Then
-        PadRight = Left$(value, totalWidth)
+    Dim fitted As String
+    Dim displayLen As Long
+
+    fitted = FitDisplayWidth(value, totalWidth, True)
+    displayLen = DisplayTextWidth(fitted)
+
+    If displayLen >= totalWidth Then
+        PadRight = fitted
     Else
-        PadRight = value & Space$(totalWidth - Len(value))
+        PadRight = fitted & Space$(totalWidth - displayLen)
+    End If
+End Function
+
+Private Function FitDisplayWidth(ByVal value As String, ByVal totalWidth As Long, ByVal trimRightSide As Boolean) As String
+    Dim i As Long
+    Dim currentWidth As Long
+    Dim currentChar As String
+
+    For i = 1 To Len(value)
+        currentChar = Mid$(value, i, 1)
+        currentWidth = currentWidth + CharDisplayWidth(currentChar)
+        If currentWidth > totalWidth Then Exit For
+        FitDisplayWidth = FitDisplayWidth & currentChar
+    Next i
+
+    If trimRightSide And Len(FitDisplayWidth) < Len(value) And totalWidth >= 2 Then
+        If DisplayTextWidth(FitDisplayWidth) > totalWidth - 2 Then
+            Do While DisplayTextWidth(FitDisplayWidth) > totalWidth - 2 And Len(FitDisplayWidth) > 0
+                FitDisplayWidth = Left$(FitDisplayWidth, Len(FitDisplayWidth) - 1)
+            Loop
+        End If
+    End If
+End Function
+
+Private Function DisplayTextWidth(ByVal value As String) As Long
+    Dim i As Long
+
+    For i = 1 To Len(value)
+        DisplayTextWidth = DisplayTextWidth + CharDisplayWidth(Mid$(value, i, 1))
+    Next i
+End Function
+
+Private Function CharDisplayWidth(ByVal value As String) As Long
+    If AscW(value) > 255 Then
+        CharDisplayWidth = 2
+    Else
+        CharDisplayWidth = 1
     End If
 End Function

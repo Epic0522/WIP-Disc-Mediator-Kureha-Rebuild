@@ -19,6 +19,7 @@ Private mPregap As String
 Private mDuration As String
 Private mPostgap As String
 Private mFlags As String
+Private mPreviewKiB As Long
 Private mEnglish As TOCCDText
 Private mJapanese As TOCCDText
 
@@ -30,10 +31,11 @@ Private Sub Class_Initialize()
     mJapanese.LanguageName = "Japanese"
 
     mSource = "Audio"
-    mPregap = "00:00:00"
-    mDuration = "04:00"
-    mPostgap = "00:00"
-    mFlags = "0"
+    mPregap = "00:02:00"
+    mDuration = "04:00:00"
+    mPostgap = "00:00:00"
+    mFlags = "DGP"
+    mPreviewKiB = 0
 End Sub
 
 Public Property Get TrackNo() As Long
@@ -82,6 +84,14 @@ End Property
 
 Public Property Let Flags(ByVal value As String)
     mFlags = value
+End Property
+
+Public Property Get PreviewKiB() As Long
+    PreviewKiB = mPreviewKiB
+End Property
+
+Public Property Let PreviewKiB(ByVal value As Long)
+    mPreviewKiB = value
 End Property
 
 Public Property Get EnglishText() As TOCCDText

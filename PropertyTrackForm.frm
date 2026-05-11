@@ -279,6 +279,10 @@ Public Property Get Accepted() As Boolean
     Accepted = mAccepted
 End Property
 
+Private Sub Form_Load()
+    ApplyTextboxFonts
+End Sub
+
 Private Sub chkCDTextEnabled_Click()
     ToggleInputs
 End Sub
@@ -507,4 +511,26 @@ Private Function ValidateField(ByVal languageLabel As String, ByVal fieldLabel A
 
     ValidateField = True
 End Function
+
+Private Sub ApplyTextboxFonts()
+    ApplyTextboxFont txtEnglishTitle, "MS UI Gothic", 0
+    ApplyTextboxFont txtEnglishPerformer, "MS UI Gothic", 0
+    ApplyTextboxFont txtEnglishSongwriter, "MS UI Gothic", 0
+    ApplyTextboxFont txtEnglishComposer, "MS UI Gothic", 0
+    ApplyTextboxFont txtEnglishArranger, "MS UI Gothic", 0
+    ApplyTextboxFont txtEnglishMessage, "MS UI Gothic", 0
+
+    ApplyTextboxFont txtJapaneseTitle, "MS UI Gothic", 128
+    ApplyTextboxFont txtJapanesePerformer, "MS UI Gothic", 128
+    ApplyTextboxFont txtJapaneseSongwriter, "MS UI Gothic", 128
+    ApplyTextboxFont txtJapaneseComposer, "MS UI Gothic", 128
+    ApplyTextboxFont txtJapaneseArranger, "MS UI Gothic", 128
+    ApplyTextboxFont txtJapaneseMessage, "MS UI Gothic", 128
+End Sub
+
+Private Sub ApplyTextboxFont(ByRef target As TextBox, ByVal fontName As String, ByVal charsetValue As Integer)
+    target.Font.Name = fontName
+    target.Font.Size = 9
+    target.Font.Charset = charsetValue
+End Sub
 
