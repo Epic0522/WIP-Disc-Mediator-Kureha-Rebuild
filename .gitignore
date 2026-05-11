@@ -2,10 +2,15 @@
 *
 
 # Keep repository metadata files
+!.gitattributes
 !.gitignore
 !README.md
 !LICENSE
 
-# Keep the actual rebuild project
-!VB6Rebuild/
-!VB6Rebuild/**
+# Keep the actual rebuild project files at repository root
+!*.bas
+!*.cls
+!*.frm
+!*.frx
+!*.vbp
+!*.vbw
