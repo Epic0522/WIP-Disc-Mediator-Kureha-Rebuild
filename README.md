@@ -51,4 +51,15 @@ The rebuild is being developed in stages:
 
 ## Status
 
-The current build is an early reconstruction stage. It already opens in the VB6 IDE, runs, and supports part of the rebuilt UI and `CD-TEXT` editing flow, but it is still under active development and does not yet reproduce the full original write pipeline.
+The current build is still in an early reconstruction stage, but the project has moved beyond a static mockup.
+
+As of the current milestone:
+
+- the rebuilt project opens and runs in the VB6 IDE without the original decompiler-related load failures
+- the main window layout has been rebuilt into a resizable, testable scaffold that now roughly matches the original workflow
+- track addition now uses the standard Windows file picker instead of a temporary text prompt
+- the track `CD-TEXT` editor supports bilingual metadata editing and preserves Japanese text correctly in the rebuilt data model
+- the lower track list has been cleaned up enough to validate titles, performers, source labels, gaps, durations, and flags during testing
+- the disc usage area now includes a working preview ring and remaining-capacity estimate driven by imported track durations
+
+What is still missing is the original application's full authoring and burn pipeline: the current rebuild is suitable for UI, metadata, and workflow reconstruction, but not yet for final disc-writing equivalence.

@@ -1158,6 +1158,7 @@ Private Sub LayoutMainForm()
     Dim leftW As Long
     Dim rightW As Long
     Dim usageW As Long
+    Dim usageLeft As Long
     Dim discLeftW As Long
 
     If Me.WindowState = 1 Then Exit Sub
@@ -1180,14 +1181,16 @@ Private Sub LayoutMainForm()
     usageW = 5280
     If usageW > contentW - 4200 Then usageW = contentW - 4200
     If usageW < 4080 Then usageW = 4080
-    discLeftW = contentW - usageW - INNER_MARGIN
+    usageLeft = clientW - usageW - 180
+    If usageLeft < 6720 Then usageLeft = 6720
+    discLeftW = usageLeft - 1320 - INNER_MARGIN
     If discLeftW < 4140 Then discLeftW = 4140
 
     txtDiscLabel.Move 1320, 300, discLeftW - 1320, 315
     cboFileSystem.Left = 1320
     cboFileSystem.Top = 720
     cboFileSystem.Width = discLeftW - 1320
-    fraUsage.Move 1320 + discLeftW + INNER_MARGIN, 240, usageW, 855
+    fraUsage.Move usageLeft, 240, usageW, 855
     LayoutUsageArea
 
     availableH = lblStatus.Top - (fraDisc.Top + fraDisc.Height) - (SECTION_GAP * 2)
