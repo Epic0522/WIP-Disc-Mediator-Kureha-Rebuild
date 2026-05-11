@@ -732,6 +732,12 @@ Private Sub lstTracks_Click()
     txtAlbumName.Text = mCurrentTrack.DisplayTitle
 End Sub
 
+Private Sub lstTracks_DblClick()
+    If lstTracks.ListIndex >= 0 Then
+        cmdTrackProperties_Click
+    End If
+End Sub
+
 Private Sub mnuFileExit_Click()
     Unload Me
 End Sub
@@ -771,6 +777,30 @@ End Sub
 
 Private Sub mnuHelpAbout_Click()
     MsgBox "Kureha VB6 Rebuild" & vbCrLf & "UI-first reconstruction build", vbInformation, "About"
+End Sub
+
+Private Sub mnuCompositionAddFile_Click()
+    cmdAddFile_Click
+End Sub
+
+Private Sub mnuCompositionAddFolder_Click()
+    cmdAddFolder_Click
+End Sub
+
+Private Sub mnuCompositionClear_Click()
+    If MsgBox("Clear all files and folders?", vbYesNo + vbQuestion, "Kureha VB6 Rebuild") <> vbYes Then Exit Sub
+
+    Set mFileEntries = New Collection
+    RefreshFileDisplay
+    lblStatus.Caption = "All file entries cleared."
+End Sub
+
+Private Sub mnuCompositionRemove_Click()
+    cmdRemoveEntry_Click
+End Sub
+
+Private Sub mnuCompositionRename_Click()
+    cmdRenameEntry_Click
 End Sub
 
 Private Sub mnuToolsAnalyze_Click()
@@ -816,6 +846,21 @@ End Sub
 
 Private Sub mnuTrackRemove_Click()
     cmdRemoveTrack_Click
+End Sub
+
+Private Sub mnuViewAlwaysOnTop_Click()
+    ShowPlaceholder "Always-on-top behavior is not wired yet."
+End Sub
+
+Private Sub mnuViewExplorer_Click()
+    On Error GoTo ExplorerError
+
+    Shell "explorer.exe", vbNormalFocus
+    lblStatus.Caption = "Windows Explorer opened."
+    Exit Sub
+
+ExplorerError:
+    MsgBox "Could not open Windows Explorer.", vbExclamation, "Kureha VB6 Rebuild"
 End Sub
 
 Private Sub RefreshFileDisplay()
