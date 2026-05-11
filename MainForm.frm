@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form MainForm
    Appearance      =   0  'Flat
    BackColor       =   &H8000000F&
-   Caption         =   "å‘‰è‘‰"
+   Caption         =   "Œà—t"
    ClientHeight    =   9495
    ClientLeft      =   120
    ClientTop       =   465
@@ -21,14 +21,14 @@ Begin VB.Form MainForm
    ScaleWidth      =   13815
    StartUpPosition =   2  'CenterScreen
    Begin VB.Frame fraToolbar
-      Caption         =   "æ“ä½œ"
+      Caption         =   "‘€ì"
       Height          =   1035
       Left            =   0
       TabIndex        =   0
       Top             =   0
       Width           =   13815
       Begin VB.CommandButton cmdWriteDisc
-         Caption         =   "æ›¸ãè¾¼ã¿"
+         Caption         =   "‘‚«‚İ"
          Height          =   495
          Left            =   150
          TabIndex        =   1
@@ -36,7 +36,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdSaveProject
-         Caption         =   "ä¿å­˜"
+         Caption         =   "•Û‘¶"
          Height          =   495
          Left            =   1440
          TabIndex        =   2
@@ -44,7 +44,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdEraseDisc
-         Caption         =   "æ¶ˆå»"
+         Caption         =   "Á‹"
          Height          =   495
          Left            =   2730
          TabIndex        =   3
@@ -52,7 +52,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdCopyDisc
-         Caption         =   "è¤‡è£½"
+         Caption         =   "•¡»"
          Height          =   495
          Left            =   4020
          TabIndex        =   4
@@ -60,7 +60,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdImageWrite
-         Caption         =   "åª’ä½“æ›¸è¾¼"
+         Caption         =   "”}‘Ì‘"
          Height          =   495
          Left            =   5310
          TabIndex        =   5
@@ -68,7 +68,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.CommandButton cmdImageRead
-         Caption         =   "åª’ä½“èª­è¾¼"
+         Caption         =   "”}‘Ì“Ç"
          Height          =   495
          Left            =   6720
          TabIndex        =   6
@@ -76,7 +76,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.CommandButton cmdReadTracks
-         Caption         =   "å–è¾¼ã¿"
+         Caption         =   "æ‚İ"
          Height          =   495
          Left            =   8130
          TabIndex        =   7
@@ -84,7 +84,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdAnalyzeDisc
-         Caption         =   "åˆ†æ"
+         Caption         =   "•ªÍ"
          Height          =   495
          Left            =   9420
          TabIndex        =   8
@@ -93,14 +93,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraDisc
-      Caption         =   "æ§‹æˆ"
+      Caption         =   "\¬"
       Height          =   1335
       Left            =   0
       TabIndex        =   9
       Top             =   1140
       Width           =   13815
       Begin VB.Label lblDiscLabel
-         Caption         =   "åª’ä½“è­˜åˆ¥å­:"
+         Caption         =   "”}‘Ì¯•Êq:"
          Height          =   255
          Left            =   180
          TabIndex        =   10
@@ -116,7 +116,7 @@ Begin VB.Form MainForm
          Width           =   4875
       End
       Begin VB.Label lblFileSystem
-         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«ç³»:"
+         Caption         =   "ƒtƒ@ƒCƒ‹Œn:"
          Height          =   255
          Left            =   180
          TabIndex        =   12
@@ -133,7 +133,7 @@ Begin VB.Form MainForm
          Width           =   4875
       End
       Begin VB.Frame fraUsage
-         Caption         =   "ä½¿ç”¨é‡"
+         Caption         =   "g—p—Ê"
          Height          =   855
          Left            =   6360
          TabIndex        =   14
@@ -141,7 +141,7 @@ Begin VB.Form MainForm
          Width           =   7230
          Begin VB.Label lblUsageValue
             Alignment       =   2  'Center
-            Caption         =   "ç©ºã:648.000KiB"
+            Caption         =   "‹ó‚«:648.000KiB"
             Height          =   255
             Left            =   4710
             TabIndex        =   18
@@ -176,7 +176,7 @@ Begin VB.Form MainForm
             Width           =   675
          End
          Begin VB.Label lblUsageCaption
-            Caption         =   "ä½¿ç”¨é‡:"
+            Caption         =   "g—p—Ê:"
             Height          =   255
             Left            =   240
             TabIndex        =   15
@@ -186,14 +186,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraExplorer
-      Caption         =   "æ§‹é€ é…ç½®"
+      Caption         =   "\‘¢”z’u"
       Height          =   4335
       Left            =   0
       TabIndex        =   20
       Top             =   2460
       Width           =   13815
       Begin VB.Frame fraDirectories
-         Caption         =   "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª"
+         Caption         =   "ƒfƒBƒŒƒNƒgƒŠ"
          Height          =   3795
          Left            =   120
          TabIndex        =   21
@@ -209,21 +209,21 @@ Begin VB.Form MainForm
          End
       End
       Begin VB.Frame fraFiles
-         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«"
+         Caption         =   "ƒtƒ@ƒCƒ‹"
          Height          =   3795
          Left            =   4740
          TabIndex        =   23
          Top             =   360
          Width           =   8955
          Begin VB.Frame fraFileActions
-            Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œ"
+            Caption         =   "ƒtƒ@ƒCƒ‹‘€ì"
             Height          =   615
             Left            =   120
             TabIndex        =   24
             Top             =   240
             Width           =   8715
             Begin VB.CommandButton cmdAddFile
-               Caption         =   "è¿½åŠ "
+               Caption         =   "’Ç‰Á"
                Height          =   315
                Left            =   180
                TabIndex        =   25
@@ -231,7 +231,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdAddFolder
-               Caption         =   "ãƒ•ã‚©ãƒ«ãƒ€"
+               Caption         =   "ƒtƒHƒ‹ƒ_"
                Height          =   315
                Left            =   1155
                TabIndex        =   26
@@ -239,7 +239,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdRenameEntry
-               Caption         =   "åå‰å¤‰æ›´"
+               Caption         =   "–¼‘O•ÏX"
                Height          =   315
                Left            =   2130
                TabIndex        =   27
@@ -247,7 +247,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdRemoveEntry
-               Caption         =   "å‰Šé™¤"
+               Caption         =   "íœ"
                Height          =   315
                Left            =   3105
                TabIndex        =   28
@@ -255,7 +255,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdProperties
-               Caption         =   "è¨­å®š"
+               Caption         =   "İ’è"
                Height          =   315
                Left            =   4080
                TabIndex        =   29
@@ -264,7 +264,7 @@ Begin VB.Form MainForm
             End
          End
          Begin VB.Label lblFilesHeader
-            Caption         =   "åå‰                                             å®¹é‡        æ›´æ–°æ—¥æ™‚"
+            Caption         =   "–¼‘O                                             —e—Ê        XV“ú"
             Height          =   255
             Left            =   180
             TabIndex        =   30
@@ -282,14 +282,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraTrackArea
-      Caption         =   "ãƒˆãƒ©ãƒƒã‚¯"
+      Caption         =   "ƒgƒ‰ƒbƒN"
       Height          =   2235
       Left            =   0
       TabIndex        =   32
       Top             =   6780
       Width           =   13815
       Begin VB.Frame fraTrackActions
-         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯æ“ä½œ"
+         Caption         =   "ƒgƒ‰ƒbƒN‘€ì"
          Height          =   615
          Left            =   120
          TabIndex        =   33
@@ -354,7 +354,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.Label lblTracksHeader
-         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯      æ›²å                           æ¼”å¥è€…                         ã‚½ãƒ¼ã‚¹      Pregap   æ™‚é–“   Postgap   å±æ€§"
+         Caption         =   "ƒgƒ‰ƒbƒN      ‹È–¼                           ‰‰‘tÒ                         ƒ\[ƒX      Pregap   ŠÔ   Postgap   ‘®«"
          Height          =   255
          Left            =   180
          TabIndex        =   41
@@ -381,102 +381,102 @@ Begin VB.Form MainForm
       Width           =   13815
    End
    Begin Menu mnuFile
-      Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«(&F)"
+      Caption         =   "ƒtƒ@ƒCƒ‹(&F)"
       Begin Menu mnuFileOpenImage
-         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’é–‹ã(&O)..."
+         Caption         =   "ƒCƒ[ƒW‚ğŠJ‚­(&O)..."
       End
       Begin Menu mnuFileLoadProject
-         Caption         =   "ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’é–‹ã(&R)..."
+         Caption         =   "ƒvƒƒWƒFƒNƒg‚ğŠJ‚­(&R)..."
       End
       Begin Menu mnuFileSaveProject
-         Caption         =   "ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆä¿å­˜(&S)..."
+         Caption         =   "ƒvƒƒWƒFƒNƒg•Û‘¶(&S)..."
       End
       Begin Menu mnuFileSep1
          Caption         =   "-"
       End
       Begin Menu mnuFileWriteDisc
-         Caption         =   "æ›¸ãè¾¼ã¿(&W)..."
+         Caption         =   "‘‚«‚İ(&W)..."
       End
       Begin Menu mnuFileSaveImage
-         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸ä¿å­˜(&A)..."
+         Caption         =   "ƒCƒ[ƒW•Û‘¶(&A)..."
       End
       Begin Menu mnuFileNew
-         Caption         =   "æ–°è¦ä½œæˆ(&N)"
+         Caption         =   "V‹Kì¬(&N)"
       End
       Begin Menu mnuFileSep2
          Caption         =   "-"
       End
       Begin Menu mnuFileExit
-         Caption         =   "çµ‚äº†(&X)"
+         Caption         =   "I—¹(&X)"
       End
    End
    Begin Menu mnuView
-      Caption         =   "è¡¨ç¤º(&V)"
+      Caption         =   "•\¦(&V)"
       Begin Menu mnuViewExplorer
-         Caption         =   "ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©(&E)"
+         Caption         =   "ƒGƒNƒXƒvƒ[ƒ‰(&E)"
       End
       Begin Menu mnuViewAlwaysOnTop
-         Caption         =   "å¸¸ã«æ‰‹å‰ã«è¡¨ç¤º(&T)"
+         Caption         =   "í‚Éè‘O‚É•\¦(&T)"
       End
    End
    Begin Menu mnuComposition
-      Caption         =   "æ§‹é€ é…ç½®(&W)"
+      Caption         =   "\‘¢”z’u(&W)"
       Begin Menu mnuCompositionAddFile
-         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«è¿½åŠ (&A)..."
+         Caption         =   "ƒtƒ@ƒCƒ‹’Ç‰Á(&A)..."
       End
       Begin Menu mnuCompositionAddFolder
-         Caption         =   "ãƒ•ã‚©ãƒ«ãƒ€è¿½åŠ (&F)..."
+         Caption         =   "ƒtƒHƒ‹ƒ_’Ç‰Á(&F)..."
       End
       Begin Menu mnuCompositionRename
-         Caption         =   "åå‰å¤‰æ›´(&R)"
+         Caption         =   "–¼‘O•ÏX(&R)"
       End
       Begin Menu mnuCompositionRemove
-         Caption         =   "å‰Šé™¤(&D)"
+         Caption         =   "íœ(&D)"
       End
       Begin Menu mnuCompositionClear
-         Caption         =   "ã‚¯ãƒªã‚¢(&C)"
+         Caption         =   "ƒNƒŠƒA(&C)"
       End
    End
    Begin Menu mnuTrack
-      Caption         =   "ãƒˆãƒ©ãƒƒã‚¯(&T)"
+      Caption         =   "ƒgƒ‰ƒbƒN(&T)"
       Begin Menu mnuTrackAdd
-         Caption         =   "è¿½åŠ (&A)..."
+         Caption         =   "’Ç‰Á(&A)..."
       End
       Begin Menu mnuTrackRemove
-         Caption         =   "å‰Šé™¤(&D)"
+         Caption         =   "íœ(&D)"
       End
       Begin Menu mnuTrackPropertiesMenu
-         Caption         =   "è¨­å®š(&P)..."
+         Caption         =   "İ’è(&P)..."
       End
       Begin Menu mnuTrackClear
-         Caption         =   "ã‚¯ãƒªã‚¢(&C)"
+         Caption         =   "ƒNƒŠƒA(&C)"
       End
    End
    Begin Menu mnuTools
-      Caption         =   "ãƒ„ãƒ¼ãƒ«(&U)"
+      Caption         =   "ƒc[ƒ‹(&U)"
       Begin Menu mnuToolsCopy
-         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯è¤‡è£½(&C)..."
+         Caption         =   "ƒfƒBƒXƒN•¡»(&C)..."
       End
       Begin Menu mnuToolsErase
-         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯æ¶ˆå»(&E)..."
+         Caption         =   "ƒfƒBƒXƒNÁ‹(&E)..."
       End
       Begin Menu mnuToolsReadTracks
-         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯å–ã‚Šè¾¼ã¿(&I)..."
+         Caption         =   "ƒgƒ‰ƒbƒNæ‚è‚İ(&I)..."
       End
       Begin Menu mnuToolsReadImage
-         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸èª­ã¿è¾¼ã¿(&R)..."
+         Caption         =   "ƒCƒ[ƒW“Ç‚İ‚İ(&R)..."
       End
       Begin Menu mnuToolsWriteImage
-         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸æ›¸ãè¾¼ã¿(&W)..."
+         Caption         =   "ƒCƒ[ƒW‘‚«‚İ(&W)..."
       End
       Begin Menu mnuToolsAnalyze
-         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯åˆ†æ(&A)..."
+         Caption         =   "ƒfƒBƒXƒN•ªÍ(&A)..."
       End
    End
    Begin Menu mnuHelp
-      Caption         =   "ãƒ˜ãƒ«ãƒ—(&H)"
+      Caption         =   "ƒwƒ‹ƒv(&H)"
       Begin Menu mnuHelpAbout
-         Caption         =   "ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±(&A)..."
+         Caption         =   "ƒo[ƒWƒ‡ƒ“î•ñ(&A)..."
       End
    End
 End
@@ -669,7 +669,12 @@ Private Sub cmdRenameEntry_Click()
 End Sub
 
 Private Sub cmdSaveProject_Click()
-    ShowPlaceholder "Project save UI is scaffolded but not wired yet."
+    Dim savePath As String
+
+    savePath = Trim$(InputBox$("Save project path:", "Save Project", App.Path & "\kureha-rebuild-project.krp"))
+    If savePath = "" Then Exit Sub
+
+    SaveProjectToPath savePath
 End Sub
 
 Private Sub cmdTrackProperties_Click()
@@ -715,11 +720,7 @@ Private Sub Form_Load()
     lstTracks.Font.Name = "MS Gothic"
     lstTracks.Font.Size = 10
 
-    lstDirectories.AddItem "\"
-    lstDirectories.AddItem "Audio"
-    lstDirectories.AddItem "Data"
-    lstDirectories.AddItem "Extras"
-    lstDirectories.ListIndex = 0
+    SeedDefaultDirectories
 
     SeedSampleFiles
     SeedSampleTracks
@@ -750,7 +751,12 @@ Private Sub mnuFileExit_Click()
 End Sub
 
 Private Sub mnuFileLoadProject_Click()
-    ShowPlaceholder "Load Project UI is scaffolded but not wired yet."
+    Dim loadPath As String
+
+    loadPath = Trim$(InputBox$("Load project path:", "Load Project", App.Path & "\kureha-rebuild-project.krp"))
+    If loadPath = "" Then Exit Sub
+
+    LoadProjectFromPath loadPath
 End Sub
 
 Private Sub mnuFileNew_Click()
@@ -767,11 +773,11 @@ Private Sub mnuFileNew_Click()
 End Sub
 
 Private Sub mnuFileOpenImage_Click()
-    ShowPlaceholder "Open Image UI is scaffolded but not wired yet."
+    mnuFileLoadProject_Click
 End Sub
 
 Private Sub mnuFileSaveImage_Click()
-    ShowPlaceholder "Save Image UI is scaffolded but not wired yet."
+    cmdSaveProject_Click
 End Sub
 
 Private Sub mnuFileSaveProject_Click()
@@ -1004,6 +1010,214 @@ Private Sub SeedSampleTracks()
     mTrackEntries.Add entry
     Set mCurrentTrack = entry
 End Sub
+
+Private Sub SeedDefaultDirectories()
+    lstDirectories.Clear
+    lstDirectories.AddItem "\"
+    lstDirectories.AddItem "Audio"
+    lstDirectories.AddItem "Data"
+    lstDirectories.AddItem "Extras"
+    lstDirectories.ListIndex = 0
+End Sub
+
+Private Sub SaveProjectToPath(ByVal savePath As String)
+    Dim fileNo As Integer
+    Dim i As Long
+    Dim fileEntry As FileEntry
+    Dim trackEntry As TrackEntry
+
+    On Error GoTo SaveError
+
+    fileNo = FreeFile
+    Open savePath For Output As #fileNo
+
+    Print #fileNo, "KUREHA_REBUILD_PROJECT|1"
+    Print #fileNo, "DISC_LABEL|" & EscapeValue(txtDiscLabel.Text)
+    Print #fileNo, "FILE_SYSTEM|" & CStr(cboFileSystem.ListIndex) & "|" & EscapeValue(cboFileSystem.Text)
+    Print #fileNo, "MEDIA_TYPE|" & CStr(cboMediaType.ListIndex) & "|" & EscapeValue(cboMediaType.Text)
+    Print #fileNo, "ALBUM|" & EscapeValue(txtAlbumName.Text)
+
+    For i = 0 To lstDirectories.ListCount - 1
+        Print #fileNo, "DIRECTORY|" & EscapeValue(lstDirectories.List(i))
+    Next i
+
+    For i = 1 To mFileEntries.Count
+        Set fileEntry = mFileEntries.Item(i)
+        Print #fileNo, "FILE|" & EscapeValue(fileEntry.Name) & "|" & EscapeValue(fileEntry.SizeText) & "|" & EscapeValue(fileEntry.ModifiedText) & "|" & BoolText(fileEntry.IsDirectory)
+    Next i
+
+    For i = 1 To mTrackEntries.Count
+        Set trackEntry = mTrackEntries.Item(i)
+        Print #fileNo, "TRACK|" & CStr(trackEntry.TrackNo) & "|" & EscapeValue(trackEntry.Source) & "|" & EscapeValue(trackEntry.Pregap) & "|" & EscapeValue(trackEntry.Duration) & "|" & EscapeValue(trackEntry.Postgap) & "|" & EscapeValue(trackEntry.Flags)
+        WriteCdTextBlock fileNo, "EN", trackEntry.EnglishText
+        WriteCdTextBlock fileNo, "JP", trackEntry.JapaneseText
+    Next i
+
+    Close #fileNo
+    lblStatus.Caption = "Project saved: " & savePath
+    Exit Sub
+
+SaveError:
+    If fileNo <> 0 Then Close #fileNo
+    MsgBox "Could not save project." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
+End Sub
+
+Private Sub LoadProjectFromPath(ByVal loadPath As String)
+    Dim fileNo As Integer
+    Dim lineText As String
+    Dim parts() As String
+    Dim currentTrack As TrackEntry
+    Dim currentFile As FileEntry
+
+    On Error GoTo LoadError
+
+    fileNo = FreeFile
+    Open loadPath For Input As #fileNo
+
+    Set mFileEntries = New Collection
+    Set mTrackEntries = New Collection
+    Set mCurrentTrack = Nothing
+    lstDirectories.Clear
+
+    Do While Not EOF(fileNo)
+        Line Input #fileNo, lineText
+        parts = Split(lineText, "|")
+
+        Select Case parts(0)
+            Case "KUREHA_REBUILD_PROJECT"
+            Case "DISC_LABEL"
+                txtDiscLabel.Text = UnescapeValue(SafeField(parts, 1))
+            Case "FILE_SYSTEM"
+                RestoreComboSelection cboFileSystem, CLng(Val(SafeField(parts, 1))), SafeField(parts, 2)
+            Case "MEDIA_TYPE"
+                RestoreComboSelection cboMediaType, CLng(Val(SafeField(parts, 1))), SafeField(parts, 2)
+            Case "ALBUM"
+                txtAlbumName.Text = UnescapeValue(SafeField(parts, 1))
+            Case "DIRECTORY"
+                lstDirectories.AddItem UnescapeValue(SafeField(parts, 1))
+            Case "FILE"
+                Set currentFile = New FileEntry
+                currentFile.Name = UnescapeValue(SafeField(parts, 1))
+                currentFile.SizeText = UnescapeValue(SafeField(parts, 2))
+                currentFile.ModifiedText = UnescapeValue(SafeField(parts, 3))
+                currentFile.IsDirectory = TextBool(SafeField(parts, 4))
+                mFileEntries.Add currentFile
+            Case "TRACK"
+                Set currentTrack = New TrackEntry
+                currentTrack.TrackNo = CLng(Val(SafeField(parts, 1)))
+                currentTrack.Source = UnescapeValue(SafeField(parts, 2))
+                currentTrack.Pregap = UnescapeValue(SafeField(parts, 3))
+                currentTrack.Duration = UnescapeValue(SafeField(parts, 4))
+                currentTrack.Postgap = UnescapeValue(SafeField(parts, 5))
+                currentTrack.Flags = UnescapeValue(SafeField(parts, 6))
+                mTrackEntries.Add currentTrack
+            Case "TEXT"
+                If Not currentTrack Is Nothing Then
+                    If UCase$(SafeField(parts, 1)) = "EN" Then
+                        ReadCdTextBlock currentTrack.EnglishText, parts
+                    ElseIf UCase$(SafeField(parts, 1)) = "JP" Then
+                        ReadCdTextBlock currentTrack.JapaneseText, parts
+                    End If
+                End If
+        End Select
+    Loop
+
+    Close #fileNo
+
+    If lstDirectories.ListCount = 0 Then SeedDefaultDirectories
+    If mTrackEntries.Count > 0 Then
+        Set mCurrentTrack = mTrackEntries.Item(1)
+        txtAlbumName.Text = mCurrentTrack.DisplayTitle
+    End If
+    RefreshFileDisplay
+    RefreshTrackDisplay
+    lblStatus.Caption = "Project loaded: " & loadPath
+    Exit Sub
+
+LoadError:
+    If fileNo <> 0 Then Close #fileNo
+    MsgBox "Could not load project." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
+End Sub
+
+Private Sub WriteCdTextBlock(ByVal fileNo As Integer, ByVal languageCode As String, ByVal textItem As TOCCDText)
+    Print #fileNo, "TEXT|" & languageCode & "|" & _
+        BoolText(textItem.LanguageEnabled) & "|" & _
+        BoolText(textItem.TitleEnabled) & "|" & _
+        BoolText(textItem.PerformerEnabled) & "|" & _
+        BoolText(textItem.SongwriterEnabled) & "|" & _
+        BoolText(textItem.ComposerEnabled) & "|" & _
+        BoolText(textItem.ArrangerEnabled) & "|" & _
+        BoolText(textItem.MessageEnabled) & "|" & _
+        EscapeValue(textItem.Title) & "|" & _
+        EscapeValue(textItem.Performer) & "|" & _
+        EscapeValue(textItem.Songwriter) & "|" & _
+        EscapeValue(textItem.Composer) & "|" & _
+        EscapeValue(textItem.Arranger) & "|" & _
+        EscapeValue(textItem.Message)
+End Sub
+
+Private Sub ReadCdTextBlock(ByVal textItem As TOCCDText, ByRef parts() As String)
+    textItem.LanguageEnabled = TextBool(SafeField(parts, 2))
+    textItem.TitleEnabled = TextBool(SafeField(parts, 3))
+    textItem.PerformerEnabled = TextBool(SafeField(parts, 4))
+    textItem.SongwriterEnabled = TextBool(SafeField(parts, 5))
+    textItem.ComposerEnabled = TextBool(SafeField(parts, 6))
+    textItem.ArrangerEnabled = TextBool(SafeField(parts, 7))
+    textItem.MessageEnabled = TextBool(SafeField(parts, 8))
+    textItem.Title = UnescapeValue(SafeField(parts, 9))
+    textItem.Performer = UnescapeValue(SafeField(parts, 10))
+    textItem.Songwriter = UnescapeValue(SafeField(parts, 11))
+    textItem.Composer = UnescapeValue(SafeField(parts, 12))
+    textItem.Arranger = UnescapeValue(SafeField(parts, 13))
+    textItem.Message = UnescapeValue(SafeField(parts, 14))
+End Sub
+
+Private Sub RestoreComboSelection(ByRef combo As ComboBox, ByVal indexValue As Long, ByVal textValue As String)
+    If indexValue >= 0 And indexValue < combo.ListCount Then
+        combo.ListIndex = indexValue
+    ElseIf Trim$(textValue) <> "" Then
+        combo.AddItem UnescapeValue(textValue)
+        combo.ListIndex = combo.ListCount - 1
+    End If
+End Sub
+
+Private Function SafeField(ByRef parts() As String, ByVal indexValue As Long) As String
+    If indexValue <= UBound(parts) Then
+        SafeField = parts(indexValue)
+    Else
+        SafeField = ""
+    End If
+End Function
+
+Private Function BoolText(ByVal value As Boolean) As String
+    If value Then
+        BoolText = "1"
+    Else
+        BoolText = "0"
+    End If
+End Function
+
+Private Function TextBool(ByVal value As String) As Boolean
+    TextBool = (Trim$(value) = "1")
+End Function
+
+Private Function EscapeValue(ByVal value As String) As String
+    value = Replace(value, "%", "%25")
+    value = Replace(value, "|", "%7C")
+    value = Replace(value, vbCrLf, "%0D%0A")
+    value = Replace(value, vbCr, "%0D")
+    value = Replace(value, vbLf, "%0A")
+    EscapeValue = value
+End Function
+
+Private Function UnescapeValue(ByVal value As String) As String
+    value = Replace(value, "%0D%0A", vbCrLf)
+    value = Replace(value, "%0D", vbCr)
+    value = Replace(value, "%0A", vbLf)
+    value = Replace(value, "%7C", "|")
+    value = Replace(value, "%25", "%")
+    UnescapeValue = value
+End Function
 
 Private Function TrackCount() As Long
     TrackCount = mTrackEntries.Count
