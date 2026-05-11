@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form MainForm
    Appearance      =   0  'Flat
    BackColor       =   &H8000000F&
-   Caption         =   "Œà—t"
+   Caption         =   "å‘‰è‘‰"
    ClientHeight    =   9495
    ClientLeft      =   120
    ClientTop       =   465
@@ -21,14 +21,14 @@ Begin VB.Form MainForm
    ScaleWidth      =   13815
    StartUpPosition =   2  'CenterScreen
    Begin VB.Frame fraToolbar
-      Caption         =   "‘€ì"
+      Caption         =   "æ“ä½œ"
       Height          =   1035
       Left            =   0
       TabIndex        =   0
       Top             =   0
       Width           =   13815
       Begin VB.CommandButton cmdWriteDisc
-         Caption         =   "‘‚«‚İ"
+         Caption         =   "æ›¸ãè¾¼ã¿"
          Height          =   495
          Left            =   150
          TabIndex        =   1
@@ -36,7 +36,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdSaveProject
-         Caption         =   "•Û‘¶"
+         Caption         =   "ä¿å­˜"
          Height          =   495
          Left            =   1440
          TabIndex        =   2
@@ -44,7 +44,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdEraseDisc
-         Caption         =   "Á‹"
+         Caption         =   "æ¶ˆå»"
          Height          =   495
          Left            =   2730
          TabIndex        =   3
@@ -52,7 +52,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdCopyDisc
-         Caption         =   "•¡»"
+         Caption         =   "è¤‡è£½"
          Height          =   495
          Left            =   4020
          TabIndex        =   4
@@ -60,7 +60,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdImageWrite
-         Caption         =   "”}‘Ì‘"
+         Caption         =   "åª’ä½“æ›¸è¾¼"
          Height          =   495
          Left            =   5310
          TabIndex        =   5
@@ -68,7 +68,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.CommandButton cmdImageRead
-         Caption         =   "”}‘Ì“Ç"
+         Caption         =   "åª’ä½“èª­è¾¼"
          Height          =   495
          Left            =   6720
          TabIndex        =   6
@@ -76,7 +76,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.CommandButton cmdReadTracks
-         Caption         =   "æ‚İ"
+         Caption         =   "å–è¾¼ã¿"
          Height          =   495
          Left            =   8130
          TabIndex        =   7
@@ -84,7 +84,7 @@ Begin VB.Form MainForm
          Width           =   1215
       End
       Begin VB.CommandButton cmdAnalyzeDisc
-         Caption         =   "•ªÍ"
+         Caption         =   "åˆ†æ"
          Height          =   495
          Left            =   9420
          TabIndex        =   8
@@ -93,14 +93,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraDisc
-      Caption         =   "\¬"
+      Caption         =   "æ§‹æˆ"
       Height          =   1335
       Left            =   0
       TabIndex        =   9
       Top             =   1140
       Width           =   13815
       Begin VB.Label lblDiscLabel
-         Caption         =   "”}‘Ì¯•Êq:"
+         Caption         =   "åª’ä½“è­˜åˆ¥å­:"
          Height          =   255
          Left            =   180
          TabIndex        =   10
@@ -116,7 +116,7 @@ Begin VB.Form MainForm
          Width           =   4875
       End
       Begin VB.Label lblFileSystem
-         Caption         =   "ƒtƒ@ƒCƒ‹Œn:"
+         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«ç³»:"
          Height          =   255
          Left            =   180
          TabIndex        =   12
@@ -133,7 +133,7 @@ Begin VB.Form MainForm
          Width           =   4875
       End
       Begin VB.Frame fraUsage
-         Caption         =   "g—p—Ê"
+         Caption         =   "ä½¿ç”¨é‡"
          Height          =   855
          Left            =   6360
          TabIndex        =   14
@@ -141,7 +141,7 @@ Begin VB.Form MainForm
          Width           =   7230
          Begin VB.Label lblUsageValue
             Alignment       =   2  'Center
-            Caption         =   "‹ó‚«:648.000KiB"
+            Caption         =   "ç©ºã:648.000KiB"
             Height          =   255
             Left            =   4710
             TabIndex        =   18
@@ -176,7 +176,7 @@ Begin VB.Form MainForm
             Width           =   675
          End
          Begin VB.Label lblUsageCaption
-            Caption         =   "g—p—Ê:"
+            Caption         =   "ä½¿ç”¨é‡:"
             Height          =   255
             Left            =   240
             TabIndex        =   15
@@ -186,14 +186,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraExplorer
-      Caption         =   "\‘¢”z’u"
+      Caption         =   "æ§‹é€ é…ç½®"
       Height          =   4335
       Left            =   0
       TabIndex        =   20
       Top             =   2460
       Width           =   13815
       Begin VB.Frame fraDirectories
-         Caption         =   "ƒfƒBƒŒƒNƒgƒŠ"
+         Caption         =   "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª"
          Height          =   3795
          Left            =   120
          TabIndex        =   21
@@ -209,21 +209,21 @@ Begin VB.Form MainForm
          End
       End
       Begin VB.Frame fraFiles
-         Caption         =   "ƒtƒ@ƒCƒ‹"
+         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«"
          Height          =   3795
          Left            =   4740
          TabIndex        =   23
          Top             =   360
          Width           =   8955
          Begin VB.Frame fraFileActions
-            Caption         =   "ƒtƒ@ƒCƒ‹‘€ì"
+            Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œ"
             Height          =   615
             Left            =   120
             TabIndex        =   24
             Top             =   240
             Width           =   8715
             Begin VB.CommandButton cmdAddFile
-               Caption         =   "’Ç‰Á"
+               Caption         =   "è¿½åŠ "
                Height          =   315
                Left            =   180
                TabIndex        =   25
@@ -231,7 +231,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdAddFolder
-               Caption         =   "ƒtƒHƒ‹ƒ_"
+               Caption         =   "ãƒ•ã‚©ãƒ«ãƒ€"
                Height          =   315
                Left            =   1155
                TabIndex        =   26
@@ -239,7 +239,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdRenameEntry
-               Caption         =   "–¼‘O•ÏX"
+               Caption         =   "åå‰å¤‰æ›´"
                Height          =   315
                Left            =   2130
                TabIndex        =   27
@@ -247,7 +247,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdRemoveEntry
-               Caption         =   "íœ"
+               Caption         =   "å‰Šé™¤"
                Height          =   315
                Left            =   3105
                TabIndex        =   28
@@ -255,7 +255,7 @@ Begin VB.Form MainForm
                Width           =   915
             End
             Begin VB.CommandButton cmdProperties
-               Caption         =   "İ’è"
+               Caption         =   "è¨­å®š"
                Height          =   315
                Left            =   4080
                TabIndex        =   29
@@ -264,7 +264,7 @@ Begin VB.Form MainForm
             End
          End
          Begin VB.Label lblFilesHeader
-            Caption         =   "–¼‘O                                             —e—Ê        XV“ú"
+            Caption         =   "åå‰                                             å®¹é‡        æ›´æ–°æ—¥æ™‚"
             Height          =   255
             Left            =   180
             TabIndex        =   30
@@ -282,14 +282,14 @@ Begin VB.Form MainForm
       End
    End
    Begin VB.Frame fraTrackArea
-      Caption         =   "ƒgƒ‰ƒbƒN"
+      Caption         =   "ãƒˆãƒ©ãƒƒã‚¯"
       Height          =   2235
       Left            =   0
       TabIndex        =   32
       Top             =   6780
       Width           =   13815
       Begin VB.Frame fraTrackActions
-         Caption         =   "ƒgƒ‰ƒbƒN‘€ì"
+         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯æ“ä½œ"
          Height          =   615
          Left            =   120
          TabIndex        =   33
@@ -354,7 +354,7 @@ Begin VB.Form MainForm
          Width           =   1335
       End
       Begin VB.Label lblTracksHeader
-         Caption         =   "ƒgƒ‰ƒbƒN      ‹È–¼                           ‰‰‘tÒ                         ƒ\[ƒX      Pregap   ŠÔ   Postgap   ‘®«"
+         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯      æ›²å                           æ¼”å¥è€…                         ã‚½ãƒ¼ã‚¹      Pregap   æ™‚é–“   Postgap   å±æ€§"
          Height          =   255
          Left            =   180
          TabIndex        =   41
@@ -381,102 +381,102 @@ Begin VB.Form MainForm
       Width           =   13815
    End
    Begin Menu mnuFile
-      Caption         =   "ƒtƒ@ƒCƒ‹(&F)"
+      Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«(&F)"
       Begin Menu mnuFileOpenImage
-         Caption         =   "ƒCƒ[ƒW‚ğŠJ‚­(&O)..."
+         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’é–‹ã(&O)..."
       End
       Begin Menu mnuFileLoadProject
-         Caption         =   "ƒvƒƒWƒFƒNƒg‚ğŠJ‚­(&R)..."
+         Caption         =   "ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’é–‹ã(&R)..."
       End
       Begin Menu mnuFileSaveProject
-         Caption         =   "ƒvƒƒWƒFƒNƒg•Û‘¶(&S)..."
+         Caption         =   "ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆä¿å­˜(&S)..."
       End
       Begin Menu mnuFileSep1
          Caption         =   "-"
       End
       Begin Menu mnuFileWriteDisc
-         Caption         =   "‘‚«‚İ(&W)..."
+         Caption         =   "æ›¸ãè¾¼ã¿(&W)..."
       End
       Begin Menu mnuFileSaveImage
-         Caption         =   "ƒCƒ[ƒW•Û‘¶(&A)..."
+         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸ä¿å­˜(&A)..."
       End
       Begin Menu mnuFileNew
-         Caption         =   "V‹Kì¬(&N)"
+         Caption         =   "æ–°è¦ä½œæˆ(&N)"
       End
       Begin Menu mnuFileSep2
          Caption         =   "-"
       End
       Begin Menu mnuFileExit
-         Caption         =   "I—¹(&X)"
+         Caption         =   "çµ‚äº†(&X)"
       End
    End
    Begin Menu mnuView
-      Caption         =   "•\¦(&V)"
+      Caption         =   "è¡¨ç¤º(&V)"
       Begin Menu mnuViewExplorer
-         Caption         =   "ƒGƒNƒXƒvƒ[ƒ‰(&E)"
+         Caption         =   "ã‚¨ã‚¯ã‚¹ãƒ—ãƒ­ãƒ¼ãƒ©(&E)"
       End
       Begin Menu mnuViewAlwaysOnTop
-         Caption         =   "í‚Éè‘O‚É•\¦(&T)"
+         Caption         =   "å¸¸ã«æ‰‹å‰ã«è¡¨ç¤º(&T)"
       End
    End
    Begin Menu mnuComposition
-      Caption         =   "\‘¢”z’u(&W)"
+      Caption         =   "æ§‹é€ é…ç½®(&W)"
       Begin Menu mnuCompositionAddFile
-         Caption         =   "ƒtƒ@ƒCƒ‹’Ç‰Á(&A)..."
+         Caption         =   "ãƒ•ã‚¡ã‚¤ãƒ«è¿½åŠ (&A)..."
       End
       Begin Menu mnuCompositionAddFolder
-         Caption         =   "ƒtƒHƒ‹ƒ_’Ç‰Á(&F)..."
+         Caption         =   "ãƒ•ã‚©ãƒ«ãƒ€è¿½åŠ (&F)..."
       End
       Begin Menu mnuCompositionRename
-         Caption         =   "–¼‘O•ÏX(&R)"
+         Caption         =   "åå‰å¤‰æ›´(&R)"
       End
       Begin Menu mnuCompositionRemove
-         Caption         =   "íœ(&D)"
+         Caption         =   "å‰Šé™¤(&D)"
       End
       Begin Menu mnuCompositionClear
-         Caption         =   "ƒNƒŠƒA(&C)"
+         Caption         =   "ã‚¯ãƒªã‚¢(&C)"
       End
    End
    Begin Menu mnuTrack
-      Caption         =   "ƒgƒ‰ƒbƒN(&T)"
+      Caption         =   "ãƒˆãƒ©ãƒƒã‚¯(&T)"
       Begin Menu mnuTrackAdd
-         Caption         =   "’Ç‰Á(&A)..."
+         Caption         =   "è¿½åŠ (&A)..."
       End
       Begin Menu mnuTrackRemove
-         Caption         =   "íœ(&D)"
+         Caption         =   "å‰Šé™¤(&D)"
       End
       Begin Menu mnuTrackPropertiesMenu
-         Caption         =   "İ’è(&P)..."
+         Caption         =   "è¨­å®š(&P)..."
       End
       Begin Menu mnuTrackClear
-         Caption         =   "ƒNƒŠƒA(&C)"
+         Caption         =   "ã‚¯ãƒªã‚¢(&C)"
       End
    End
    Begin Menu mnuTools
-      Caption         =   "ƒc[ƒ‹(&U)"
+      Caption         =   "ãƒ„ãƒ¼ãƒ«(&U)"
       Begin Menu mnuToolsCopy
-         Caption         =   "ƒfƒBƒXƒN•¡»(&C)..."
+         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯è¤‡è£½(&C)..."
       End
       Begin Menu mnuToolsErase
-         Caption         =   "ƒfƒBƒXƒNÁ‹(&E)..."
+         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯æ¶ˆå»(&E)..."
       End
       Begin Menu mnuToolsReadTracks
-         Caption         =   "ƒgƒ‰ƒbƒNæ‚è‚İ(&I)..."
+         Caption         =   "ãƒˆãƒ©ãƒƒã‚¯å–ã‚Šè¾¼ã¿(&I)..."
       End
       Begin Menu mnuToolsReadImage
-         Caption         =   "ƒCƒ[ƒW“Ç‚İ‚İ(&R)..."
+         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸èª­ã¿è¾¼ã¿(&R)..."
       End
       Begin Menu mnuToolsWriteImage
-         Caption         =   "ƒCƒ[ƒW‘‚«‚İ(&W)..."
+         Caption         =   "ã‚¤ãƒ¡ãƒ¼ã‚¸æ›¸ãè¾¼ã¿(&W)..."
       End
       Begin Menu mnuToolsAnalyze
-         Caption         =   "ƒfƒBƒXƒN•ªÍ(&A)..."
+         Caption         =   "ãƒ‡ã‚£ã‚¹ã‚¯åˆ†æ(&A)..."
       End
    End
    Begin Menu mnuHelp
-      Caption         =   "ƒwƒ‹ƒv(&H)"
+      Caption         =   "ãƒ˜ãƒ«ãƒ—(&H)"
       Begin Menu mnuHelpAbout
-         Caption         =   "ƒo[ƒWƒ‡ƒ“î•ñ(&A)..."
+         Caption         =   "ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±(&A)..."
       End
    End
 End
