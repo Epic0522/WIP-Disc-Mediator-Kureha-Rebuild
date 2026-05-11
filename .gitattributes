@@ -1,5 +1,5 @@
-*.bas linguist-language=Visual Basic
-*.cls linguist-language=Visual Basic
-*.frm linguist-language=Visual Basic
-*.vbp linguist-language=Visual Basic
-*.vbw linguist-language=Visual Basic
+*.bas linguist-language=Visual Basic 6.0
+*.cls linguist-language=Visual Basic 6.0
+*.frm linguist-language=Visual Basic 6.0
+*.vbp linguist-language=Visual Basic 6.0
+*.vbw linguist-language=Visual Basic 6.0
