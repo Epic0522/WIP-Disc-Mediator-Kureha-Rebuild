@@ -1,0 +1,988 @@
+VERSION 5.00
+Begin VB.Form MainForm
+   Appearance      =   0  'Flat
+   BackColor       =   &H8000000F&
+   Caption         =   "呉葉"
+   ClientHeight    =   9495
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   13815
+   BeginProperty Font
+      Name            =   "MS UI Gothic"
+      Size            =   9
+      Charset         =   128
+      Weight          =   400
+      Underline       =   0   'False
+      Italic          =   0   'False
+      Strikethrough   =   0   'False
+   EndProperty
+   LinkTopic       =   "MainForm"
+   ScaleHeight     =   9495
+   ScaleWidth      =   13815
+   StartUpPosition =   2  'CenterScreen
+   Begin VB.Frame fraToolbar
+      Caption         =   "操作"
+      Height          =   1035
+      Left            =   0
+      TabIndex        =   0
+      Top             =   0
+      Width           =   13815
+      Begin VB.CommandButton cmdWriteDisc
+         Caption         =   "書き込み"
+         Height          =   495
+         Left            =   150
+         TabIndex        =   1
+         Top             =   285
+         Width           =   1215
+      End
+      Begin VB.CommandButton cmdSaveProject
+         Caption         =   "保存"
+         Height          =   495
+         Left            =   1440
+         TabIndex        =   2
+         Top             =   285
+         Width           =   1215
+      End
+      Begin VB.CommandButton cmdEraseDisc
+         Caption         =   "消去"
+         Height          =   495
+         Left            =   2730
+         TabIndex        =   3
+         Top             =   285
+         Width           =   1215
+      End
+      Begin VB.CommandButton cmdCopyDisc
+         Caption         =   "複製"
+         Height          =   495
+         Left            =   4020
+         TabIndex        =   4
+         Top             =   285
+         Width           =   1215
+      End
+      Begin VB.CommandButton cmdImageWrite
+         Caption         =   "媒体書込"
+         Height          =   495
+         Left            =   5310
+         TabIndex        =   5
+         Top             =   285
+         Width           =   1335
+      End
+      Begin VB.CommandButton cmdImageRead
+         Caption         =   "媒体読込"
+         Height          =   495
+         Left            =   6720
+         TabIndex        =   6
+         Top             =   285
+         Width           =   1335
+      End
+      Begin VB.CommandButton cmdReadTracks
+         Caption         =   "取込み"
+         Height          =   495
+         Left            =   8130
+         TabIndex        =   7
+         Top             =   285
+         Width           =   1215
+      End
+      Begin VB.CommandButton cmdAnalyzeDisc
+         Caption         =   "分析"
+         Height          =   495
+         Left            =   9420
+         TabIndex        =   8
+         Top             =   285
+         Width           =   1215
+      End
+   End
+   Begin VB.Frame fraDisc
+      Caption         =   "構成"
+      Height          =   1335
+      Left            =   0
+      TabIndex        =   9
+      Top             =   1140
+      Width           =   13815
+      Begin VB.Label lblDiscLabel
+         Caption         =   "媒体識別子:"
+         Height          =   255
+         Left            =   180
+         TabIndex        =   10
+         Top             =   360
+         Width           =   1095
+      End
+      Begin VB.TextBox txtDiscLabel
+         Appearance      =   0  'Flat
+         Height          =   315
+         Left            =   1320
+         TabIndex        =   11
+         Top             =   300
+         Width           =   4875
+      End
+      Begin VB.Label lblFileSystem
+         Caption         =   "ファイル系:"
+         Height          =   255
+         Left            =   180
+         TabIndex        =   12
+         Top             =   780
+         Width           =   1095
+      End
+      Begin VB.ComboBox cboFileSystem
+         Appearance      =   0  'Flat
+         Height          =   315
+         Left            =   1320
+         Style           =   2  'Dropdown List
+         TabIndex        =   13
+         Top             =   720
+         Width           =   4875
+      End
+      Begin VB.Frame fraUsage
+         Caption         =   "使用量"
+         Height          =   855
+         Left            =   6360
+         TabIndex        =   14
+         Top             =   240
+         Width           =   7230
+         Begin VB.Label lblUsageValue
+            Alignment       =   2  'Center
+            Caption         =   "空き:648.000KiB"
+            Height          =   255
+            Left            =   4710
+            TabIndex        =   18
+            Top             =   165
+            Width           =   1875
+         End
+         Begin VB.ComboBox cboMediaType
+            Appearance      =   0  'Flat
+            Height          =   315
+            Left            =   5280
+            Style           =   2  'Dropdown List
+            TabIndex        =   19
+            Top             =   480
+            Width           =   1710
+         End
+         Begin VB.Shape shpDiscOuter
+            BorderColor     =   &H00FFFF00&
+            BorderWidth     =   2
+            Height          =   615
+            Left            =   1290
+            Shape           =   3  'Circle
+            Top             =   120
+            Width           =   2115
+         End
+         Begin VB.Shape shpDiscInner
+            BorderColor     =   &H00FFFF00&
+            BorderWidth     =   2
+            Height          =   255
+            Left            =   2010
+            Shape           =   3  'Circle
+            Top             =   300
+            Width           =   675
+         End
+         Begin VB.Label lblUsageCaption
+            Caption         =   "使用量:"
+            Height          =   255
+            Left            =   240
+            TabIndex        =   15
+            Top             =   240
+            Width           =   795
+         End
+      End
+   End
+   Begin VB.Frame fraExplorer
+      Caption         =   "構造配置"
+      Height          =   4335
+      Left            =   0
+      TabIndex        =   20
+      Top             =   2460
+      Width           =   13815
+      Begin VB.Frame fraDirectories
+         Caption         =   "ディレクトリ"
+         Height          =   3795
+         Left            =   120
+         TabIndex        =   21
+         Top             =   360
+         Width           =   4515
+         Begin VB.ListBox lstDirectories
+            Appearance      =   0  'Flat
+            Height          =   3180
+            Left            =   120
+            TabIndex        =   22
+            Top             =   360
+            Width           =   4215
+         End
+      End
+      Begin VB.Frame fraFiles
+         Caption         =   "ファイル"
+         Height          =   3795
+         Left            =   4740
+         TabIndex        =   23
+         Top             =   360
+         Width           =   8955
+         Begin VB.Frame fraFileActions
+            Caption         =   "ファイル操作"
+            Height          =   615
+            Left            =   120
+            TabIndex        =   24
+            Top             =   240
+            Width           =   8715
+            Begin VB.CommandButton cmdAddFile
+               Caption         =   "追加"
+               Height          =   315
+               Left            =   180
+               TabIndex        =   25
+               Top             =   210
+               Width           =   915
+            End
+            Begin VB.CommandButton cmdAddFolder
+               Caption         =   "フォルダ"
+               Height          =   315
+               Left            =   1155
+               TabIndex        =   26
+               Top             =   210
+               Width           =   915
+            End
+            Begin VB.CommandButton cmdRenameEntry
+               Caption         =   "名前変更"
+               Height          =   315
+               Left            =   2130
+               TabIndex        =   27
+               Top             =   210
+               Width           =   915
+            End
+            Begin VB.CommandButton cmdRemoveEntry
+               Caption         =   "削除"
+               Height          =   315
+               Left            =   3105
+               TabIndex        =   28
+               Top             =   210
+               Width           =   915
+            End
+            Begin VB.CommandButton cmdProperties
+               Caption         =   "設定"
+               Height          =   315
+               Left            =   4080
+               TabIndex        =   29
+               Top             =   210
+               Width           =   915
+            End
+         End
+         Begin VB.Label lblFilesHeader
+            Caption         =   "名前                                             容量        更新日時"
+            Height          =   255
+            Left            =   180
+            TabIndex        =   30
+            Top             =   1140
+            Width           =   8115
+         End
+         Begin VB.ListBox lstFiles
+            Appearance      =   0  'Flat
+            Height          =   2250
+            Left            =   120
+            TabIndex        =   31
+            Top             =   1140
+            Width           =   8715
+         End
+      End
+   End
+   Begin VB.Frame fraTrackArea
+      Caption         =   "トラック"
+      Height          =   2235
+      Left            =   0
+      TabIndex        =   32
+      Top             =   6780
+      Width           =   13815
+      Begin VB.Frame fraTrackActions
+         Caption         =   "トラック操作"
+         Height          =   615
+         Left            =   120
+         TabIndex        =   33
+         Top             =   240
+         Width           =   3135
+         Begin VB.CommandButton cmdAddTrack
+            Caption         =   "+"
+            Height          =   315
+            Left            =   180
+            TabIndex        =   34
+            Top             =   210
+            Width           =   435
+         End
+         Begin VB.CommandButton cmdRemoveTrack
+            Caption         =   "x"
+            Height          =   315
+            Left            =   660
+            TabIndex        =   35
+            Top             =   210
+            Width           =   435
+          End
+         Begin VB.CommandButton cmdMoveTrackUp
+            Caption         =   "^"
+            Height          =   315
+            Left            =   1140
+            TabIndex        =   36
+            Top             =   210
+            Width           =   435
+         End
+         Begin VB.CommandButton cmdMoveTrackDown
+            Caption         =   "v"
+            Height          =   315
+            Left            =   1620
+            TabIndex        =   37
+            Top             =   210
+            Width           =   435
+         End
+         Begin VB.CommandButton cmdTrackProperties
+            Caption         =   "CD"
+            Height          =   315
+            Left            =   2250
+            TabIndex        =   38
+            Top             =   210
+            Width           =   615
+         End
+      End
+      Begin VB.TextBox txtAlbumName
+         Appearance      =   0  'Flat
+         Height          =   315
+         Left            =   3780
+         Locked          =   -1  'True
+         TabIndex        =   40
+         Top             =   330
+         Width           =   3675
+      End
+      Begin VB.Label lblAlbumNameCaption
+         Caption         =   "Album Name:"
+         Height          =   255
+         Left            =   3780
+         TabIndex        =   39
+         Top             =   120
+         Width           =   1335
+      End
+      Begin VB.Label lblTracksHeader
+         Caption         =   "トラック      曲名                           演奏者                         ソース      Pregap   時間   Postgap   属性"
+         Height          =   255
+         Left            =   180
+         TabIndex        =   41
+         Top             =   960
+         Width           =   13155
+      End
+      Begin VB.ListBox lstTracks
+         Appearance      =   0  'Flat
+         Height          =   1080
+         Left            =   120
+         TabIndex        =   42
+         Top             =   1200
+         Width           =   13515
+      End
+   End
+   Begin VB.Label lblStatus
+      BackColor       =   &H8000000F&
+      BorderStyle     =   1  'Fixed Single
+      Caption         =   "Ready"
+      Height          =   255
+      Left            =   0
+      TabIndex        =   43
+      Top             =   9180
+      Width           =   13815
+   End
+   Begin Menu mnuFile
+      Caption         =   "ファイル(&F)"
+      Begin Menu mnuFileOpenImage
+         Caption         =   "イメージを開く(&O)..."
+      End
+      Begin Menu mnuFileLoadProject
+         Caption         =   "プロジェクトを開く(&R)..."
+      End
+      Begin Menu mnuFileSaveProject
+         Caption         =   "プロジェクト保存(&S)..."
+      End
+      Begin Menu mnuFileSep1
+         Caption         =   "-"
+      End
+      Begin Menu mnuFileWriteDisc
+         Caption         =   "書き込み(&W)..."
+      End
+      Begin Menu mnuFileSaveImage
+         Caption         =   "イメージ保存(&A)..."
+      End
+      Begin Menu mnuFileNew
+         Caption         =   "新規作成(&N)"
+      End
+      Begin Menu mnuFileSep2
+         Caption         =   "-"
+      End
+      Begin Menu mnuFileExit
+         Caption         =   "終了(&X)"
+      End
+   End
+   Begin Menu mnuView
+      Caption         =   "表示(&V)"
+      Begin Menu mnuViewExplorer
+         Caption         =   "エクスプローラ(&E)"
+      End
+      Begin Menu mnuViewAlwaysOnTop
+         Caption         =   "常に手前に表示(&T)"
+      End
+   End
+   Begin Menu mnuComposition
+      Caption         =   "構造配置(&W)"
+      Begin Menu mnuCompositionAddFile
+         Caption         =   "ファイル追加(&A)..."
+      End
+      Begin Menu mnuCompositionAddFolder
+         Caption         =   "フォルダ追加(&F)..."
+      End
+      Begin Menu mnuCompositionRename
+         Caption         =   "名前変更(&R)"
+      End
+      Begin Menu mnuCompositionRemove
+         Caption         =   "削除(&D)"
+      End
+      Begin Menu mnuCompositionClear
+         Caption         =   "クリア(&C)"
+      End
+   End
+   Begin Menu mnuTrack
+      Caption         =   "トラック(&T)"
+      Begin Menu mnuTrackAdd
+         Caption         =   "追加(&A)..."
+      End
+      Begin Menu mnuTrackRemove
+         Caption         =   "削除(&D)"
+      End
+      Begin Menu mnuTrackPropertiesMenu
+         Caption         =   "設定(&P)..."
+      End
+      Begin Menu mnuTrackClear
+         Caption         =   "クリア(&C)"
+      End
+   End
+   Begin Menu mnuTools
+      Caption         =   "ツール(&U)"
+      Begin Menu mnuToolsCopy
+         Caption         =   "ディスク複製(&C)..."
+      End
+      Begin Menu mnuToolsErase
+         Caption         =   "ディスク消去(&E)..."
+      End
+      Begin Menu mnuToolsReadTracks
+         Caption         =   "トラック取り込み(&I)..."
+      End
+      Begin Menu mnuToolsReadImage
+         Caption         =   "イメージ読み込み(&R)..."
+      End
+      Begin Menu mnuToolsWriteImage
+         Caption         =   "イメージ書き込み(&W)..."
+      End
+      Begin Menu mnuToolsAnalyze
+         Caption         =   "ディスク分析(&A)..."
+      End
+   End
+   Begin Menu mnuHelp
+      Caption         =   "ヘルプ(&H)"
+      Begin Menu mnuHelpAbout
+         Caption         =   "バージョン情報(&A)..."
+      End
+   End
+End
+Attribute VB_Name = "MainForm"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Option Explicit
+
+Private mTocInfo As TOCInformation
+Private mTrackEntries As Collection
+Private mFileEntries As Collection
+Private mCurrentTrack As TrackEntry
+
+Private Sub cmdAddFile_Click()
+    Dim fileName As String
+    Dim entry As FileEntry
+
+    fileName = Trim$(InputBox$("File name to add:", "Add File", "newfile.bin"))
+    If fileName = "" Then Exit Sub
+
+    Set entry = New FileEntry
+    entry.Name = fileName
+    entry.SizeText = "0 KB"
+    entry.ModifiedText = Format$(Date, "yyyy/mm/dd")
+    entry.IsDirectory = False
+    mFileEntries.Add entry
+
+    RefreshFileDisplay
+    lblStatus.Caption = "Added file: " & fileName
+End Sub
+
+Private Sub cmdAddFolder_Click()
+    Dim folderName As String
+    Dim entry As FileEntry
+
+    folderName = Trim$(InputBox$("Folder name to add:", "Add Folder", "NewFolder"))
+    If folderName = "" Then Exit Sub
+
+    Set entry = New FileEntry
+    entry.Name = folderName & "\"
+    entry.SizeText = "<DIR>"
+    entry.ModifiedText = Format$(Date, "yyyy/mm/dd")
+    entry.IsDirectory = True
+    mFileEntries.Add entry
+
+    RefreshFileDisplay
+    lblStatus.Caption = "Added folder: " & folderName
+End Sub
+
+Private Sub cmdAddTrack_Click()
+    Dim entry As TrackEntry
+    Dim defaultTitle As String
+
+    Set entry = New TrackEntry
+    entry.TrackNo = mTrackEntries.Count + 1
+    entry.EnglishText.LanguageEnabled = True
+    entry.EnglishText.TitleEnabled = True
+    entry.EnglishText.PerformerEnabled = True
+
+    defaultTitle = Trim$(InputBox$("Track title:", "Add Track", "Track " & Format$(entry.TrackNo, "00")))
+    If defaultTitle = "" Then defaultTitle = "Track " & Format$(entry.TrackNo, "00")
+
+    entry.EnglishText.Title = defaultTitle
+    entry.EnglishText.Performer = ""
+    mTrackEntries.Add entry
+    Set mCurrentTrack = entry
+
+    RefreshTrackDisplay
+    SelectTrackIndex mTrackEntries.Count - 1
+    lblStatus.Caption = "Added track: " & defaultTitle
+End Sub
+
+Private Sub cmdAnalyzeDisc_Click()
+    ShowPlaceholder "Analyze Disc UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdCopyDisc_Click()
+    ShowPlaceholder "Copy Disc UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdEraseDisc_Click()
+    ShowPlaceholder "Erase Disc UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdImageRead_Click()
+    ShowPlaceholder "Image Read UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdImageWrite_Click()
+    ShowPlaceholder "Image Write UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdMoveTrackDown_Click()
+    MoveSelectedTrack 1
+End Sub
+
+Private Sub cmdMoveTrackUp_Click()
+    MoveSelectedTrack -1
+End Sub
+
+Private Sub cmdProperties_Click()
+    Dim entry As FileEntry
+    Dim selectedIndex As Long
+
+    selectedIndex = lstFiles.ListIndex
+    If selectedIndex < 0 Then
+        MsgBox "Select a file or folder first.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    Set entry = mFileEntries.Item(selectedIndex + 1)
+    MsgBox "Name: " & entry.Name & vbCrLf & _
+        "Size: " & entry.SizeText & vbCrLf & _
+        "Modified: " & entry.ModifiedText, vbInformation, "Entry Properties"
+End Sub
+
+Private Sub cmdReadTracks_Click()
+    ShowPlaceholder "Track reading UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdRemoveEntry_Click()
+    Dim selectedIndex As Long
+
+    selectedIndex = lstFiles.ListIndex
+    If selectedIndex < 0 Then
+        MsgBox "Select a file or folder to remove.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    If MsgBox("Remove the selected entry?", vbYesNo + vbQuestion, "Kureha VB6 Rebuild") <> vbYes Then Exit Sub
+
+    mFileEntries.Remove selectedIndex + 1
+    RefreshFileDisplay
+    lblStatus.Caption = "Entry removed."
+End Sub
+
+Private Sub cmdRemoveTrack_Click()
+    Dim selectedIndex As Long
+
+    selectedIndex = lstTracks.ListIndex
+    If selectedIndex < 0 Then
+        MsgBox "Select a track to remove.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    If MsgBox("Remove the selected track?", vbYesNo + vbQuestion, "Kureha VB6 Rebuild") <> vbYes Then Exit Sub
+
+    mTrackEntries.Remove selectedIndex + 1
+    RenumberTracks
+    If mTrackEntries.Count > 0 Then
+        Set mCurrentTrack = mTrackEntries.Item(1)
+    Else
+        Set mCurrentTrack = Nothing
+    End If
+    RefreshTrackDisplay
+    lblStatus.Caption = "Track removed."
+End Sub
+
+Private Sub cmdRenameEntry_Click()
+    Dim selectedIndex As Long
+    Dim entry As FileEntry
+    Dim newName As String
+
+    selectedIndex = lstFiles.ListIndex
+    If selectedIndex < 0 Then
+        MsgBox "Select a file or folder to rename.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    Set entry = mFileEntries.Item(selectedIndex + 1)
+    newName = Trim$(InputBox$("New name:", "Rename Entry", entry.Name))
+    If newName = "" Then Exit Sub
+
+    If entry.IsDirectory And Right$(newName, 1) <> "\" Then
+        newName = newName & "\"
+    End If
+
+    entry.Name = newName
+    RefreshFileDisplay
+    SelectFileIndex selectedIndex
+    lblStatus.Caption = "Entry renamed."
+End Sub
+
+Private Sub cmdSaveProject_Click()
+    ShowPlaceholder "Project save UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub cmdTrackProperties_Click()
+    If mCurrentTrack Is Nothing Then
+        MsgBox "Add or select a track first.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    PropertyTrackForm.LoadFromTexts mCurrentTrack.EnglishText, mCurrentTrack.JapaneseText, True
+    PropertyTrackForm.Show vbModal, Me
+    RefreshTrackDisplay
+End Sub
+
+Private Sub cmdWriteDisc_Click()
+    ShowPlaceholder "Disc write UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub Form_Load()
+    Me.Font.Name = "MS UI Gothic"
+    Me.Font.Size = 9
+
+    Set mTocInfo = New TOCInformation
+    Set mTrackEntries = New Collection
+    Set mFileEntries = New Collection
+
+    cboFileSystem.AddItem "JIS X 0606 (Joliet+ Extension)"
+    cboFileSystem.AddItem "ISO 9660 Level 1"
+    cboFileSystem.AddItem "ISO 9660 Level 2"
+    cboFileSystem.ListIndex = 0
+
+    cboMediaType.AddItem "CD-R 74min"
+    cboMediaType.AddItem "CD-R 80min"
+    cboMediaType.AddItem "CD-RW 74min"
+    cboMediaType.ListIndex = 0
+
+    txtDiscLabel.Text = "VOL_202605111641"
+    txtAlbumName.Text = "No Album Name"
+
+    lstDirectories.Font.Name = "MS UI Gothic"
+    lstFiles.Font.Name = "MS Gothic"
+    lstFiles.Font.Size = 10
+    lstTracks.Font.Name = "MS Gothic"
+    lstTracks.Font.Size = 10
+
+    lstDirectories.AddItem "\"
+    lstDirectories.AddItem "Audio"
+    lstDirectories.AddItem "Data"
+    lstDirectories.AddItem "Extras"
+    lstDirectories.ListIndex = 0
+
+    SeedSampleFiles
+    SeedSampleTracks
+
+    RefreshTrackDisplay
+    RefreshFileDisplay
+    lblStatus.Caption = "UI scaffold loaded. Track CD-TEXT editor is wired."
+End Sub
+
+Private Sub lstTracks_Click()
+    Dim selectedIndex As Long
+
+    selectedIndex = lstTracks.ListIndex
+    If selectedIndex < 0 Then Exit Sub
+
+    Set mCurrentTrack = mTrackEntries.Item(selectedIndex + 1)
+    txtAlbumName.Text = mCurrentTrack.DisplayTitle
+End Sub
+
+Private Sub mnuFileExit_Click()
+    Unload Me
+End Sub
+
+Private Sub mnuFileLoadProject_Click()
+    ShowPlaceholder "Load Project UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub mnuFileNew_Click()
+    If MsgBox("Clear files and tracks for a new project?", vbYesNo + vbQuestion, "Kureha VB6 Rebuild") <> vbYes Then Exit Sub
+
+    Set mFileEntries = New Collection
+    Set mTrackEntries = New Collection
+    Set mCurrentTrack = Nothing
+    txtDiscLabel.Text = "VOL_" & Format$(Now, "yyyymmddhhnnss")
+    txtAlbumName.Text = "No Album Name"
+    RefreshFileDisplay
+    RefreshTrackDisplay
+    lblStatus.Caption = "New project created."
+End Sub
+
+Private Sub mnuFileOpenImage_Click()
+    ShowPlaceholder "Open Image UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub mnuFileSaveImage_Click()
+    ShowPlaceholder "Save Image UI is scaffolded but not wired yet."
+End Sub
+
+Private Sub mnuFileSaveProject_Click()
+    cmdSaveProject_Click
+End Sub
+
+Private Sub mnuFileWriteDisc_Click()
+    cmdWriteDisc_Click
+End Sub
+
+Private Sub mnuHelpAbout_Click()
+    MsgBox "Kureha VB6 Rebuild" & vbCrLf & "UI-first reconstruction build", vbInformation, "About"
+End Sub
+
+Private Sub mnuToolsAnalyze_Click()
+    cmdAnalyzeDisc_Click
+End Sub
+
+Private Sub mnuToolsCopy_Click()
+    cmdCopyDisc_Click
+End Sub
+
+Private Sub mnuToolsErase_Click()
+    cmdEraseDisc_Click
+End Sub
+
+Private Sub mnuToolsReadImage_Click()
+    cmdImageRead_Click
+End Sub
+
+Private Sub mnuToolsReadTracks_Click()
+    cmdReadTracks_Click
+End Sub
+
+Private Sub mnuToolsWriteImage_Click()
+    cmdImageWrite_Click
+End Sub
+
+Private Sub mnuTrackAdd_Click()
+    cmdAddTrack_Click
+End Sub
+
+Private Sub mnuTrackClear_Click()
+    If MsgBox("Clear all tracks?", vbYesNo + vbQuestion, "Kureha VB6 Rebuild") <> vbYes Then Exit Sub
+
+    Set mTrackEntries = New Collection
+    Set mCurrentTrack = Nothing
+    RefreshTrackDisplay
+    lblStatus.Caption = "All tracks cleared."
+End Sub
+
+Private Sub mnuTrackPropertiesMenu_Click()
+    cmdTrackProperties_Click
+End Sub
+
+Private Sub mnuTrackRemove_Click()
+    cmdRemoveTrack_Click
+End Sub
+
+Private Sub RefreshFileDisplay()
+    Dim i As Long
+    Dim entry As FileEntry
+
+    lstFiles.Clear
+
+    For i = 1 To mFileEntries.Count
+        Set entry = mFileEntries.Item(i)
+        lstFiles.AddItem PadRight(entry.Name, 42) & PadLeft(entry.SizeText, 9) & "   " & entry.ModifiedText
+    Next i
+End Sub
+
+Private Sub RefreshTrackDisplay()
+    Dim i As Long
+    Dim entry As TrackEntry
+
+    lstTracks.Clear
+
+    If mTrackEntries.Count = 0 Then
+        txtAlbumName.Text = "No Album Name"
+        lblStatus.Caption = "No tracks loaded."
+        Exit Sub
+    End If
+
+    For i = 1 To mTrackEntries.Count
+        Set entry = mTrackEntries.Item(i)
+        lstTracks.AddItem PadRight(Format$(entry.TrackNo, "00"), 9) & _
+            PadRight(entry.DisplayTitle, 28) & _
+            PadRight(entry.DisplayPerformer, 28) & _
+            PadRight(entry.Source, 14) & _
+            PadRight(entry.Pregap, 9) & _
+            PadRight(entry.Duration, 8) & _
+            PadRight(entry.Postgap, 9) & _
+            entry.Flags
+    Next i
+
+    If mCurrentTrack Is Nothing Then Set mCurrentTrack = mTrackEntries.Item(1)
+    txtAlbumName.Text = mCurrentTrack.DisplayTitle
+    lblStatus.Caption = "Track view refreshed."
+End Sub
+
+Private Sub RenumberTracks()
+    Dim i As Long
+
+    For i = 1 To mTrackEntries.Count
+        mTrackEntries.Item(i).TrackNo = i
+    Next i
+End Sub
+
+Private Sub MoveSelectedTrack(ByVal direction As Long)
+    Dim selectedIndex As Long
+    Dim targetIndex As Long
+    Dim reordered As New Collection
+    Dim i As Long
+    Dim movingEntry As TrackEntry
+
+    selectedIndex = lstTracks.ListIndex
+    If selectedIndex < 0 Then
+        MsgBox "Select a track first.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    targetIndex = selectedIndex + direction
+    If targetIndex < 0 Or targetIndex >= mTrackEntries.Count Then Exit Sub
+
+    Set movingEntry = mTrackEntries.Item(selectedIndex + 1)
+
+    For i = 1 To mTrackEntries.Count
+        If i - 1 = targetIndex Then
+            reordered.Add movingEntry
+        End If
+
+        If i - 1 <> selectedIndex Then
+            reordered.Add mTrackEntries.Item(i)
+        End If
+    Next i
+
+    If targetIndex = mTrackEntries.Count - 1 Then
+        If reordered.Count < mTrackEntries.Count Then reordered.Add movingEntry
+    End If
+
+    Set mTrackEntries = reordered
+    RenumberTracks
+    Set mCurrentTrack = mTrackEntries.Item(targetIndex + 1)
+    RefreshTrackDisplay
+    SelectTrackIndex targetIndex
+    lblStatus.Caption = "Track order updated."
+End Sub
+
+Private Sub SeedSampleFiles()
+    Dim entry As FileEntry
+
+    Set entry = New FileEntry
+    entry.Name = "README.TXT"
+    entry.SizeText = "12 KB"
+    entry.ModifiedText = "2026/05/11"
+    mFileEntries.Add entry
+
+    Set entry = New FileEntry
+    entry.Name = "cover.jpg"
+    entry.SizeText = "421 KB"
+    entry.ModifiedText = "2026/05/11"
+    mFileEntries.Add entry
+
+    Set entry = New FileEntry
+    entry.Name = "bonus\"
+    entry.SizeText = "<DIR>"
+    entry.ModifiedText = "2026/05/11"
+    entry.IsDirectory = True
+    mFileEntries.Add entry
+End Sub
+
+Private Sub SeedSampleTracks()
+    Dim entry As TrackEntry
+
+    mTocInfo.MCN = "1234567890123"
+    mTocInfo.TOCAdd 1, 1, 1, 0, 0, 0, 18000
+    mTocInfo.RawTOCAdd 1, 65, 1, 1, 0, 2, 0, 0, 0, 4, 0
+
+    Set entry = New TrackEntry
+    entry.TrackNo = 1
+    entry.EnglishText.LanguageEnabled = True
+    entry.EnglishText.TitleEnabled = True
+    entry.EnglishText.Title = "Sample Track"
+    entry.EnglishText.PerformerEnabled = True
+    entry.EnglishText.Performer = "Sample Performer"
+    entry.JapaneseText.LanguageEnabled = True
+    entry.JapaneseText.TitleEnabled = True
+    entry.JapaneseText.Title = "Sample JP Title"
+
+    mTrackEntries.Add entry
+    Set mCurrentTrack = entry
+End Sub
+
+Private Sub SelectFileIndex(ByVal index As Long)
+    If index >= 0 And index < lstFiles.ListCount Then
+        lstFiles.ListIndex = index
+    End If
+End Sub
+
+Private Sub SelectTrackIndex(ByVal index As Long)
+    If index >= 0 And index < lstTracks.ListCount Then
+        lstTracks.ListIndex = index
+        Set mCurrentTrack = mTrackEntries.Item(index + 1)
+        txtAlbumName.Text = mCurrentTrack.DisplayTitle
+    End If
+End Sub
+
+Private Sub ShowPlaceholder(ByVal messageText As String)
+    lblStatus.Caption = messageText
+    MsgBox messageText, vbInformation, "Kureha VB6 Rebuild"
+End Sub
+
+Private Function PadLeft(ByVal value As String, ByVal totalWidth As Long) As String
+    If Len(value) >= totalWidth Then
+        PadLeft = value
+    Else
+        PadLeft = Space$(totalWidth - Len(value)) & value
+    End If
+End Function
+
+Private Function PadRight(ByVal value As String, ByVal totalWidth As Long) As String
+    If Len(value) >= totalWidth Then
+        PadRight = Left$(value, totalWidth)
+    Else
+        PadRight = value & Space$(totalWidth - Len(value))
+    End If
+End Function

@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Keep repository metadata files
+!.gitignore
+!README.md
+!LICENSE
+
+# Keep the actual rebuild project
+!VB6Rebuild/
+!VB6Rebuild/**
