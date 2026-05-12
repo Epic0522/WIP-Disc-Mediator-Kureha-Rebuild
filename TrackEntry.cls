@@ -14,6 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private mTrackNo As Long
+Private mFilePath As String
 Private mSource As String
 Private mPregap As String
 Private mDuration As String
@@ -44,6 +45,14 @@ End Property
 
 Public Property Let TrackNo(ByVal value As Long)
     mTrackNo = value
+End Property
+
+Public Property Get FilePath() As String
+    FilePath = mFilePath
+End Property
+
+Public Property Let FilePath(ByVal value As String)
+    mFilePath = value
 End Property
 
 Public Property Get Source() As String

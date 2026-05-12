@@ -531,6 +531,8 @@ Private mTocInfo As TOCInformation
 Private mTrackEntries As Collection
 Private mFileEntries As Collection
 Private mCurrentTrack As TrackEntry
+Private mZenki As ZenkiEngine
+Private mZenkiAvailable As Boolean
 
 Private Sub cmdAddFile_Click()
     Dim fileName As String
@@ -577,8 +579,14 @@ Private Sub cmdAddTrack_Click()
     selectedPath = ShowOpenFileDialog(Me.hWnd, "Audio Files (*.wav;*.mp3;*.m3u)|*.wav;*.mp3;*.m3u", "Open Audio File")
     If selectedPath = "" Then Exit Sub
 
+    If HasOnlyPlaceholderTracks() Then
+        Set mTrackEntries = New Collection
+        Set mCurrentTrack = Nothing
+    End If
+
     Set entry = New TrackEntry
     entry.TrackNo = mTrackEntries.Count + 1
+    entry.FilePath = selectedPath
     entry.EnglishText.LanguageEnabled = True
     entry.EnglishText.TitleEnabled = True
     entry.EnglishText.PerformerEnabled = True
@@ -600,7 +608,9 @@ Private Sub cmdAddTrack_Click()
     RefreshTrackDisplay
     UpdateCapacityPreview
     SelectTrackIndex mTrackEntries.Count - 1
-    lblStatus.Caption = "Added track: " & defaultTitle
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "Added track: " & defaultTitle
+    End If
 End Sub
 
 Private Sub cmdAnalyzeDisc_Click()
@@ -696,8 +706,10 @@ Private Sub cmdRemoveTrack_Click()
         Set mCurrentTrack = Nothing
     End If
     RefreshTrackDisplay
-    lblStatus.Caption = "Track removed."
     UpdateCapacityPreview
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "Track removed."
+    End If
 End Sub
 
 Private Sub cmdRenameEntry_Click()
@@ -743,6 +755,9 @@ Private Sub cmdTrackProperties_Click()
     PropertyTrackForm.LoadFromTexts mCurrentTrack.EnglishText, mCurrentTrack.JapaneseText, True
     PropertyTrackForm.Show vbModal, Me
     RefreshTrackDisplay
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "Track CD-TEXT updated."
+    End If
 End Sub
 
 Private Sub cmdWriteDisc_Click()
@@ -784,6 +799,7 @@ Private Sub Form_Load()
 
     SeedSampleFiles
     SeedSampleTracks
+    InitializeZenkiEngine
 
     FitWindowToScreen
     LayoutMainForm
@@ -791,7 +807,11 @@ Private Sub Form_Load()
     RefreshTrackDisplay
     RefreshFileDisplay
     UpdateCapacityPreview
-    lblStatus.Caption = "UI scaffold loaded. Track CD-TEXT editor is wired."
+    If mZenkiAvailable Then
+        lblStatus.Caption = "UI scaffold loaded. Zenki bridge is ready."
+    Else
+        lblStatus.Caption = "UI scaffold loaded. Zenki bridge is offline."
+    End If
 End Sub
 
 Private Sub Form_Resize()
@@ -839,7 +859,9 @@ Private Sub mnuFileNew_Click()
     RefreshFileDisplay
     RefreshTrackDisplay
     UpdateCapacityPreview
-    lblStatus.Caption = "New project created."
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "New project created."
+    End If
 End Sub
 
 Private Sub mnuFileOpenImage_Click()
@@ -922,7 +944,9 @@ Private Sub mnuTrackClear_Click()
     Set mCurrentTrack = Nothing
     RefreshTrackDisplay
     UpdateCapacityPreview
-    lblStatus.Caption = "All tracks cleared."
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "All tracks cleared."
+    End If
 End Sub
 
 Private Sub mnuTrackPropertiesMenu_Click()
@@ -1028,7 +1052,9 @@ Private Sub MoveSelectedTrack(ByVal direction As Long)
     Set mCurrentTrack = mTrackEntries.Item(targetIndex + 1)
     RefreshTrackDisplay
     SelectTrackIndex targetIndex
-    lblStatus.Caption = "Track order updated."
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "Track order updated."
+    End If
 End Sub
 
 Private Sub SeedSampleFiles()
@@ -1063,6 +1089,7 @@ Private Sub SeedSampleTracks()
 
     Set entry = New TrackEntry
     entry.TrackNo = 1
+    entry.FilePath = ""
     entry.EnglishText.LanguageEnabled = True
     entry.EnglishText.TitleEnabled = True
     entry.EnglishText.Title = "Sample Track"
@@ -1331,7 +1358,7 @@ Private Sub SaveProjectToPath(ByVal savePath As String)
 
     For i = 1 To mTrackEntries.Count
         Set trackEntry = mTrackEntries.Item(i)
-        Print #fileNo, "TRACK|" & CStr(trackEntry.TrackNo) & "|" & EscapeValue(trackEntry.Source) & "|" & EscapeValue(trackEntry.Pregap) & "|" & EscapeValue(trackEntry.Duration) & "|" & EscapeValue(trackEntry.Postgap) & "|" & EscapeValue(trackEntry.Flags) & "|" & CStr(trackEntry.PreviewKiB)
+        Print #fileNo, "TRACK|" & CStr(trackEntry.TrackNo) & "|" & EscapeValue(trackEntry.FilePath) & "|" & EscapeValue(trackEntry.Source) & "|" & EscapeValue(trackEntry.Pregap) & "|" & EscapeValue(trackEntry.Duration) & "|" & EscapeValue(trackEntry.Postgap) & "|" & EscapeValue(trackEntry.Flags) & "|" & CStr(trackEntry.PreviewKiB)
         WriteCdTextBlock fileNo, "EN", trackEntry.EnglishText
         WriteCdTextBlock fileNo, "JP", trackEntry.JapaneseText
     Next i
@@ -1388,12 +1415,23 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
             Case "TRACK"
                 Set currentTrack = New TrackEntry
                 currentTrack.TrackNo = CLng(Val(SafeField(parts, 1)))
-                currentTrack.Source = UnescapeValue(SafeField(parts, 2))
-                currentTrack.Pregap = UnescapeValue(SafeField(parts, 3))
-                currentTrack.Duration = UnescapeValue(SafeField(parts, 4))
-                currentTrack.Postgap = UnescapeValue(SafeField(parts, 5))
-                currentTrack.Flags = UnescapeValue(SafeField(parts, 6))
-                currentTrack.PreviewKiB = CLng(Val(SafeField(parts, 7)))
+                If UBound(parts) >= 8 Then
+                    currentTrack.FilePath = UnescapeValue(SafeField(parts, 2))
+                    currentTrack.Source = UnescapeValue(SafeField(parts, 3))
+                    currentTrack.Pregap = UnescapeValue(SafeField(parts, 4))
+                    currentTrack.Duration = UnescapeValue(SafeField(parts, 5))
+                    currentTrack.Postgap = UnescapeValue(SafeField(parts, 6))
+                    currentTrack.Flags = UnescapeValue(SafeField(parts, 7))
+                    currentTrack.PreviewKiB = CLng(Val(SafeField(parts, 8)))
+                Else
+                    currentTrack.FilePath = ""
+                    currentTrack.Source = UnescapeValue(SafeField(parts, 2))
+                    currentTrack.Pregap = UnescapeValue(SafeField(parts, 3))
+                    currentTrack.Duration = UnescapeValue(SafeField(parts, 4))
+                    currentTrack.Postgap = UnescapeValue(SafeField(parts, 5))
+                    currentTrack.Flags = UnescapeValue(SafeField(parts, 6))
+                    currentTrack.PreviewKiB = CLng(Val(SafeField(parts, 7)))
+                End If
                 mTrackEntries.Add currentTrack
             Case "TEXT"
                 If Not currentTrack Is Nothing Then
@@ -1416,7 +1454,9 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
     RefreshFileDisplay
     RefreshTrackDisplay
     UpdateCapacityPreview
-    lblStatus.Caption = "Project loaded: " & loadPath
+    If SyncZenkiFromTracks() Then
+        lblStatus.Caption = "Project loaded: " & loadPath
+    End If
     Exit Sub
 
 LoadError:
@@ -1521,6 +1561,22 @@ Private Function FileTitleFromPath(ByVal filePath As String) As String
     End If
 End Function
 
+Private Function HasOnlyPlaceholderTracks() As Boolean
+    Dim i As Long
+    Dim entry As TrackEntry
+
+    If mTrackEntries.Count = 0 Then Exit Function
+
+    HasOnlyPlaceholderTracks = True
+    For i = 1 To mTrackEntries.Count
+        Set entry = mTrackEntries.Item(i)
+        If Trim$(entry.FilePath) <> "" Then
+            HasOnlyPlaceholderTracks = False
+            Exit Function
+        End If
+    Next i
+End Function
+
 Private Function TrackCount() As Long
     TrackCount = mTrackEntries.Count
 End Function
@@ -1554,6 +1610,40 @@ Private Function ProjectHasCdText() As Boolean
             End If
         End If
     Next i
+End Function
+
+Private Sub InitializeZenkiEngine()
+    On Error GoTo InitError
+
+    Set mZenki = New ZenkiEngine
+    mZenkiAvailable = Not (mZenki Is Nothing)
+    If mZenkiAvailable Then mZenkiAvailable = (mZenki.Handle <> 0)
+    Exit Sub
+
+InitError:
+    mZenkiAvailable = False
+    Set mZenki = Nothing
+End Sub
+
+Private Function SyncZenkiFromTracks() As Boolean
+    Dim syncedCount As Long
+    Dim skippedCount As Long
+
+    If Not mZenkiAvailable Then
+        SyncZenkiFromTracks = True
+        Exit Function
+    End If
+
+    On Error GoTo SyncError
+
+    If SyncZenkiTracks(mZenki, mTrackEntries, syncedCount, skippedCount) Then
+        SyncZenkiFromTracks = True
+        Exit Function
+    End If
+
+SyncError:
+    MsgBox "Zenki sync failed." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
+    lblStatus.Caption = "Zenki sync failed."
 End Function
 
 Private Sub UpdateCapacityPreview()

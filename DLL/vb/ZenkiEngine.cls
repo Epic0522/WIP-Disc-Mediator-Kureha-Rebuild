@@ -34,6 +34,10 @@ Public Function AddTrackFile(ByVal fileName As String, Optional ByVal pregap As 
     AddTrackFile = (Zenki_AddTrack(mHandle, fileName, pregap, postgap, flags) <> 0)
 End Function
 
+Public Sub ClearTracks()
+    If mHandle <> 0 Then Zenki_ClearTrack mHandle
+End Sub
+
 Public Function TrackCount() As Long
     TrackCount = Zenki_GetTrackCount(mHandle)
 End Function

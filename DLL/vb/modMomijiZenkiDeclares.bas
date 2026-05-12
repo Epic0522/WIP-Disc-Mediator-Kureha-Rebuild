@@ -204,13 +204,13 @@ Public Declare Function Zenki_AddISODummyFile Lib "Zenki.dll" Alias "AddISODummy
     ByVal hEngine As Long, _
     ByVal isoName As String, _
     ByVal byteSizeOrAttribute As Long, _
-    ByVal attribute As Long, _
+    ByVal fileAttribute As Long, _
     ByVal timestampValue As Long) As Long
 
 Public Declare Function Zenki_MakeISODirectory Lib "Zenki.dll" Alias "MakeISODirectory" ( _
     ByVal hEngine As Long, _
     ByVal isoName As String, _
-    ByVal attribute As Long, _
+    ByVal fileAttribute As Long, _
     ByVal timestampValue As Long) As Long
 
 Public Declare Sub Zenki_GetISONewFileDirectoryName Lib "Zenki.dll" Alias "GetISONewFileDirectoryName" ( _
@@ -234,7 +234,7 @@ Public Declare Function Zenki_RenameISOFile Lib "Zenki.dll" Alias "RenameISOFile
 Public Declare Function Zenki_ChangeISOProperties Lib "Zenki.dll" Alias "ChangeISOProperties" ( _
     ByVal hEngine As Long, _
     ByVal isoName As String, _
-    ByVal attribute As Long, _
+    ByVal fileAttribute As Long, _
     ByVal timestampValue As Long) As Long
 
 Public Declare Sub Zenki_GetISOCurrentDirectory Lib "Zenki.dll" Alias "GetISOCurrentDirectory" ( _

@@ -32,6 +32,11 @@ Public Const OFN_PATHMUSTEXIST As Long = &H800
 Public Const OFN_EXPLORER As Long = &H80000
 
 Public Sub Main()
+    On Error Resume Next
+    ChDrive Left$(App.Path, 1)
+    ChDir App.Path
+    On Error GoTo 0
+
     Load MainForm
     MainForm.Show
 End Sub
