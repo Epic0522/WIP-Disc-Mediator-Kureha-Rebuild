@@ -57,6 +57,48 @@ Public Function GetText(ByVal trackNo As Long, ByVal languageNo As Long, ByVal i
     GetText = CStringFromBuffer(buf)
 End Function
 
+Public Function GetTrackPath(ByVal trackNo As Long) As String
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackPath = CStringFromBytes(infoBytes, &H400)
+End Function
+
+Public Function GetTrackPathHex(ByVal trackNo As Long, Optional ByVal maxBytes As Long = 64) As String
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackPathHex = HexFromBytes(infoBytes, maxBytes)
+End Function
+
+Public Function GetTrackPregapFrames(ByVal trackNo As Long) As Long
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackPregapFrames = ReadLongFromBytes(infoBytes, &H400)
+End Function
+
+Public Function GetTrackPostgapFrames(ByVal trackNo As Long) As Long
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackPostgapFrames = ReadLongFromBytes(infoBytes, &H404)
+End Function
+
+Public Function GetTrackControlFlag(ByVal trackNo As Long) As Long
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackControlFlag = ReadLongFromBytes(infoBytes, &H408)
+End Function
+
+Public Function GetTrackSectorCount(ByVal trackNo As Long) As Long
+    Dim infoBytes() As Byte
+
+    infoBytes = ReadTrackInfoBytes(trackNo)
+    GetTrackSectorCount = ReadLongFromBytes(infoBytes, &H40C)
+End Function
+
 Public Function ReadStart() As Boolean
     ReadStart = (Zenki_ReadStart(mHandle, vbNullString) = 0)
 End Function
@@ -69,3 +111,64 @@ End Function
 Public Sub ReadEnd()
     Zenki_ReadEnd mHandle
 End Sub
+
+Private Function ReadTrackInfoBytes(ByVal trackNo As Long) As Byte()
+    Dim buffer(0 To &H40F) As Byte
+
+    Zenki_GetTrackInformation mHandle, trackNo, VarPtr(buffer(0))
+    ReadTrackInfoBytes = buffer
+End Function
+
+Private Function ReadLongFromBytes(ByRef value() As Byte, ByVal offset As Long) As Long
+    Dim result As Long
+
+    If offset < LBound(value) Or offset + 3 > UBound(value) Then Exit Function
+
+    CopyMemory VarPtr(result), VarPtr(value(offset)), 4
+    ReadLongFromBytes = result
+End Function
+
+Private Function CStringFromBytes(ByRef value() As Byte, ByVal maxBytes As Long) As String
+    Dim i As Long
+    Dim limitValue As Long
+    Dim byteCount As Long
+    Dim rawBytes() As Byte
+
+    If maxBytes <= 0 Then Exit Function
+
+    limitValue = maxBytes - 1
+    If limitValue > UBound(value) Then limitValue = UBound(value)
+
+    For i = 0 To limitValue
+        If value(i) = 0 Then Exit For
+        byteCount = byteCount + 1
+    Next i
+
+    If byteCount = 0 Then
+        CStringFromBytes = ""
+        Exit Function
+    End If
+
+    ReDim rawBytes(0 To byteCount - 1) As Byte
+    CopyMemory VarPtr(rawBytes(0)), VarPtr(value(0)), byteCount
+    CStringFromBytes = StrConv(rawBytes, vbUnicode)
+End Function
+
+Private Function HexFromBytes(ByRef value() As Byte, ByVal maxBytes As Long) As String
+    Dim i As Long
+    Dim lastIndex As Long
+    Dim pieces() As String
+
+    If maxBytes <= 0 Then Exit Function
+
+    lastIndex = maxBytes - 1
+    If lastIndex > UBound(value) Then lastIndex = UBound(value)
+    If lastIndex < 0 Then Exit Function
+
+    ReDim pieces(0 To lastIndex) As String
+    For i = 0 To lastIndex
+        pieces(i) = Right$("0" & Hex$(value(i)), 2)
+    Next i
+
+    HexFromBytes = Join(pieces, " ")
+End Function

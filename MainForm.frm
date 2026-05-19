@@ -1628,6 +1628,7 @@ End Sub
 Private Function SyncZenkiFromTracks() As Boolean
     Dim syncedCount As Long
     Dim skippedCount As Long
+    Dim verifyReport As String
 
     If Not mZenkiAvailable Then
         SyncZenkiFromTracks = True
@@ -1637,13 +1638,20 @@ Private Function SyncZenkiFromTracks() As Boolean
     On Error GoTo SyncError
 
     If SyncZenkiTracks(mZenki, mTrackEntries, syncedCount, skippedCount) Then
-        SyncZenkiFromTracks = True
-        Exit Function
+        If VerifyZenkiTracks(mZenki, mTrackEntries, verifyReport) Then
+            SyncZenkiFromTracks = True
+            Exit Function
+        End If
     End If
 
 SyncError:
-    MsgBox "Zenki sync failed." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
-    lblStatus.Caption = "Zenki sync failed."
+    If verifyReport <> "" Then
+        MsgBox "Zenki verification failed." & vbCrLf & verifyReport, vbExclamation, "Kureha VB6 Rebuild"
+        lblStatus.Caption = "Zenki verification failed."
+    Else
+        MsgBox "Zenki sync failed." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
+        lblStatus.Caption = "Zenki sync failed."
+    End If
 End Function
 
 Private Sub UpdateCapacityPreview()

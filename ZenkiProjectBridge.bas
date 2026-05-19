@@ -50,6 +50,35 @@ SyncError:
     SyncZenkiTracks = False
 End Function
 
+Public Function VerifyZenkiTracks(ByVal engine As ZenkiEngine, ByVal tracks As Collection, ByRef reportText As String) As Boolean
+    Dim i As Long
+    Dim dllTrackNo As Long
+    Dim entry As TrackEntry
+    Dim mismatchText As String
+
+    If engine Is Nothing Then Exit Function
+
+    If engine.TrackCount <> CountBackedTracks(tracks) Then
+        reportText = "Track count mismatch. VB=" & CStr(CountBackedTracks(tracks)) & " DLL=" & CStr(engine.TrackCount)
+        Exit Function
+    End If
+
+    For i = 1 To tracks.Count
+        Set entry = tracks.Item(i)
+        If Trim$(entry.FilePath) <> "" Then
+            dllTrackNo = dllTrackNo + 1
+            mismatchText = VerifyTrack(engine, dllTrackNo, entry)
+            If mismatchText <> "" Then
+                reportText = mismatchText
+                Exit Function
+            End If
+        End If
+    Next i
+
+    reportText = "Zenki verified " & CStr(dllTrackNo) & " track(s)."
+    VerifyZenkiTracks = True
+End Function
+
 Public Function MsfToFramesBridge(ByVal value As String) As Long
     Dim parts() As String
     Dim minutesValue As Long
@@ -80,6 +109,136 @@ Private Function CollectionHasCdText(ByVal tracks As Collection) As Boolean
             Exit Function
         End If
     Next i
+End Function
+
+Private Function CountBackedTracks(ByVal tracks As Collection) As Long
+    Dim i As Long
+    Dim entry As TrackEntry
+
+    For i = 1 To tracks.Count
+        Set entry = tracks.Item(i)
+        If Trim$(entry.FilePath) <> "" Then CountBackedTracks = CountBackedTracks + 1
+    Next i
+End Function
+
+Private Function VerifyTrack(ByVal engine As ZenkiEngine, ByVal dllTrackNo As Long, ByVal entry As TrackEntry) As String
+    Dim actualPath As String
+    Dim expectedPath As String
+    Dim actualPathHex As String
+    Dim expectedFile As String
+    Dim actualFile As String
+    Dim expectedFlag As Long
+    Dim actualFlag As Long
+    Dim actualSectorCount As Long
+
+    actualPath = NormalizePathText(engine.GetTrackPath(dllTrackNo))
+    expectedPath = NormalizePathText(entry.FilePath)
+    actualPathHex = engine.GetTrackPathHex(dllTrackNo, 96)
+    expectedFile = FileNameOnly(expectedPath)
+    actualFile = FileNameOnly(actualPath)
+    expectedFlag = ZenkiTrackFormatFlag(entry.Source)
+    actualFlag = engine.GetTrackControlFlag(dllTrackNo)
+    actualSectorCount = engine.GetTrackSectorCount(dllTrackNo)
+
+    If Not SameTrackPath(actualPath, expectedPath) Then
+        VerifyTrack = "Track " & CStr(dllTrackNo) & " path mismatch." & vbCrLf & _
+            "Expected file: " & expectedFile & vbCrLf & _
+            "Actual file: " & actualFile & vbCrLf & _
+            "Actual bytes: " & actualPathHex & vbCrLf & _
+            "Actual path: " & actualPath
+        Exit Function
+    End If
+
+    If engine.GetTrackPregapFrames(dllTrackNo) <> MsfToFramesBridge(entry.Pregap) Then
+        VerifyTrack = "Track " & CStr(dllTrackNo) & " pregap mismatch."
+        Exit Function
+    End If
+
+    If engine.GetTrackPostgapFrames(dllTrackNo) <> MsfToFramesBridge(entry.Postgap) Then
+        VerifyTrack = "Track " & CStr(dllTrackNo) & " postgap mismatch."
+        Exit Function
+    End If
+
+    If actualFlag <> expectedFlag Then
+        VerifyTrack = "Track " & CStr(dllTrackNo) & " flag mismatch." & vbCrLf & _
+            "Expected flag: " & CStr(expectedFlag) & vbCrLf & _
+            "Actual flag: " & CStr(actualFlag) & vbCrLf & _
+            "Source label: " & entry.Source
+        Exit Function
+    End If
+
+    If actualSectorCount <= 0 Then
+        VerifyTrack = "Track " & CStr(dllTrackNo) & " sector count invalid." & vbCrLf & _
+            "Actual sector count: " & CStr(actualSectorCount)
+        Exit Function
+    End If
+
+    If Not VerifyTextLanguage(engine, dllTrackNo, ZENKI_LANG_ENGLISH, entry.EnglishText, VerifyTrack) Then Exit Function
+    If Not VerifyTextLanguage(engine, dllTrackNo, ZENKI_LANG_JAPANESE, entry.JapaneseText, VerifyTrack) Then Exit Function
+End Function
+
+Private Function VerifyTextLanguage(ByVal engine As ZenkiEngine, ByVal trackNo As Long, ByVal languageNo As Long, ByVal textItem As TOCCDText, ByRef mismatchText As String) As Boolean
+    If textItem Is Nothing Then
+        VerifyTextLanguage = True
+        Exit Function
+    End If
+
+    If Not textItem.LanguageEnabled Then
+        VerifyTextLanguage = True
+        Exit Function
+    End If
+
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_TITLE, textItem.TitleEnabled, textItem.Title, mismatchText, "title") Then Exit Function
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_PERFORMER, textItem.PerformerEnabled, textItem.Performer, mismatchText, "performer") Then Exit Function
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_SONGWRITER, textItem.SongwriterEnabled, textItem.Songwriter, mismatchText, "songwriter") Then Exit Function
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_COMPOSER, textItem.ComposerEnabled, textItem.Composer, mismatchText, "composer") Then Exit Function
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_ARRANGER, textItem.ArrangerEnabled, textItem.Arranger, mismatchText, "arranger") Then Exit Function
+    If Not VerifyTextField(engine, trackNo, languageNo, ZENKI_INFO_MESSAGE, textItem.MessageEnabled, textItem.Message, mismatchText, "message") Then Exit Function
+
+    VerifyTextLanguage = True
+End Function
+
+Private Function VerifyTextField(ByVal engine As ZenkiEngine, ByVal trackNo As Long, ByVal languageNo As Long, ByVal informationNo As Long, ByVal enabled As Boolean, ByVal expectedValue As String, ByRef mismatchText As String, ByVal fieldName As String) As Boolean
+    Dim actualValue As String
+
+    If Not enabled Then
+        VerifyTextField = True
+        Exit Function
+    End If
+
+    actualValue = engine.GetText(trackNo, languageNo, informationNo)
+    If StrComp(actualValue, expectedValue, vbBinaryCompare) <> 0 Then
+        mismatchText = "Track " & CStr(trackNo) & " " & fieldName & " mismatch."
+        Exit Function
+    End If
+
+    VerifyTextField = True
+End Function
+
+Private Function NormalizePathText(ByVal value As String) As String
+    NormalizePathText = Replace(Trim$(value), "/", "\")
+End Function
+
+Private Function SameTrackPath(ByVal leftPath As String, ByVal rightPath As String) As Boolean
+    If StrComp(leftPath, rightPath, vbTextCompare) = 0 Then
+        SameTrackPath = True
+        Exit Function
+    End If
+
+    If StrComp(FileNameOnly(leftPath), FileNameOnly(rightPath), vbTextCompare) = 0 Then
+        SameTrackPath = True
+    End If
+End Function
+
+Private Function FileNameOnly(ByVal value As String) As String
+    Dim slashPos As Long
+
+    slashPos = InStrRev(value, "\")
+    If slashPos > 0 Then
+        FileNameOnly = Mid$(value, slashPos + 1)
+    Else
+        FileNameOnly = value
+    End If
 End Function
 
 Private Function TextItemHasCdText(ByVal textItem As TOCCDText) As Boolean

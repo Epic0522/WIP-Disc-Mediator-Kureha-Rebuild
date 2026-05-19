@@ -4,6 +4,11 @@ Option Explicit
 ' Clean VB6 declares for the rebuilt Momiji.dll / Zenki.dll.
 ' All DLL Boolean-like results are declared As Long to avoid VB6 Boolean width issues.
 
+Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+    ByVal Destination As Long, _
+    ByVal Source As Long, _
+    ByVal Length As Long)
+
 ' ===== Momiji.dll =====
 Public Declare Function Momiji_GetEngineVersion Lib "Momiji.dll" Alias "GetEngineVersion" () As Long
 Public Declare Function Momiji_Initialize Lib "Momiji.dll" Alias "Initialize" () As Long
