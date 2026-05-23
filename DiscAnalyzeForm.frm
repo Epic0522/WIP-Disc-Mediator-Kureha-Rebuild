@@ -52,7 +52,8 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdRefresh_Click()
-    MsgBox "Detailed disc analysis is not wired yet.", vbInformation, "Disc Analyze"
+    ListStatusForm.LoadLines "Disc analysis stages", "TOC inspection" & vbCrLf & "Raw TOC inspection" & vbCrLf & "CD-TEXT pack inspection"
+    ListStatusForm.Show vbModal, Me
 End Sub
 
 Public Sub LoadPreview(ByVal discLabel As String, ByVal mediaType As String, ByVal trackCount As Long, ByVal hasCdText As Boolean)

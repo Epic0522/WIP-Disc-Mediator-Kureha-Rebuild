@@ -42,6 +42,9 @@ The rebuild is being developed in stages:
 - `Project.vbp`: the rebuilt VB6 project
 - `MainForm.frm`: the main application scaffold
 - `PropertyTrackForm.frm`: track `CD-TEXT` editor
+- `DiscWriteForm.frm`, `DiscReadForm.frm`, `DiscCopyForm.frm`, `DiscEraseForm.frm`, `DiscAnalyzeForm.frm`: primary disc-operation dialogs
+- `PropertyConfigurationForm.frm`, `PropertyISOFile.frm`, `PropertyReadParameterForm.frm`, `PropertyWriteParameterForm.frm`: configuration and property dialogs
+- `TrackRippingForm.frm`, `TrackRippingSubForm.frm`, `WellSaveForm.frm`, `WellWriteForm.frm`, `IsReadyForm.frm`, `ListStatusForm.frm`: ripping, image, media-ready, and status/progress scaffolds
 - `TOCTrack.cls`: track model and time helpers
 - `TOCRawTrack.cls`: raw `TOC` entry model
 - `TOCCDText.cls`: bilingual `CD-TEXT` field container
@@ -107,5 +110,7 @@ As of the current milestone:
 - the disc usage area now includes a working preview ring and remaining-capacity estimate driven by imported track durations
 - the required native dependency layer is now organized in-repo as `DLL_stub/` and `DLL/`, preserving both the first static reverse-engineering pass and the current active reimplementation workspace
 - the current `DLL/` workspace already includes rebuilt DLL outputs, native reimplementation sources, and VB6 wrapper classes intended to receive and relay calls from the application side
+- the rebuilt VB6 project now has form-level coverage for the original application's main window, disc-operation dialogs, configuration/property dialogs, image save/write progress windows, media-ready prompt, list status dialog, and track-ripping subwindow
+- the major menu and toolbar entry points now open concrete rebuilt windows instead of stopping at a single placeholder message, so the next development pass can debug behavior inside each screen
 
 What is still missing is the original application's full authoring and burn pipeline: the current rebuild is suitable for UI, metadata, and workflow reconstruction, but not yet for final disc-writing equivalence.

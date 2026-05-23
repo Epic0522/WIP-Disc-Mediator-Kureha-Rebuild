@@ -74,7 +74,8 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdRip_Click()
-    MsgBox "Track ripping pipeline is not wired yet.", vbInformation, "Track Ripping"
+    TrackRippingSubForm.LoadTask "Track ripping"
+    TrackRippingSubForm.Show vbModal, Me
 End Sub
 
 Private Sub Form_Load()

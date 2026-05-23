@@ -445,6 +445,15 @@ Begin VB.Form MainForm
       Begin Menu mnuCompositionRemove
          Caption         =   "削除(&D)"
       End
+      Begin Menu mnuCompositionMakeDirectory
+         Caption         =   "Make directory(&M)..."
+      End
+      Begin Menu mnuCompositionDummyFile
+         Caption         =   "Add dummy file(&Y)..."
+      End
+      Begin Menu mnuCompositionProperties
+         Caption         =   "Properties(&P)..."
+      End
       Begin Menu mnuCompositionClear
          Caption         =   "クリア(&C)"
       End
@@ -456,6 +465,15 @@ Begin VB.Form MainForm
       End
       Begin Menu mnuTrackRemove
          Caption         =   "削除(&D)"
+      End
+      Begin Menu mnuTrackUp
+         Caption         =   "Move up(&U)"
+      End
+      Begin Menu mnuTrackDown
+         Caption         =   "Move down(&N)"
+      End
+      Begin Menu mnuDiscProperties
+         Caption         =   "Disc properties(&D)..."
       End
       Begin Menu mnuTrackPropertiesMenu
          Caption         =   "設定(&P)..."
@@ -483,6 +501,18 @@ Begin VB.Form MainForm
       End
       Begin Menu mnuToolsAnalyze
          Caption         =   "ディスク分析(&A)..."
+      End
+      Begin Menu mnuToolsMasteringLog
+         Caption         =   "Mastering log(&L)..."
+      End
+      Begin Menu mnuToolsReadParameters
+         Caption         =   "Read parameters(&R)..."
+      End
+      Begin Menu mnuToolsWriteParameters
+         Caption         =   "Write parameters(&W)..."
+      End
+      Begin Menu mnuToolsConfiguration
+         Caption         =   "Configuration(&C)..."
       End
    End
    Begin Menu mnuHelp
@@ -535,39 +565,33 @@ Private mZenki As ZenkiEngine
 Private mZenkiAvailable As Boolean
 
 Private Sub cmdAddFile_Click()
-    Dim fileName As String
+    Dim selectedPath As String
     Dim entry As FileEntry
 
-    fileName = Trim$(InputBox$("File name to add:", "Add File", "newfile.bin"))
-    If fileName = "" Then Exit Sub
+    selectedPath = ShowOpenFileDialog(Me.hWnd, "All Files (*.*)|*.*", "Add File", App.Path)
+    If selectedPath = "" Then Exit Sub
 
-    Set entry = New FileEntry
-    entry.Name = fileName
-    entry.SizeText = "0 KB"
-    entry.ModifiedText = Format$(Date, "yyyy/mm/dd")
-    entry.IsDirectory = False
+    Set entry = BuildFileEntryFromPath(selectedPath)
     mFileEntries.Add entry
 
     RefreshFileDisplay
-    lblStatus.Caption = "Added file: " & fileName
+    SelectFileIndex mFileEntries.Count - 1
+    lblStatus.Caption = "Added file: " & entry.Name
 End Sub
 
 Private Sub cmdAddFolder_Click()
-    Dim folderName As String
+    Dim selectedPath As String
     Dim entry As FileEntry
 
-    folderName = Trim$(InputBox$("Folder name to add:", "Add Folder", "NewFolder"))
-    If folderName = "" Then Exit Sub
+    selectedPath = ShowFolderDialog(Me.hWnd, "Add Folder")
+    If selectedPath = "" Then Exit Sub
 
-    Set entry = New FileEntry
-    entry.Name = folderName & "\"
-    entry.SizeText = "<DIR>"
-    entry.ModifiedText = Format$(Date, "yyyy/mm/dd")
-    entry.IsDirectory = True
+    Set entry = BuildFolderEntryFromPath(selectedPath)
     mFileEntries.Add entry
 
     RefreshFileDisplay
-    lblStatus.Caption = "Added folder: " & folderName
+    SelectFileIndex mFileEntries.Count - 1
+    lblStatus.Caption = "Added folder: " & entry.Name
 End Sub
 
 Private Sub cmdAddTrack_Click()
@@ -661,9 +685,8 @@ Private Sub cmdProperties_Click()
     End If
 
     Set entry = mFileEntries.Item(selectedIndex + 1)
-    MsgBox "Name: " & entry.Name & vbCrLf & _
-        "Size: " & entry.SizeText & vbCrLf & _
-        "Modified: " & entry.ModifiedText, vbInformation, "Entry Properties"
+    PropertyISOFile.LoadEntry entry.Name, DisplayOriginalPath(entry), entry.SizeText, entry.ModifiedText
+    PropertyISOFile.Show vbModal, Me
 End Sub
 
 Private Sub cmdReadTracks_Click()
@@ -740,7 +763,7 @@ End Sub
 Private Sub cmdSaveProject_Click()
     Dim savePath As String
 
-    savePath = Trim$(InputBox$("Save project path:", "Save Project", App.Path & "\kureha-rebuild-project.krp"))
+    savePath = ShowSaveFileDialog(Me.hWnd, "Kureha Project (*.krp)|*.krp|All Files (*.*)|*.*", "Save Project", "kureha-rebuild-project.krp", App.Path, "krp")
     If savePath = "" Then Exit Sub
 
     SaveProjectToPath savePath
@@ -842,7 +865,7 @@ End Sub
 Private Sub mnuFileLoadProject_Click()
     Dim loadPath As String
 
-    loadPath = Trim$(InputBox$("Load project path:", "Load Project", App.Path & "\kureha-rebuild-project.krp"))
+    loadPath = ShowOpenFileDialog(Me.hWnd, "Kureha Project (*.krp)|*.krp|All Files (*.*)|*.*", "Load Project", App.Path, "krp")
     If loadPath = "" Then Exit Sub
 
     LoadProjectFromPath loadPath
@@ -865,11 +888,13 @@ Private Sub mnuFileNew_Click()
 End Sub
 
 Private Sub mnuFileOpenImage_Click()
-    mnuFileLoadProject_Click
+    DiscReadForm.LoadPreview cboMediaType.Text
+    DiscReadForm.Show vbModal, Me
 End Sub
 
 Private Sub mnuFileSaveImage_Click()
-    cmdSaveProject_Click
+    WellSaveForm.LoadTask txtDiscLabel.Text, TrackCount()
+    WellSaveForm.Show vbModal, Me
 End Sub
 
 Private Sub mnuFileSaveProject_Click()
@@ -909,6 +934,33 @@ Private Sub mnuCompositionRename_Click()
     cmdRenameEntry_Click
 End Sub
 
+Private Sub mnuCompositionDummyFile_Click()
+    Dim entry As FileEntry
+    Dim fileName As String
+
+    fileName = Trim$(InputBox$("Dummy file name:", "Add Dummy File", "DUMMY.BIN"))
+    If fileName = "" Then Exit Sub
+
+    Set entry = New FileEntry
+    entry.Name = fileName
+    entry.OriginalPath = ""
+    entry.SizeText = "0 KB"
+    entry.ModifiedText = Format$(Date, "yyyy/mm/dd")
+    entry.IsDirectory = False
+    mFileEntries.Add entry
+
+    RefreshFileDisplay
+    lblStatus.Caption = "Dummy file added: " & fileName
+End Sub
+
+Private Sub mnuCompositionMakeDirectory_Click()
+    cmdAddFolder_Click
+End Sub
+
+Private Sub mnuCompositionProperties_Click()
+    cmdProperties_Click
+End Sub
+
 Private Sub mnuToolsAnalyze_Click()
     cmdAnalyzeDisc_Click
 End Sub
@@ -933,6 +985,23 @@ Private Sub mnuToolsWriteImage_Click()
     cmdImageWrite_Click
 End Sub
 
+Private Sub mnuToolsConfiguration_Click()
+    PropertyConfigurationForm.Show vbModal, Me
+End Sub
+
+Private Sub mnuToolsMasteringLog_Click()
+    ListStatusForm.LoadLines "Mastering log", "Project loaded" & vbCrLf & "Zenki bridge available: " & CStr(mZenkiAvailable) & vbCrLf & "Tracks: " & CStr(TrackCount())
+    ListStatusForm.Show vbModal, Me
+End Sub
+
+Private Sub mnuToolsReadParameters_Click()
+    PropertyReadParameterForm.Show vbModal, Me
+End Sub
+
+Private Sub mnuToolsWriteParameters_Click()
+    PropertyWriteParameterForm.Show vbModal, Me
+End Sub
+
 Private Sub mnuTrackAdd_Click()
     cmdAddTrack_Click
 End Sub
@@ -953,8 +1022,23 @@ Private Sub mnuTrackPropertiesMenu_Click()
     cmdTrackProperties_Click
 End Sub
 
+Private Sub mnuDiscProperties_Click()
+    MsgBox "Disc label: " & txtDiscLabel.Text & vbCrLf & _
+        "File system: " & cboFileSystem.Text & vbCrLf & _
+        "Media: " & cboMediaType.Text & vbCrLf & _
+        "Tracks: " & CStr(TrackCount()), vbInformation, "Disc Properties"
+End Sub
+
+Private Sub mnuTrackDown_Click()
+    cmdMoveTrackDown_Click
+End Sub
+
 Private Sub mnuTrackRemove_Click()
     cmdRemoveTrack_Click
+End Sub
+
+Private Sub mnuTrackUp_Click()
+    cmdMoveTrackUp_Click
 End Sub
 
 Private Sub mnuViewAlwaysOnTop_Click()
@@ -1353,7 +1437,7 @@ Private Sub SaveProjectToPath(ByVal savePath As String)
 
     For i = 1 To mFileEntries.Count
         Set fileEntry = mFileEntries.Item(i)
-        Print #fileNo, "FILE|" & EscapeValue(fileEntry.Name) & "|" & EscapeValue(fileEntry.SizeText) & "|" & EscapeValue(fileEntry.ModifiedText) & "|" & BoolText(fileEntry.IsDirectory)
+        Print #fileNo, "FILE|" & EscapeValue(fileEntry.Name) & "|" & EscapeValue(fileEntry.OriginalPath) & "|" & EscapeValue(fileEntry.SizeText) & "|" & EscapeValue(fileEntry.ModifiedText) & "|" & BoolText(fileEntry.IsDirectory)
     Next i
 
     For i = 1 To mTrackEntries.Count
@@ -1408,9 +1492,17 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
             Case "FILE"
                 Set currentFile = New FileEntry
                 currentFile.Name = UnescapeValue(SafeField(parts, 1))
-                currentFile.SizeText = UnescapeValue(SafeField(parts, 2))
-                currentFile.ModifiedText = UnescapeValue(SafeField(parts, 3))
-                currentFile.IsDirectory = TextBool(SafeField(parts, 4))
+                If UBound(parts) >= 5 Then
+                    currentFile.OriginalPath = UnescapeValue(SafeField(parts, 2))
+                    currentFile.SizeText = UnescapeValue(SafeField(parts, 3))
+                    currentFile.ModifiedText = UnescapeValue(SafeField(parts, 4))
+                    currentFile.IsDirectory = TextBool(SafeField(parts, 5))
+                Else
+                    currentFile.OriginalPath = ""
+                    currentFile.SizeText = UnescapeValue(SafeField(parts, 2))
+                    currentFile.ModifiedText = UnescapeValue(SafeField(parts, 3))
+                    currentFile.IsDirectory = TextBool(SafeField(parts, 4))
+                End If
                 mFileEntries.Add currentFile
             Case "TRACK"
                 Set currentTrack = New TrackEntry
@@ -1514,6 +1606,41 @@ Private Function SafeField(ByRef parts() As String, ByVal indexValue As Long) As
     End If
 End Function
 
+Private Function BuildFileEntryFromPath(ByVal filePath As String) As FileEntry
+    Dim entry As FileEntry
+
+    Set entry = New FileEntry
+    entry.Name = FileNameWithExtensionFromPath(filePath)
+    If entry.Name = "" Then entry.Name = filePath
+    entry.OriginalPath = filePath
+    entry.SizeText = FileSizeText(filePath)
+    entry.ModifiedText = FileModifiedText(filePath)
+    entry.IsDirectory = False
+    Set BuildFileEntryFromPath = entry
+End Function
+
+Private Function BuildFolderEntryFromPath(ByVal folderPath As String) As FileEntry
+    Dim entry As FileEntry
+
+    Set entry = New FileEntry
+    entry.Name = FileNameWithExtensionFromPath(folderPath)
+    If entry.Name = "" Then entry.Name = folderPath
+    If Right$(entry.Name, 1) <> "\" Then entry.Name = entry.Name & "\"
+    entry.OriginalPath = folderPath
+    entry.SizeText = "<DIR>"
+    entry.ModifiedText = FileModifiedText(folderPath)
+    entry.IsDirectory = True
+    Set BuildFolderEntryFromPath = entry
+End Function
+
+Private Function DisplayOriginalPath(ByVal entry As FileEntry) As String
+    If Trim$(entry.OriginalPath) <> "" Then
+        DisplayOriginalPath = entry.OriginalPath
+    Else
+        DisplayOriginalPath = entry.Name
+    End If
+End Function
+
 Private Function BoolText(ByVal value As Boolean) As String
     If value Then
         BoolText = "1"
@@ -1548,17 +1675,57 @@ Private Function FileTitleFromPath(ByVal filePath As String) As String
     Dim slashPos As Long
     Dim dotPos As Long
 
-    slashPos = InStrRev(filePath, "\")
-    If slashPos > 0 Then
-        FileTitleFromPath = Mid$(filePath, slashPos + 1)
-    Else
-        FileTitleFromPath = filePath
-    End If
+    FileTitleFromPath = FileNameWithExtensionFromPath(filePath)
 
     dotPos = InStrRev(FileTitleFromPath, ".")
     If dotPos > 1 Then
         FileTitleFromPath = Left$(FileTitleFromPath, dotPos - 1)
     End If
+End Function
+
+Private Function FileNameWithExtensionFromPath(ByVal filePath As String) As String
+    Dim slashPos As Long
+    Dim normalizedPath As String
+
+    normalizedPath = Replace(filePath, "/", "\")
+    If Right$(normalizedPath, 1) = "\" Then
+        normalizedPath = Left$(normalizedPath, Len(normalizedPath) - 1)
+    End If
+
+    slashPos = InStrRev(normalizedPath, "\")
+    If slashPos > 0 Then
+        FileNameWithExtensionFromPath = Mid$(normalizedPath, slashPos + 1)
+    Else
+        FileNameWithExtensionFromPath = normalizedPath
+    End If
+End Function
+
+Private Function FileSizeText(ByVal filePath As String) As String
+    Dim bytesValue As Double
+
+    On Error GoTo SizeError
+    bytesValue = CDbl(FileLen(filePath))
+
+    If bytesValue < 1024# Then
+        FileSizeText = CStr(CLng(bytesValue)) & " B"
+    ElseIf bytesValue < 1048576# Then
+        FileSizeText = Format$(bytesValue / 1024#, "0") & " KB"
+    Else
+        FileSizeText = Format$(bytesValue / 1048576#, "0.0") & " MB"
+    End If
+    Exit Function
+
+SizeError:
+    FileSizeText = "0 KB"
+End Function
+
+Private Function FileModifiedText(ByVal filePath As String) As String
+    On Error GoTo ModifiedError
+    FileModifiedText = Format$(FileDateTime(filePath), "yyyy/mm/dd")
+    Exit Function
+
+ModifiedError:
+    FileModifiedText = Format$(Date, "yyyy/mm/dd")
 End Function
 
 Private Function HasOnlyPlaceholderTracks() As Boolean

@@ -21,6 +21,14 @@ Begin VB.Form DiscWriteForm
       Top             =   2640
       Width           =   1095
    End
+   Begin VB.CommandButton cmdParameters
+      Caption         =   "Parameters"
+      Height          =   375
+      Left            =   2040
+      TabIndex        =   8
+      Top             =   2640
+      Width           =   1215
+   End
    Begin VB.CommandButton cmdClose
       Caption         =   "Close"
       Height          =   375
@@ -81,8 +89,12 @@ Private Sub cmdClose_Click()
     Unload Me
 End Sub
 
+Private Sub cmdParameters_Click()
+    PropertyWriteParameterForm.Show vbModal, Me
+End Sub
+
 Private Sub cmdStartWrite_Click()
-    MsgBox "Write pipeline is not wired yet." & vbCrLf & "This dialog is the rebuilt entry point.", vbInformation, "Disc Write"
+    WellWriteForm.Show vbModal, Me
 End Sub
 
 Private Sub Form_Load()

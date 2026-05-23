@@ -14,6 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private mName As String
+Private mOriginalPath As String
 Private mSizeText As String
 Private mModifiedText As String
 Private mIsDirectory As Boolean
@@ -24,6 +25,14 @@ End Property
 
 Public Property Let Name(ByVal value As String)
     mName = value
+End Property
+
+Public Property Get OriginalPath() As String
+    OriginalPath = mOriginalPath
+End Property
+
+Public Property Let OriginalPath(ByVal value As String)
+    mOriginalPath = value
 End Property
 
 Public Property Get SizeText() As String

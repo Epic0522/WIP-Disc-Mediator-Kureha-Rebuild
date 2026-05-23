@@ -21,6 +21,14 @@ Begin VB.Form DiscReadForm
       Top             =   2100
       Width           =   1095
    End
+   Begin VB.CommandButton cmdParameters
+      Caption         =   "Parameters"
+      Height          =   375
+      Left            =   1560
+      TabIndex        =   6
+      Top             =   2100
+      Width           =   1215
+   End
    Begin VB.CommandButton cmdClose
       Caption         =   "Close"
       Height          =   375
@@ -73,8 +81,13 @@ Private Sub cmdClose_Click()
     Unload Me
 End Sub
 
+Private Sub cmdParameters_Click()
+    PropertyReadParameterForm.Show vbModal, Me
+End Sub
+
 Private Sub cmdRead_Click()
-    MsgBox "Disc read pipeline is not wired yet.", vbInformation, "Disc Read"
+    IsReadyForm.LoadPrompt "Default optical drive", False
+    IsReadyForm.Show vbModal, Me
 End Sub
 
 Private Sub Form_Load()

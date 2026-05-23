@@ -74,7 +74,8 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdErase_Click()
-    MsgBox "Disc erase pipeline is not wired yet.", vbInformation, "Disc Erase"
+    IsReadyForm.LoadPrompt "Default optical drive", True
+    IsReadyForm.Show vbModal, Me
 End Sub
 
 Private Sub Form_Load()
