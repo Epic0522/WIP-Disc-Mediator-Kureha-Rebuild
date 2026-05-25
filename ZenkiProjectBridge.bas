@@ -50,6 +50,52 @@ SyncError:
     SyncZenkiTracks = False
 End Function
 
+Public Function SyncZenkiIsoEntries(ByVal engine As ZenkiEngine, ByVal entries As Collection, ByRef syncedCount As Long, ByRef reportText As String) As Boolean
+    Dim i As Long
+    Dim entry As FileEntry
+
+    On Error GoTo SyncError
+
+    syncedCount = 0
+    reportText = ""
+
+    If engine Is Nothing Then Exit Function
+
+    If Not engine.InitIsoFileSystem(0) Then
+        reportText = "InitISOFS failed."
+        Exit Function
+    End If
+
+    For i = 1 To entries.Count
+        Set entry = entries.Item(i)
+        If entry.IsDirectory Then
+            If Not engine.MakeIsoDirectory(CleanIsoDisplayName(entry.Name)) Then
+                reportText = "MakeISODirectory failed: " & entry.Name
+                Exit Function
+            End If
+        ElseIf Trim$(entry.OriginalPath) <> "" Then
+            If Not engine.AddIsoFile(CleanIsoDisplayName(entry.Name), entry.OriginalPath) Then
+                reportText = "AddISOFile failed: " & entry.Name
+                Exit Function
+            End If
+        Else
+            If Not engine.AddIsoDummyFile(CleanIsoDisplayName(entry.Name), SizeTextToBytes(entry.SizeText)) Then
+                reportText = "AddISODummyFile failed: " & entry.Name
+                Exit Function
+            End If
+        End If
+        syncedCount = syncedCount + 1
+    Next i
+
+    reportText = "Zenki ISO synced " & CStr(syncedCount) & " item(s)."
+    SyncZenkiIsoEntries = True
+    Exit Function
+
+SyncError:
+    reportText = Err.Description
+    SyncZenkiIsoEntries = False
+End Function
+
 Public Function VerifyZenkiTracks(ByVal engine As ZenkiEngine, ByVal tracks As Collection, ByRef reportText As String) As Boolean
     Dim i As Long
     Dim dllTrackNo As Long
@@ -77,6 +123,42 @@ Public Function VerifyZenkiTracks(ByVal engine As ZenkiEngine, ByVal tracks As C
 
     reportText = "Zenki verified " & CStr(dllTrackNo) & " track(s)."
     VerifyZenkiTracks = True
+End Function
+
+Public Function SizeTextToBytes(ByVal sizeText As String) As Long
+    Dim valueText As String
+    Dim numberValue As Double
+    Dim upperText As String
+
+    upperText = UCase$(Trim$(sizeText))
+    valueText = Replace(upperText, ",", "")
+    valueText = Replace(valueText, "KB", "")
+    valueText = Replace(valueText, "KIB", "")
+    valueText = Replace(valueText, "MB", "")
+    valueText = Replace(valueText, "MIB", "")
+    valueText = Replace(valueText, "B", "")
+    valueText = Trim$(valueText)
+
+    If valueText = "" Or Left$(valueText, 1) = "<" Then Exit Function
+
+    numberValue = Val(valueText)
+    If InStr(upperText, "MB") > 0 Or InStr(upperText, "MIB") > 0 Then
+        numberValue = numberValue * 1048576#
+    ElseIf InStr(upperText, "KB") > 0 Or InStr(upperText, "KIB") > 0 Then
+        numberValue = numberValue * 1024#
+    End If
+
+    If numberValue < 0# Then numberValue = 0#
+    If numberValue > 2147483647# Then numberValue = 2147483647#
+    SizeTextToBytes = CLng(numberValue)
+End Function
+
+Private Function CleanIsoDisplayName(ByVal value As String) As String
+    CleanIsoDisplayName = Trim$(value)
+    If Right$(CleanIsoDisplayName, 1) = "\" Then
+        CleanIsoDisplayName = Left$(CleanIsoDisplayName, Len(CleanIsoDisplayName) - 1)
+    End If
+    If CleanIsoDisplayName = "" Then CleanIsoDisplayName = "UNTITLED"
 End Function
 
 Public Function MsfToFramesBridge(ByVal value As String) As Long

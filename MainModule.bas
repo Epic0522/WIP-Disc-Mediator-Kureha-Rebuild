@@ -26,12 +26,18 @@ End Type
 
 Public Declare Function GetOpenFileName Lib "comdlg32.dll" Alias "GetOpenFileNameA" (ByRef pOpenfilename As OPENFILENAME) As Long
 Public Declare Function GetSaveFileName Lib "comdlg32.dll" Alias "GetSaveFileNameA" (ByRef pOpenfilename As OPENFILENAME) As Long
+Public Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
 
 Public Const OFN_FILEMUSTEXIST As Long = &H1000
 Public Const OFN_HIDEREADONLY As Long = &H4
 Public Const OFN_OVERWRITEPROMPT As Long = &H2
 Public Const OFN_PATHMUSTEXIST As Long = &H800
 Public Const OFN_EXPLORER As Long = &H80000
+Public Const HWND_NOTOPMOST As Long = -2
+Public Const HWND_TOPMOST As Long = -1
+Public Const SWP_NOMOVE As Long = &H2
+Public Const SWP_NOSIZE As Long = &H1
+Public Const SWP_NOACTIVATE As Long = &H10
 
 Public Sub Main()
     On Error Resume Next
@@ -119,5 +125,17 @@ Public Function ShowFolderDialog(ByVal ownerHwnd As Long, ByVal dialogTitle As S
 
 FolderError:
     ShowFolderDialog = ""
+End Function
+
+Public Sub SetFormAlwaysOnTop(ByVal hwnd As Long, ByVal enabled As Boolean)
+    If enabled Then
+        SetWindowPos hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE Or SWP_NOACTIVATE
+    Else
+        SetWindowPos hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE Or SWP_NOACTIVATE
+    End If
+End Sub
+
+Public Function QuoteShellPath(ByVal pathText As String) As String
+    QuoteShellPath = Chr$(34) & pathText & Chr$(34)
 End Function
 

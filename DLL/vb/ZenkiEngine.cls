@@ -30,6 +30,49 @@ Public Property Get Handle() As Long
     Handle = mHandle
 End Property
 
+Public Function InitIsoFileSystem(ByVal isoFlags As Long) As Boolean
+    InitIsoFileSystem = (Zenki_InitISOFS(mHandle, isoFlags) <> 0)
+End Function
+
+Public Sub ClearIso()
+    If mHandle <> 0 Then Zenki_ClearISO mHandle
+End Sub
+
+Public Function IsIsoEmpty() As Boolean
+    IsIsoEmpty = (Zenki_IsISOEmpty(mHandle) <> 0)
+End Function
+
+Public Function AddIsoFile(ByVal isoName As String, ByVal originalFileName As String) As Boolean
+    AddIsoFile = (Zenki_AddISOFile(mHandle, isoName, originalFileName) <> 0)
+End Function
+
+Public Function AddIsoDummyFile(ByVal isoName As String, ByVal byteSize As Long, Optional ByVal fileAttribute As Long = 0, Optional ByVal timestampValue As Long = 0) As Boolean
+    AddIsoDummyFile = (Zenki_AddISODummyFile(mHandle, isoName, byteSize, fileAttribute, timestampValue) <> 0)
+End Function
+
+Public Function MakeIsoDirectory(ByVal isoName As String, Optional ByVal fileAttribute As Long = 0, Optional ByVal timestampValue As Long = 0) As Boolean
+    MakeIsoDirectory = (Zenki_MakeISODirectory(mHandle, isoName, fileAttribute, timestampValue) <> 0)
+End Function
+
+Public Function RemoveIsoFile(ByVal isoName As String) As Boolean
+    RemoveIsoFile = (Zenki_RemoveISOFile(mHandle, isoName) <> 0)
+End Function
+
+Public Function RenameIsoFile(ByVal oldIsoName As String, ByVal newIsoName As String) As Boolean
+    RenameIsoFile = (Zenki_RenameISOFile(mHandle, oldIsoName, newIsoName) <> 0)
+End Function
+
+Public Function ChangeIsoProperties(ByVal isoName As String, ByVal fileAttribute As Long, ByVal timestampValue As Long) As Boolean
+    ChangeIsoProperties = (Zenki_ChangeISOProperties(mHandle, isoName, fileAttribute, timestampValue) <> 0)
+End Function
+
+Public Function IsoCurrentDirectory() As String
+    Dim buf As String
+    buf = String$(260, vbNullChar)
+    Zenki_GetISOCurrentDirectory mHandle, buf, Len(buf)
+    IsoCurrentDirectory = CStringFromBuffer(buf)
+End Function
+
 Public Function AddTrackFile(ByVal fileName As String, Optional ByVal pregap As Long = 0, Optional ByVal postgap As Long = 0, Optional ByVal flags As Long = 0) As Boolean
     AddTrackFile = (Zenki_AddTrack(mHandle, fileName, pregap, postgap, flags) <> 0)
 End Function

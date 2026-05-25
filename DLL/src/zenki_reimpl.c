@@ -7,6 +7,7 @@
 #define MAX_ISO_ITEMS 512
 #define MAX_LANG 8
 #define MAX_INFO 16
+#define ISO_ROOT_PARENT 0xffffffffu
 
 void* memcpy(void* dst, const void* src, u32 n) {
     u8* d = (u8*)dst;
@@ -43,6 +44,9 @@ typedef struct ZENKI_ISO_ITEM_TAG {
     u32 sizeBytes;
     u32 extent;
     u32 sectorCount;
+    u32 parent;
+    u32 dirBytes;
+    u32 dirSectors;
     char name[260];
     char original[260];
     char isoName[96];
@@ -63,6 +67,8 @@ typedef struct ZENKI_CONTEXT_TAG {
     u32 isoVdstSector;
     u32 isoLPathSector;
     u32 isoMPathSector;
+    u32 isoPathTableBytes;
+    u32 isoPathTableSectors;
     u32 isoRootSector;
     u32 isoRootBytes;
     u32 isoRootSectors;
@@ -75,6 +81,7 @@ typedef struct ZENKI_CONTEXT_TAG {
 
     u32 trackTextEnabled;
     u32 textEnabled[MAX_LANG][MAX_INFO];
+    u32 textUsed[100][MAX_LANG][MAX_INFO];
     char text[100][MAX_LANG][MAX_INFO][128];
 
     HANDLE32 readHandle;
@@ -129,6 +136,8 @@ static void clear_iso(ZENKI_CONTEXT* c) {
     c->isoVdstSector = 17;
     c->isoLPathSector = 18;
     c->isoMPathSector = 19;
+    c->isoPathTableBytes = 10;
+    c->isoPathTableSectors = 1;
     c->isoRootSector = 20;
     c->isoRootBytes = 0;
     c->isoRootSectors = 1;
@@ -149,7 +158,10 @@ static void clear_text(ZENKI_CONTEXT* c) {
     }
     for (t = 0; t < 100; ++t) {
         for (l = 0; l < MAX_LANG; ++l) {
-            for (i = 0; i < MAX_INFO; ++i) c->text[t][l][i][0] = 0;
+            for (i = 0; i < MAX_INFO; ++i) {
+                c->textUsed[t][l][i] = 0;
+                c->text[t][l][i][0] = 0;
+            }
         }
     }
 }
@@ -252,6 +264,109 @@ static const char* basename_ptr(const char* path) {
     return b;
 }
 
+static int iso_is_slash(char ch) {
+    return ch == '\\' || ch == '/';
+}
+
+static void normalize_iso_path(char* dst, u32 cap, const char* currentDir, const char* name, u32 isDir) {
+    u32 k = 0, i = 0;
+    int lastSlash = 0;
+    if (!dst || cap == 0) return;
+    dst[0] = 0;
+    if (!name) name = "";
+
+    if (!iso_is_slash(name[0]) && currentDir && currentDir[0] && !kureha_streq(currentDir, "\\")) {
+        while (currentDir[i] && k + 1 < cap) {
+            char ch = iso_is_slash(currentDir[i]) ? '\\' : currentDir[i];
+            if (ch == '\\') {
+                if (!lastSlash && k > 0) dst[k++] = ch;
+                lastSlash = 1;
+            } else {
+                dst[k++] = ch;
+                lastSlash = 0;
+            }
+            ++i;
+        }
+        if (k > 0 && !lastSlash && k + 1 < cap) {
+            dst[k++] = '\\';
+            lastSlash = 1;
+        }
+    }
+
+    i = 0;
+    while (name[i] && k + 1 < cap) {
+        char ch = iso_is_slash(name[i]) ? '\\' : name[i];
+        if (ch == '\\') {
+            if (!lastSlash && k > 0) dst[k++] = ch;
+            lastSlash = 1;
+        } else if (ch != ':') {
+            dst[k++] = ch;
+            lastSlash = 0;
+        }
+        ++i;
+    }
+
+    while (k > 0 && dst[k - 1] == '\\') --k;
+    dst[k] = 0;
+    if (dst[0] == 0 && isDir) kureha_strcopy(dst, cap, "\\");
+}
+
+static void parent_path_of(char* dst, u32 cap, const char* path) {
+    u32 i, last = 0xffffffffu;
+    if (!dst || cap == 0) return;
+    dst[0] = 0;
+    if (!path) return;
+    for (i = 0; path[i]; ++i) {
+        if (iso_is_slash(path[i])) last = i;
+    }
+    if (last == 0xffffffffu) return;
+    for (i = 0; i < last && i + 1 < cap; ++i) dst[i] = path[i];
+    dst[i] = 0;
+}
+
+static int iso_path_equal(const char* a, const char* b) {
+    u32 i = 0;
+    if (!a || !b) return 0;
+    while (a[i] && b[i]) {
+        char ca = iso_is_slash(a[i]) ? '\\' : a[i];
+        char cb = iso_is_slash(b[i]) ? '\\' : b[i];
+        if (kureha_lower_char(ca) != kureha_lower_char(cb)) return 0;
+        ++i;
+    }
+    return a[i] == 0 && b[i] == 0;
+}
+
+static int iso_is_descendant_path(const char* child, const char* parent) {
+    u32 i = 0;
+    if (!child || !parent || !parent[0]) return 0;
+    while (parent[i]) {
+        char cc = iso_is_slash(child[i]) ? '\\' : child[i];
+        char pc = iso_is_slash(parent[i]) ? '\\' : parent[i];
+        if (kureha_lower_char(cc) != kureha_lower_char(pc)) return 0;
+        ++i;
+    }
+    return iso_is_slash(child[i]);
+}
+
+static u32 find_iso_item_index(ZENKI_CONTEXT* c, const char* path, u32 wantDir, u32 useType) {
+    u32 i;
+    if (!c || !path) return ISO_ROOT_PARENT;
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used) continue;
+        if (useType && it->isDir != wantDir) continue;
+        if (iso_path_equal(it->name, path) || iso_path_equal(it->isoName, path)) return i;
+    }
+    return ISO_ROOT_PARENT;
+}
+
+static u32 find_parent_index(ZENKI_CONTEXT* c, const char* path) {
+    char parent[260];
+    parent_path_of(parent, sizeof(parent), path);
+    if (!parent[0]) return ISO_ROOT_PARENT;
+    return find_iso_item_index(c, parent, 1, 1);
+}
+
 static void make_iso_name(char* dst, u32 cap, const char* source, u32 isDir) {
     const char* b = basename_ptr(source);
     char base[32];
@@ -316,29 +431,58 @@ static u32 write_dir_record_name(u8* p, u32 extent, u32 size, u32 flags, const c
 
 static ZENKI_ISO_ITEM* add_iso_item(ZENKI_CONTEXT* c, const char* name, u32 isDir) {
     ZENKI_ISO_ITEM* it;
+    char fullPath[260];
     if (!c || !name || !name[0] || c->isoCount >= MAX_ISO_ITEMS) return (ZENKI_ISO_ITEM*)0;
+    normalize_iso_path(fullPath, sizeof(fullPath), c->currentDir, name, isDir);
+    if (!fullPath[0] || kureha_streq(fullPath, "\\")) return (ZENKI_ISO_ITEM*)0;
+    if (find_iso_item_index(c, fullPath, isDir, 0) != ISO_ROOT_PARENT) return (ZENKI_ISO_ITEM*)0;
     it = &c->isoItems[c->isoCount++];
     kureha_zero(it, sizeof(*it));
     it->used = 1;
     it->isDir = isDir;
-    kureha_strcopy(it->name, sizeof(it->name), name);
-    make_iso_name(it->isoName, sizeof(it->isoName), name, isDir);
-    kureha_strcopy(c->lastIsoName, sizeof(c->lastIsoName), name);
+    it->parent = find_parent_index(c, fullPath);
+    kureha_strcopy(it->name, sizeof(it->name), fullPath);
+    make_iso_name(it->isoName, sizeof(it->isoName), fullPath, isDir);
+    kureha_strcopy(c->lastIsoName, sizeof(c->lastIsoName), fullPath);
     c->isoLayoutValid = 0;
     return it;
 }
 
-static u32 compute_root_dir_bytes(ZENKI_CONTEXT* c) {
+static u32 compute_dir_bytes(ZENKI_CONTEXT* c, u32 parentIndex) {
     u32 i, total;
     if (!c) return 2048;
     total = dir_record_length(1) + dir_record_length(1);
     for (i = 0; i < c->isoCount; ++i) {
         ZENKI_ISO_ITEM* it = &c->isoItems[i];
         if (!it->used) continue;
+        if (it->parent != parentIndex) continue;
         if (!it->isoName[0]) make_iso_name(it->isoName, sizeof(it->isoName), it->name, it->isDir);
         total += dir_record_length(kureha_strlen(it->isoName));
     }
     return align2048(total);
+}
+
+static u32 dir_table_number(ZENKI_CONTEXT* c, u32 itemIndex) {
+    u32 i, n = 2;
+    if (itemIndex == ISO_ROOT_PARENT) return 1;
+    if (!c || itemIndex >= c->isoCount || !c->isoItems[itemIndex].isDir) return 1;
+    for (i = 0; i < c->isoCount; ++i) {
+        if (!c->isoItems[i].used || !c->isoItems[i].isDir) continue;
+        if (i == itemIndex) return n;
+        ++n;
+    }
+    return 1;
+}
+
+static u32 path_table_bytes(ZENKI_CONTEXT* c) {
+    u32 i, total = 10; /* root path table entry */
+    if (!c) return total;
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used || !it->isDir) continue;
+        total += 8 + kureha_strlen(it->isoName) + (kureha_strlen(it->isoName) & 1u);
+    }
+    return total;
 }
 
 static void layout_iso(ZENKI_CONTEXT* c) {
@@ -349,7 +493,19 @@ static void layout_iso(ZENKI_CONTEXT* c) {
     c->isoLPathSector = 18;
     c->isoMPathSector = 19;
     c->isoRootSector = 20;
-    c->isoRootBytes = compute_root_dir_bytes(c);
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used) continue;
+        it->parent = find_parent_index(c, it->name);
+        if (!it->isoName[0]) make_iso_name(it->isoName, sizeof(it->isoName), it->name, it->isDir);
+    }
+    c->isoPathTableBytes = path_table_bytes(c);
+    c->isoPathTableSectors = divceil2048(c->isoPathTableBytes);
+    if (c->isoPathTableSectors == 0) c->isoPathTableSectors = 1;
+    c->isoLPathSector = 18;
+    c->isoMPathSector = c->isoLPathSector + c->isoPathTableSectors;
+    c->isoRootSector = c->isoMPathSector + c->isoPathTableSectors;
+    c->isoRootBytes = compute_dir_bytes(c, ISO_ROOT_PARENT);
     c->isoRootSectors = divceil2048(c->isoRootBytes);
     if (c->isoRootSectors == 0) c->isoRootSectors = 1;
     c->isoDataStart = c->isoRootSector + c->isoRootSectors;
@@ -357,9 +513,21 @@ static void layout_iso(ZENKI_CONTEXT* c) {
     for (i = 0; i < c->isoCount; ++i) {
         ZENKI_ISO_ITEM* it = &c->isoItems[i];
         if (!it->used) continue;
-        if (!it->isDir && it->original[0] && it->sizeBytes == 0) it->sizeBytes = file_size_low(it->original);
-        it->sectorCount = it->isDir ? 0 : divceil2048(it->sizeBytes);
-        it->extent = it->isDir ? c->isoRootSector : cur;
+        if (it->isDir) {
+            it->dirBytes = compute_dir_bytes(c, i);
+            it->dirSectors = divceil2048(it->dirBytes);
+            if (it->dirSectors == 0) it->dirSectors = 1;
+            it->sectorCount = it->dirSectors;
+            it->extent = cur;
+            cur += it->sectorCount;
+        }
+    }
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used || it->isDir) continue;
+        if (it->original[0] && it->sizeBytes == 0) it->sizeBytes = file_size_low(it->original);
+        it->sectorCount = divceil2048(it->sizeBytes);
+        it->extent = cur;
         cur += it->sectorCount;
     }
     c->isoVolumeSectors = cur;
@@ -394,7 +562,7 @@ static void write_pvd(ZENKI_CONTEXT* c, u8* out) {
     put_both16(out + 120, 1);
     put_both16(out + 124, 1);
     put_both16(out + 128, 2048);
-    put_both32(out + 132, 10); /* one root path-table entry */
+    put_both32(out + 132, c->isoPathTableBytes);
     put_le32(out + 140, c->isoLPathSector);
     put_le32(out + 144, 0);
     kureha_put_be32(out + 148, c->isoMPathSector);
@@ -417,28 +585,68 @@ static void write_vdst(u8* out) {
     out[6] = 1;
 }
 
-static void write_path_table(ZENKI_CONTEXT* c, u8* out, u32 bigEndian) {
-    kureha_zero(out, 2048);
-    out[0] = 1; /* root identifier length */
-    out[1] = 0; /* ext attr length */
+static void write_path_table_entry(u8* out, u32 sectorIndex, u32* streamOffset, u32 bigEndian, u32 extent, u32 parentNo, const u8* name, u32 nameLen) {
+    u8 rec[128];
+    u32 pos = 0;
+    u32 recLen;
+    u32 secStart = sectorIndex * 2048u;
+    u32 secEnd = secStart + 2048u;
+    if (nameLen > 96) nameLen = 96;
+    rec[pos++] = (u8)nameLen;
+    rec[pos++] = 0;
     if (bigEndian) {
-        kureha_put_be32(out + 2, c->isoRootSector);
-        kureha_put_be16(out + 6, 1);
+        kureha_put_be32(rec + pos, extent); pos += 4;
+        kureha_put_be16(rec + pos, parentNo); pos += 2;
     } else {
-        put_le32(out + 2, c->isoRootSector);
-        put_le16(out + 6, 1);
+        put_le32(rec + pos, extent); pos += 4;
+        put_le16(rec + pos, parentNo); pos += 2;
     }
-    out[8] = 0;
-    out[9] = 0;
+    kureha_copy(rec + pos, name, nameLen);
+    pos += nameLen;
+    if (nameLen & 1u) rec[pos++] = 0;
+    recLen = pos;
+    if (*streamOffset + recLen > secStart && *streamOffset < secEnd) {
+        u32 dstOff = *streamOffset > secStart ? *streamOffset - secStart : 0;
+        u32 srcOff = secStart > *streamOffset ? secStart - *streamOffset : 0;
+        u32 cp = min_u32(recLen - srcOff, 2048u - dstOff);
+        kureha_copy(out + dstOff, rec + srcOff, cp);
+    }
+    *streamOffset += recLen;
 }
 
-static void write_root_dir_sector(ZENKI_CONTEXT* c, u32 rootSectorIndex, u8* out) {
+static void write_path_table(ZENKI_CONTEXT* c, u8* out, u32 sectorIndex, u32 bigEndian) {
+    u32 i, offset = 0;
+    u8 rootName = 0;
+    kureha_zero(out, 2048);
+    write_path_table_entry(out, sectorIndex, &offset, bigEndian, c->isoRootSector, 1, &rootName, 1);
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used || !it->isDir) continue;
+        write_path_table_entry(out, sectorIndex, &offset, bigEndian, it->extent, dir_table_number(c, it->parent), (const u8*)it->isoName, kureha_strlen(it->isoName));
+    }
+}
+
+static u32 dir_extent_for(ZENKI_CONTEXT* c, u32 dirIndex) {
+    if (dirIndex == ISO_ROOT_PARENT) return c->isoRootSector;
+    if (!c || dirIndex >= c->isoCount) return c ? c->isoRootSector : 0;
+    return c->isoItems[dirIndex].extent;
+}
+
+static u32 dir_size_for(ZENKI_CONTEXT* c, u32 dirIndex) {
+    if (dirIndex == ISO_ROOT_PARENT) return c->isoRootBytes;
+    if (!c || dirIndex >= c->isoCount) return c ? c->isoRootBytes : 2048;
+    return c->isoItems[dirIndex].dirBytes;
+}
+
+static void write_dir_sector(ZENKI_CONTEXT* c, u32 dirIndex, u32 dirSectorIndex, u8* out) {
     u32 i;
     u32 streamOffset = 0;
-    u32 secStart = rootSectorIndex * 2048u;
+    u32 secStart = dirSectorIndex * 2048u;
     u32 secEnd = secStart + 2048u;
     u8 rec[256];
     u8 dot0 = 0, dot1 = 1;
+    u32 parentIndex = ISO_ROOT_PARENT;
+    if (dirIndex != ISO_ROOT_PARENT && dirIndex < c->isoCount) parentIndex = c->isoItems[dirIndex].parent;
     kureha_zero(out, 2048);
 #define EMIT_REC(expr_len) do { \
         u32 rl = (expr_len); \
@@ -453,14 +661,15 @@ static void write_root_dir_sector(ZENKI_CONTEXT* c, u32 rootSectorIndex, u8* out
         } \
     } while (0)
     kureha_zero(rec, sizeof(rec));
-    EMIT_REC(write_dir_record_raw(rec, c->isoRootSector, c->isoRootBytes, 2, &dot0, 1));
+    EMIT_REC(write_dir_record_raw(rec, dir_extent_for(c, dirIndex), dir_size_for(c, dirIndex), 2, &dot0, 1));
     kureha_zero(rec, sizeof(rec));
-    EMIT_REC(write_dir_record_raw(rec, c->isoRootSector, c->isoRootBytes, 2, &dot1, 1));
+    EMIT_REC(write_dir_record_raw(rec, dir_extent_for(c, parentIndex), dir_size_for(c, parentIndex), 2, &dot1, 1));
     for (i = 0; i < c->isoCount; ++i) {
         ZENKI_ISO_ITEM* it = &c->isoItems[i];
         if (!it->used) continue;
+        if (it->parent != dirIndex) continue;
         kureha_zero(rec, sizeof(rec));
-        EMIT_REC(write_dir_record_name(rec, it->extent, it->isDir ? 2048u : it->sizeBytes, it->isDir ? 2u : 0u, it->isoName));
+        EMIT_REC(write_dir_record_name(rec, it->extent, it->isDir ? it->dirBytes : it->sizeBytes, it->isDir ? 2u : 0u, it->isoName));
         if (streamOffset >= secEnd) break;
     }
 #undef EMIT_REC
@@ -486,11 +695,25 @@ static void write_iso_sector(ZENKI_CONTEXT* c, u32 lba, u8* out2048) {
     if (lba < 16) return;
     if (lba == c->isoPvdSector) { write_pvd(c, out2048); return; }
     if (lba == c->isoVdstSector) { write_vdst(out2048); return; }
-    if (lba == c->isoLPathSector) { write_path_table(c, out2048, 0); return; }
-    if (lba == c->isoMPathSector) { write_path_table(c, out2048, 1); return; }
-    if (lba >= c->isoRootSector && lba < c->isoRootSector + c->isoRootSectors) {
-        write_root_dir_sector(c, lba - c->isoRootSector, out2048);
+    if (lba >= c->isoLPathSector && lba < c->isoLPathSector + c->isoPathTableSectors) {
+        write_path_table(c, out2048, lba - c->isoLPathSector, 0);
         return;
+    }
+    if (lba >= c->isoMPathSector && lba < c->isoMPathSector + c->isoPathTableSectors) {
+        write_path_table(c, out2048, lba - c->isoMPathSector, 1);
+        return;
+    }
+    if (lba >= c->isoRootSector && lba < c->isoRootSector + c->isoRootSectors) {
+        write_dir_sector(c, ISO_ROOT_PARENT, lba - c->isoRootSector, out2048);
+        return;
+    }
+    for (i = 0; i < c->isoCount; ++i) {
+        ZENKI_ISO_ITEM* it = &c->isoItems[i];
+        if (!it->used || !it->isDir || it->sectorCount == 0) continue;
+        if (lba >= it->extent && lba < it->extent + it->sectorCount) {
+            write_dir_sector(c, i, lba - it->extent, out2048);
+            return;
+        }
     }
     for (i = 0; i < c->isoCount; ++i) {
         ZENKI_ISO_ITEM* it = &c->isoItems[i];
@@ -521,6 +744,16 @@ static void raw2352_from_2048(u32 lba, const u8* user, u8* raw) {
 static u32 normalize_track_no(u32 trackNo) {
     if (trackNo >= 100) return 99;
     return trackNo;
+}
+
+static const char* track_display_text(ZENKI_CONTEXT* c, u32 zeroBasedTrack) {
+    u32 tn = zeroBasedTrack + 1;
+    if (!c || tn >= 100) return "";
+    if (c->trackTextEnabled) {
+        if (c->textUsed[tn][0][0] && c->text[tn][0][0][0]) return c->text[tn][0][0];
+        if (c->textUsed[tn][1][0] && c->text[tn][1][0][0]) return c->text[tn][1][0];
+    }
+    return "";
 }
 
 static int open_current_track(ZENKI_CONTEXT* c) {
@@ -650,48 +883,86 @@ void STDCALL GetISONewFileDirectoryName(ptr h, char* outName, u32 outBytes) {
 
 u32 STDCALL ChangeISODirectory(ptr h, const char* isoName) {
     ZENKI_CONTEXT* c = ctx_from_handle(h);
+    char fullPath[260];
+    u32 idx;
     if (!c || !isoName) return 0;
-    kureha_strcopy(c->currentDir, sizeof(c->currentDir), isoName);
+    if (kureha_streq(isoName, ".")) return 1;
+    if (kureha_streq(isoName, "..")) {
+        parent_path_of(fullPath, sizeof(fullPath), c->currentDir);
+        if (!fullPath[0]) kureha_strcopy(c->currentDir, sizeof(c->currentDir), "\\");
+        else kureha_strcopy(c->currentDir, sizeof(c->currentDir), fullPath);
+        return 1;
+    }
+    normalize_iso_path(fullPath, sizeof(fullPath), c->currentDir, isoName, 1);
+    if (!fullPath[0] || kureha_streq(fullPath, "\\")) {
+        kureha_strcopy(c->currentDir, sizeof(c->currentDir), "\\");
+        return 1;
+    }
+    idx = find_iso_item_index(c, fullPath, 1, 1);
+    if (idx == ISO_ROOT_PARENT) return 0;
+    kureha_strcopy(c->currentDir, sizeof(c->currentDir), fullPath);
     return 1;
 }
 
 u32 STDCALL RemoveISOFile(ptr h, const char* isoName) {
     ZENKI_CONTEXT* c = ctx_from_handle(h);
-    u32 i, j;
+    u32 i, j, removed = 0;
+    char fullPath[260];
     if (!c || !isoName) return 0;
+    normalize_iso_path(fullPath, sizeof(fullPath), c->currentDir, isoName, 0);
     for (i = 0; i < c->isoCount; ++i) {
-        if (kureha_streq(c->isoItems[i].name, isoName) || kureha_streq(c->isoItems[i].isoName, isoName)) {
+        if (iso_path_equal(c->isoItems[i].name, fullPath) || iso_path_equal(c->isoItems[i].isoName, isoName) || iso_is_descendant_path(c->isoItems[i].name, fullPath)) {
             for (j = i; j + 1 < c->isoCount; ++j) c->isoItems[j] = c->isoItems[j + 1];
             --c->isoCount;
-            c->isoLayoutValid = 0;
-            return 1;
+            --i;
+            removed = 1;
         }
     }
-    return 0;
+    if (removed) c->isoLayoutValid = 0;
+    return removed ? 1u : 0u;
 }
 
 u32 STDCALL RenameISOFile(ptr h, const char* oldName, const char* newName) {
     ZENKI_CONTEXT* c = ctx_from_handle(h);
-    u32 i;
+    u32 i, oldLen, found = 0;
+    char oldPath[260];
+    char newPath[260];
     if (!c || !oldName || !newName) return 0;
+    normalize_iso_path(oldPath, sizeof(oldPath), c->currentDir, oldName, 0);
+    normalize_iso_path(newPath, sizeof(newPath), c->currentDir, newName, 0);
+    oldLen = kureha_strlen(oldPath);
     for (i = 0; i < c->isoCount; ++i) {
-        if (kureha_streq(c->isoItems[i].name, oldName) || kureha_streq(c->isoItems[i].isoName, oldName)) {
-            kureha_strcopy(c->isoItems[i].name, sizeof(c->isoItems[i].name), newName);
-            make_iso_name(c->isoItems[i].isoName, sizeof(c->isoItems[i].isoName), newName, c->isoItems[i].isDir);
-            kureha_strcopy(c->lastIsoName, sizeof(c->lastIsoName), newName);
+        if (iso_path_equal(c->isoItems[i].name, oldPath) || iso_path_equal(c->isoItems[i].isoName, oldName)) {
+            kureha_strcopy(c->isoItems[i].name, sizeof(c->isoItems[i].name), newPath);
+            make_iso_name(c->isoItems[i].isoName, sizeof(c->isoItems[i].isoName), newPath, c->isoItems[i].isDir);
+            kureha_strcopy(c->lastIsoName, sizeof(c->lastIsoName), newPath);
             c->isoLayoutValid = 0;
-            return 1;
+            found = 1;
+        } else if (iso_is_descendant_path(c->isoItems[i].name, oldPath)) {
+            char tmp[260];
+            u32 k = 0, j = 0;
+            while (newPath[k] && k + 1 < sizeof(tmp)) { tmp[k] = newPath[k]; ++k; }
+            if (k + 1 < sizeof(tmp)) tmp[k++] = '\\';
+            j = oldLen + 1;
+            while (c->isoItems[i].name[j] && k + 1 < sizeof(tmp)) tmp[k++] = c->isoItems[i].name[j++];
+            tmp[k] = 0;
+            kureha_strcopy(c->isoItems[i].name, sizeof(c->isoItems[i].name), tmp);
+            make_iso_name(c->isoItems[i].isoName, sizeof(c->isoItems[i].isoName), tmp, c->isoItems[i].isDir);
+            c->isoLayoutValid = 0;
+            found = 1;
         }
     }
-    return 0;
+    return found ? 1u : 0u;
 }
 
 u32 STDCALL ChangeISOProperties(ptr h, const char* isoName, u32 attr, u32 stamp) {
     ZENKI_CONTEXT* c = ctx_from_handle(h);
     u32 i;
+    char fullPath[260];
     if (!c || !isoName) return 0;
+    normalize_iso_path(fullPath, sizeof(fullPath), c->currentDir, isoName, 0);
     for (i = 0; i < c->isoCount; ++i) {
-        if (kureha_streq(c->isoItems[i].name, isoName) || kureha_streq(c->isoItems[i].isoName, isoName)) {
+        if (iso_path_equal(c->isoItems[i].name, fullPath) || iso_path_equal(c->isoItems[i].isoName, isoName)) {
             c->isoItems[i].attr = attr;
             c->isoItems[i].stamp = stamp;
             return 1;
@@ -801,7 +1072,8 @@ void STDCALL GetTrackInformation(ptr h, u32 trackNo, void* outInfo) {
     if (idx > 0) idx--;
     if (!c || idx >= c->trackCount) return;
     t = &c->tracks[idx];
-    kureha_strcopy((char*)p, 0x400, t->path);
+    if (track_display_text(c, idx)[0]) kureha_strcopy((char*)p, 0x400, track_display_text(c, idx));
+    else kureha_strcopy((char*)p, 0x400, t->path);
     ((u32*)(p + 0x400))[0] = t->pregap;
     ((u32*)(p + 0x400))[1] = t->postgap;
     ((u32*)(p + 0x400))[2] = t->flag;
@@ -864,13 +1136,23 @@ u32 STDCALL Read(ptr h, void* sectorBuffer, u32 rawMode) {
             if (c->readByteInData >= t->dataBytes) {
                 c->readPhase = 2; c->readSectorInPhase = 0;
             } else {
+                u8 user[2048];
+                u32 trackSector = 0;
                 dataLeft = t->dataBytes - c->readByteInData;
                 want = sectorBytes;
                 if (!t->isWave && rawMode && t->sectorSize == 2048) want = 2048;
                 if (want > dataLeft) want = dataLeft;
                 got = 0;
-                if (!kureha_ReadFile(c->readHandle, (!t->isWave && rawMode && t->sectorSize == 2048) ? (u8*)sectorBuffer + 16 : sectorBuffer, want, &got)) got = 0;
+                if (!t->isWave && rawMode && t->sectorSize == 2048) {
+                    kureha_zero(user, sizeof(user));
+                    trackSector = t->sectorSize ? (c->readByteInData / t->sectorSize) : 0;
+                    if (!kureha_ReadFile(c->readHandle, user, want, &got)) got = 0;
+                    raw2352_from_2048(t->pregap + trackSector, user, (u8*)sectorBuffer);
+                } else {
+                    if (!kureha_ReadFile(c->readHandle, sectorBuffer, want, &got)) got = 0;
+                }
                 c->readByteInData += got;
+                if (got) ++c->readSectorInPhase;
                 if (got == 0 && want != 0) { c->readPhase = 2; c->readSectorInPhase = 0; }
                 else return 1;
             }
@@ -904,7 +1186,11 @@ void STDCALL SetTrackText(ptr h, u32 trackNo, u32 language, u32 information, con
     u32 tn = normalize_track_no(trackNo);
     if (!c || language >= MAX_LANG || information >= MAX_INFO) return;
     kureha_strcopy(c->text[tn][language][information], sizeof(c->text[tn][language][information]), text ? text : "");
-    if (text && text[0]) c->textEnabled[language][information] = 1;
+    c->textUsed[tn][language][information] = (text && text[0]) ? 1u : 0u;
+    if (text && text[0]) {
+        c->trackTextEnabled = 1;
+        c->textEnabled[language][information] = 1;
+    }
 }
 
 void STDCALL GetTrackText(ptr h, u32 trackNo, u32 language, u32 information, char* outText, u32 outBytes) {
@@ -912,5 +1198,6 @@ void STDCALL GetTrackText(ptr h, u32 trackNo, u32 language, u32 information, cha
     u32 tn = normalize_track_no(trackNo);
     if (!outText || outBytes == 0) return;
     if (!c || language >= MAX_LANG || information >= MAX_INFO) { outText[0] = 0; return; }
+    if (!c->textUsed[tn][language][information]) { outText[0] = 0; return; }
     kureha_strcopy(outText, outBytes, c->text[tn][language][information]);
 }

@@ -563,6 +563,7 @@ Private mFileEntries As Collection
 Private mCurrentTrack As TrackEntry
 Private mZenki As ZenkiEngine
 Private mZenkiAvailable As Boolean
+Private mAlwaysOnTop As Boolean
 
 Private Sub cmdAddFile_Click()
     Dim selectedPath As String
@@ -576,7 +577,9 @@ Private Sub cmdAddFile_Click()
 
     RefreshFileDisplay
     SelectFileIndex mFileEntries.Count - 1
-    lblStatus.Caption = "Added file: " & entry.Name
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "Added file: " & entry.Name
+    End If
 End Sub
 
 Private Sub cmdAddFolder_Click()
@@ -591,7 +594,9 @@ Private Sub cmdAddFolder_Click()
 
     RefreshFileDisplay
     SelectFileIndex mFileEntries.Count - 1
-    lblStatus.Caption = "Added folder: " & entry.Name
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "Added folder: " & entry.Name
+    End If
 End Sub
 
 Private Sub cmdAddTrack_Click()
@@ -707,7 +712,9 @@ Private Sub cmdRemoveEntry_Click()
 
     mFileEntries.Remove selectedIndex + 1
     RefreshFileDisplay
-    lblStatus.Caption = "Entry removed."
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "Entry removed."
+    End If
 End Sub
 
 Private Sub cmdRemoveTrack_Click()
@@ -757,7 +764,9 @@ Private Sub cmdRenameEntry_Click()
     entry.Name = newName
     RefreshFileDisplay
     SelectFileIndex selectedIndex
-    lblStatus.Caption = "Entry renamed."
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "Entry renamed."
+    End If
 End Sub
 
 Private Sub cmdSaveProject_Click()
@@ -830,6 +839,7 @@ Private Sub Form_Load()
     RefreshTrackDisplay
     RefreshFileDisplay
     UpdateCapacityPreview
+    SyncZenkiFromFiles
     If mZenkiAvailable Then
         lblStatus.Caption = "UI scaffold loaded. Zenki bridge is ready."
     Else
@@ -882,7 +892,7 @@ Private Sub mnuFileNew_Click()
     RefreshFileDisplay
     RefreshTrackDisplay
     UpdateCapacityPreview
-    If SyncZenkiFromTracks() Then
+    If SyncZenkiFromFiles() And SyncZenkiFromTracks() Then
         lblStatus.Caption = "New project created."
     End If
 End Sub
@@ -923,7 +933,9 @@ Private Sub mnuCompositionClear_Click()
 
     Set mFileEntries = New Collection
     RefreshFileDisplay
-    lblStatus.Caption = "All file entries cleared."
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "All file entries cleared."
+    End If
 End Sub
 
 Private Sub mnuCompositionRemove_Click()
@@ -950,7 +962,10 @@ Private Sub mnuCompositionDummyFile_Click()
     mFileEntries.Add entry
 
     RefreshFileDisplay
-    lblStatus.Caption = "Dummy file added: " & fileName
+    SelectFileIndex mFileEntries.Count - 1
+    If SyncZenkiFromFiles() Then
+        lblStatus.Caption = "Dummy file added: " & fileName
+    End If
 End Sub
 
 Private Sub mnuCompositionMakeDirectory_Click()
@@ -990,7 +1005,7 @@ Private Sub mnuToolsConfiguration_Click()
 End Sub
 
 Private Sub mnuToolsMasteringLog_Click()
-    ListStatusForm.LoadLines "Mastering log", "Project loaded" & vbCrLf & "Zenki bridge available: " & CStr(mZenkiAvailable) & vbCrLf & "Tracks: " & CStr(TrackCount())
+    ListStatusForm.LoadLines "Mastering log", MasteringLogText()
     ListStatusForm.Show vbModal, Me
 End Sub
 
@@ -1042,14 +1057,24 @@ Private Sub mnuTrackUp_Click()
 End Sub
 
 Private Sub mnuViewAlwaysOnTop_Click()
-    ShowPlaceholder "Always-on-top behavior is not wired yet."
+    mAlwaysOnTop = Not mAlwaysOnTop
+    SetFormAlwaysOnTop Me.hWnd, mAlwaysOnTop
+    mnuViewAlwaysOnTop.Checked = mAlwaysOnTop
+    If mAlwaysOnTop Then
+        lblStatus.Caption = "Always on top enabled."
+    Else
+        lblStatus.Caption = "Always on top disabled."
+    End If
 End Sub
 
 Private Sub mnuViewExplorer_Click()
+    Dim openPath As String
+
     On Error GoTo ExplorerError
 
-    Shell "explorer.exe", vbNormalFocus
-    lblStatus.Caption = "Windows Explorer opened."
+    openPath = ProjectExplorerPath()
+    Shell "explorer.exe " & QuoteShellPath(openPath), vbNormalFocus
+    lblStatus.Caption = "Windows Explorer opened: " & openPath
     Exit Sub
 
 ExplorerError:
@@ -1546,7 +1571,7 @@ Private Sub LoadProjectFromPath(ByVal loadPath As String)
     RefreshFileDisplay
     RefreshTrackDisplay
     UpdateCapacityPreview
-    If SyncZenkiFromTracks() Then
+    If SyncZenkiFromFiles() And SyncZenkiFromTracks() Then
         lblStatus.Caption = "Project loaded: " & loadPath
     End If
     Exit Sub
@@ -1792,6 +1817,25 @@ InitError:
     Set mZenki = Nothing
 End Sub
 
+Private Function SyncZenkiFromFiles() As Boolean
+    Dim syncedCount As Long
+    Dim reportText As String
+
+    If Not mZenkiAvailable Then
+        SyncZenkiFromFiles = True
+        Exit Function
+    End If
+
+    If SyncZenkiIsoEntries(mZenki, mFileEntries, syncedCount, reportText) Then
+        SyncZenkiFromFiles = True
+        Exit Function
+    End If
+
+    If reportText = "" Then reportText = "Unknown ISO sync failure."
+    MsgBox "Zenki ISO sync failed." & vbCrLf & reportText, vbExclamation, "Kureha VB6 Rebuild"
+    lblStatus.Caption = "Zenki ISO sync failed."
+End Function
+
 Private Function SyncZenkiFromTracks() As Boolean
     Dim syncedCount As Long
     Dim skippedCount As Long
@@ -1819,6 +1863,26 @@ SyncError:
         MsgBox "Zenki sync failed." & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
         lblStatus.Caption = "Zenki sync failed."
     End If
+End Function
+
+Private Function MasteringLogText() As String
+    Dim textValue As String
+
+    textValue = "Project loaded" & vbCrLf
+    textValue = textValue & "Disc label: " & txtDiscLabel.Text & vbCrLf
+    textValue = textValue & "File system: " & cboFileSystem.Text & vbCrLf
+    textValue = textValue & "Media: " & cboMediaType.Text & vbCrLf
+    textValue = textValue & "Files: " & CStr(mFileEntries.Count) & vbCrLf
+    textValue = textValue & "Tracks: " & CStr(TrackCount()) & vbCrLf
+    textValue = textValue & "CD-TEXT: " & CStr(ProjectHasCdText()) & vbCrLf
+    textValue = textValue & "Zenki bridge available: " & CStr(mZenkiAvailable) & vbCrLf
+    If mZenkiAvailable Then
+        textValue = textValue & "Zenki ISO empty: " & CStr(mZenki.IsIsoEmpty()) & vbCrLf
+        textValue = textValue & "Zenki current directory: " & mZenki.IsoCurrentDirectory() & vbCrLf
+        textValue = textValue & "Zenki backed tracks: " & CStr(mZenki.TrackCount()) & vbCrLf
+    End If
+
+    MasteringLogText = textValue
 End Function
 
 Private Sub UpdateCapacityPreview()
@@ -2033,6 +2097,40 @@ Private Sub SelectTrackIndex(ByVal index As Long)
         txtAlbumName.Text = mCurrentTrack.DisplayTitle
     End If
 End Sub
+
+Private Function ProjectExplorerPath() As String
+    Dim selectedIndex As Long
+    Dim entry As FileEntry
+    Dim candidatePath As String
+
+    selectedIndex = lstFiles.ListIndex
+    If selectedIndex >= 0 And selectedIndex < mFileEntries.Count Then
+        Set entry = mFileEntries.Item(selectedIndex + 1)
+        candidatePath = entry.OriginalPath
+        If candidatePath <> "" Then
+            If entry.IsDirectory Then
+                ProjectExplorerPath = candidatePath
+            Else
+                ProjectExplorerPath = DirectoryNameFromPath(candidatePath)
+            End If
+        End If
+    End If
+
+    If ProjectExplorerPath = "" Then ProjectExplorerPath = App.Path
+End Function
+
+Private Function DirectoryNameFromPath(ByVal filePath As String) As String
+    Dim slashPos As Long
+    Dim normalizedPath As String
+
+    normalizedPath = Replace(filePath, "/", "\")
+    slashPos = InStrRev(normalizedPath, "\")
+    If slashPos > 0 Then
+        DirectoryNameFromPath = Left$(normalizedPath, slashPos - 1)
+    Else
+        DirectoryNameFromPath = App.Path
+    End If
+End Function
 
 Private Sub ShowPlaceholder(ByVal messageText As String)
     lblStatus.Caption = messageText

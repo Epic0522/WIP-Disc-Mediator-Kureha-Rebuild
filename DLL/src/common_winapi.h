@@ -313,5 +313,10 @@ static BOOL32 kureha_FlushFileBuffers(HANDLE32 h) {
     if (!f) return 0;
     return f(h);
 }
+static BOOL32 kureha_SetEndOfFile(HANDLE32 h) {
+    PFN_SetEndOfFile f = (PFN_SetEndOfFile)kureha_api("SetEndOfFile");
+    if (!f) return 0;
+    return f(h);
+}
 
 #endif

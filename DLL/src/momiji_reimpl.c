@@ -48,6 +48,7 @@ typedef struct MOMIJI_CONTEXT_TAG {
     u32 readSpeed;
     u32 writeSpeed;
     u32 writeCacheBytes;
+    u32 writeCacheUsedBytes;
     u32 blockBytes;
     u32 isTestWrite;
     u32 tocTrackCount;
@@ -88,6 +89,7 @@ static void reset_runtime(MOMIJI_CONTEXT* c) {
     c->readSpeed = 0;
     c->writeSpeed = 0;
     c->writeCacheBytes = 0;
+    c->writeCacheUsedBytes = 0;
     c->blockBytes = 2048;
     c->isTestWrite = 0;
     c->tocTrackCount = 0;
@@ -154,6 +156,7 @@ static int open_path(MOMIJI_CONTEXT* c, const char* path) {
     c->h = h;
     c->opened = 1;
     c->fileBacked = is_device_path(path) ? 0u : 1u;
+    if (c->fileBacked) c->mediaProfile = 0x0009; /* CD-R style file-backed test target. */
     c->lastSense = 0;
     c->lastScsiStatus = 0;
     return 1;
@@ -633,10 +636,17 @@ u32 STDCALL WriteLBA(ptr h, u32 dataType, const void* buffer, i32 lba) {
     u32 sz = write_sector_size_from_type(dataType);
     if (!c || !c->opened || !buffer || lba < 0) return 0;
     /* WRITE(10) is the normal MMC path for all current block types after MODE SELECT. */
-    if (write10(c, (u32)lba, buffer, sz)) { c->lastWroteLBA = lba; return 1; }
+    if (write10(c, (u32)lba, buffer, sz)) {
+        c->lastWroteLBA = lba;
+        c->writeCacheUsedBytes += sz;
+        if (c->fileBacked) update_capacity(c);
+        return 1;
+    }
     /* Some bridges expose raw-sized blocks through WRITE(12); keep it as a fallback. */
     if (sz != 2048 && write12_raw(c, (u32)lba, buffer, sz)) {
         c->lastWroteLBA = lba;
+        c->writeCacheUsedBytes += sz;
+        if (c->fileBacked) update_capacity(c);
         return 1;
     }
     return 0;
@@ -647,10 +657,16 @@ u32 STDCALL WriteFlush(ptr h, u32 abortFlag) {
     u8 cdb[10];
     (void)abortFlag;
     if (!c || !c->opened) return 0;
-    if (c->fileBacked) return kureha_FlushFileBuffers(c->h) ? 1u : 0u;
+    if (c->fileBacked) {
+        if (!kureha_FlushFileBuffers(c->h)) return 0;
+        c->writeCacheUsedBytes = 0;
+        return 1;
+    }
     kureha_zero(cdb, sizeof(cdb));
     cdb[0] = 0x35; /* SYNCHRONIZE CACHE */
-    return send_cdb(c, cdb, 10, SCSI_IOCTL_DATA_UNSPECIFIED, (ptr)0, 0, 120) ? 1u : 0u;
+    if (!send_cdb(c, cdb, 10, SCSI_IOCTL_DATA_UNSPECIFIED, (ptr)0, 0, 120)) return 0;
+    c->writeCacheUsedBytes = 0;
+    return 1;
 }
 
 u32 STDCALL WriteEnd(ptr h, u32 abortFlag) {
@@ -712,7 +728,17 @@ u32 STDCALL LockUnlock(ptr h, u32 lock) {
 u32 STDCALL Erase(ptr h, u32 quickly) {
     MOMIJI_CONTEXT* c = ctx_from_handle(h);
     u8 cdb[12];
-    if (!c || !c->opened || c->fileBacked) return 0;
+    if (!c || !c->opened) return 0;
+    if (c->fileBacked) {
+        i32 hi = 0;
+        (void)quickly;
+        kureha_SetFilePointer(c->h, 0, &hi, K_FILE_BEGIN);
+        if (!kureha_SetEndOfFile(c->h)) return 0;
+        c->lastLBA = 0;
+        c->lastWroteLBA = -1;
+        c->writeCacheUsedBytes = 0;
+        return 1;
+    }
     kureha_zero(cdb, sizeof(cdb));
     cdb[0] = 0xa1;              /* BLANK, mainly CD-RW */
     cdb[1] = quickly ? 0x01 : 0x00;
@@ -741,7 +767,11 @@ u32 STDCALL IsDiscEmpty(ptr h) {
     MOMIJI_CONTEXT* c = ctx_from_handle(h);
     u8 cdb[10];
     u8 data[32];
-    if (!c || !c->opened || c->fileBacked) return 0;
+    if (!c || !c->opened) return 0;
+    if (c->fileBacked) {
+        update_capacity(c);
+        return c->lastLBA == 0 ? 1u : 0u;
+    }
     kureha_zero(cdb, sizeof(cdb));
     kureha_zero(data, sizeof(data));
     cdb[0] = 0x51; /* READ DISC INFORMATION */
@@ -852,5 +882,5 @@ u32 STDCALL SetWriteCacheBufferSize(ptr h, u32 bytes) {
 
 u32 STDCALL GetUsedWriteCacheBufferSize(ptr h) {
     MOMIJI_CONTEXT* c = ctx_from_handle(h);
-    return c ? c->writeCacheBytes : 0;
+    return c ? c->writeCacheUsedBytes : 0;
 }

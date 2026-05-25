@@ -82,8 +82,11 @@ The most significant change in the current state is that the rebuilt DLLs no lon
 
 - a static reverse-engineered ABI baseline from `DLL_stub/`
 - a newer active `DLL/` implementation that is intended to receive calls from the decompiled or rebuilt VB6 side and forward them into real device-facing behavior
+- a safer build script that writes new DLLs to a temporary directory first and only replaces `DLL/bin/*.dll` after a successful link
 
 That means the next stage is no longer just export reconstruction. It is integration and behavioral verification.
+
+The active native sources are currently being developed with an import-free / no-CRT design. They resolve the small Win32 surface they need at runtime, so the final DLLs should not require a Visual C++ runtime redistributable on the XP test system. The intended build path is to use LLVM/`lld-link` from the development machine, then copy only the generated `DLL/bin/Momiji.dll` and `DLL/bin/Zenki.dll` into the VB6 test directory.
 
 ## Planned Next Steps
 
@@ -105,12 +108,20 @@ As of the current milestone:
 - the rebuilt project opens and runs in the VB6 IDE without the original decompiler-related load failures
 - the main window layout has been rebuilt into a resizable, testable scaffold that now roughly matches the original workflow
 - track addition now uses the standard Windows file picker instead of a temporary text prompt
+- file and folder addition now use native Windows picker dialogs, retain original source paths, and persist those paths through project save/load
 - the track `CD-TEXT` editor supports bilingual metadata editing and preserves Japanese text correctly in the rebuilt data model
 - the lower track list has been cleaned up enough to validate titles, performers, source labels, gaps, durations, and flags during testing
 - the disc usage area now includes a working preview ring and remaining-capacity estimate driven by imported track durations
+- basic ISO file-list actions now synchronize into the rebuilt `Zenki.dll` layer, including real files, dummy files, directories, clears, removals, and renames
 - the required native dependency layer is now organized in-repo as `DLL_stub/` and `DLL/`, preserving both the first static reverse-engineering pass and the current active reimplementation workspace
 - the current `DLL/` workspace already includes rebuilt DLL outputs, native reimplementation sources, and VB6 wrapper classes intended to receive and relay calls from the application side
 - the rebuilt VB6 project now has form-level coverage for the original application's main window, disc-operation dialogs, configuration/property dialogs, image save/write progress windows, media-ready prompt, list status dialog, and track-ripping subwindow
 - the major menu and toolbar entry points now open concrete rebuilt windows instead of stopping at a single placeholder message, so the next development pass can debug behavior inside each screen
+- view-menu quality-of-life actions have started to behave like application features: always-on-top now toggles through the Win32 API, Explorer opens at the selected file source or project folder, and the mastering log reports current project/DLL state
+- `Zenki` now has a more complete in-memory ISO model: normalized ISO paths, directory parent/child relationships, multi-directory directory sectors, path table generation, multi-sector path table layout, file/dummy/directory enumeration, and safer remove/rename/property behavior
+- `Zenki` track reading now understands ordinary file tracks and WAV data chunks, can stream track data with pregap/postgap handling, and can wrap 2048-byte sectors into raw 2352-byte sectors for raw-mode reads
+- `Zenki` `CD-TEXT` storage now tracks whether each field was actually set, keeps album/track text separated by track number, and can return track-title text through `GetTrackInformation`
+- `Momiji` now has a safer file-backed test mode for non-hardware verification: ordinary files can be opened as simulated CD-R targets, written by LBA, flushed, erased, queried for empty/non-empty state, and inspected for last-written LBA/cache-used state
+- the native sources currently pass a 32-bit Windows-target `clang -c` syntax check, but the checked-in `DLL/bin` binaries still need to be regenerated with a real LLVM `lld-link` toolchain before XP-side behavioral testing reflects the latest source changes
 
 What is still missing is the original application's full authoring and burn pipeline: the current rebuild is suitable for UI, metadata, and workflow reconstruction, but not yet for final disc-writing equivalence.
