@@ -1,11 +1,11 @@
 
-/mnt/data/kureha_dll_remake_v4/bin/Momiji.dll:	file format coff-i386
+/Users/epicreds/Projects/Kureha reverse/DLL/bin/Momiji.dll:	file format coff-i386
 Characteristics 0x2102
 	executable
 	32 bit words
 	DLL
 
-Time/Date               Mon May 11 12:16:12 2026
+Time/Date               Tue May 26 16:34:56 2026
 Magic                   010b	(PE32)
 MajorLinkerVersion      14
 MinorLinkerVersion      0
@@ -18,12 +18,12 @@ BaseOfData              00000000
 ImageBase               10000000
 SectionAlignment        00001000
 FileAlignment           00000200
-MajorOSystemVersion     6
-MinorOSystemVersion     0
+MajorOSystemVersion     5
+MinorOSystemVersion     1
 MajorImageVersion       0
 MinorImageVersion       0
-MajorSubsystemVersion   6
-MinorSubsystemVersion   0
+MajorSubsystemVersion   5
+MinorSubsystemVersion   1
 Win32Version            00000000
 SizeOfImage             0001b000
 SizeOfHeaders           00000400
@@ -46,7 +46,7 @@ Entry 1 00000000 00000000 Import Directory [parts of .idata]
 Entry 2 00000000 00000000 Resource Directory [.rsrc]
 Entry 3 00000000 00000000 Exception Directory [.pdata]
 Entry 4 00000000 00000000 Security Directory
-Entry 5 0001a000 00000110 Base Relocation Directory [.reloc]
+Entry 5 0001a000 0000010c Base Relocation Directory [.reloc]
 Entry 6 00000000 00000000 Debug Directory
 Entry 7 00000000 00000000 Description Directory
 Entry 8 00000000 00000000 Special Directory
@@ -65,42 +65,42 @@ Export Table:
        1   0x1000  GetEngineVersion
        2   0x1010  Initialize
        3   0x13b0  Terminate
-       4   0x1460  GetRemoteHosts
-       5   0x1480  Open
-       6   0x1700  OpenEx
+       4   0x1470  GetRemoteHosts
+       5   0x1490  Open
+       6   0x1710  OpenEx
        7   0x1770  Close
-       8   0x17e0  GetDeviceName
-       9   0x1890  ClearTOCStructure
-      10   0x18c0  GetTOCStructure
+       8   0x17d0  GetDeviceName
+       9   0x1880  ClearTOCStructure
+      10   0x18b0  GetTOCStructure
       11   0x1b00  SetTOCStructure
-      12   0x1da0  GetFirstLBA
-      13   0x1dd0  GetLastLBA
-      14   0x1e00  SetBufferingBlockLength
-      15   0x1e40  ReadStart
-      16   0x1f10  ReadLBA
-      17   0x21b0  ReadLBADummy
-      18   0x2230  ReadEnd
-      19   0x2250  WriteStart
-      20   0x2510  WriteLBA
-      21   0x2760  WriteFlush
-      22   0x29a0  WriteEnd
-      23   0x2a90  GetLastWroteLBA
-      24   0x2ac0  LoadTray
-      25   0x2b40  IsReady
-      26   0x2bb0  GetMediaType
-      27   0x2be0  GetMediaFamilyType
-      28   0x2c50  LockUnlock
-      29   0x2cd0  Erase
-      30   0x2d60  IsSupportMedia
-      31   0x2d90  IsReadSupport
-      32   0x2dc0  IsWriteSupport
-      33   0x2df0  IsDiscEmpty
-      34   0x2e80  ResetSense
-      35   0x2ec0  SetECCMode
-      36   0x2f00  SetReadSpeed
-      37   0x2fa0  SetWriteSpeed
-      38   0x3040  GetWriteSpeed
-      39   0x31e0  CheckWriteMode
-      40   0x3260  GetSCSIErrorStatus
-      41   0x32a0  SetWriteCacheBufferSize
-      42   0x32d0  GetUsedWriteCacheBufferSize
+      12   0x1df0  GetFirstLBA
+      13   0x1e20  GetLastLBA
+      14   0x1e50  SetBufferingBlockLength
+      15   0x1e90  ReadStart
+      16   0x1f60  ReadLBA
+      17   0x2200  ReadLBADummy
+      18   0x2280  ReadEnd
+      19   0x22a0  WriteStart
+      20   0x2550  WriteLBA
+      21   0x27a0  WriteFlush
+      22   0x29d0  WriteEnd
+      23   0x2a50  GetLastWroteLBA
+      24   0x2a80  LoadTray
+      25   0x2b00  IsReady
+      26   0x2b70  GetMediaType
+      27   0x2ba0  GetMediaFamilyType
+      28   0x2c10  LockUnlock
+      29   0x2c90  Erase
+      30   0x2d80  IsSupportMedia
+      31   0x2db0  IsReadSupport
+      32   0x2de0  IsWriteSupport
+      33   0x2e10  IsDiscEmpty
+      34   0x2ea0  ResetSense
+      35   0x2ee0  SetECCMode
+      36   0x2f20  SetReadSpeed
+      37   0x2fc0  SetWriteSpeed
+      38   0x3060  GetWriteSpeed
+      39   0x31f0  CheckWriteMode
+      40   0x3270  GetSCSIErrorStatus
+      41   0x32b0  SetWriteCacheBufferSize
+      42   0x32e0  GetUsedWriteCacheBufferSize

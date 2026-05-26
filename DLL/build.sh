@@ -18,7 +18,7 @@ if [[ -d "$BREW_LLVM" ]]; then
     export PATH="$BREW_LLVM:$PATH"
 fi
 CFLAGS=(--target=i686-pc-windows-msvc -fuse-ld=lld -O2 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib)
-LDFLAGS=(-Wl,/dll -Wl,/noentry)
+LDFLAGS=(-Wl,/dll -Wl,/noentry -Xlinker /subsystem:windows,5.01)
 
 "$CLANG" "${CFLAGS[@]}" "${LDFLAGS[@]}" -Wl,/def:"$ROOT/src/momiji.def" "$ROOT/src/momiji_reimpl.c" -o "$TMPDIR/Momiji.dll" 2>"$ROOT/build/momiji_build.log"
 "$CLANG" "${CFLAGS[@]}" "${LDFLAGS[@]}" -Wl,/def:"$ROOT/src/zenki.def" "$ROOT/src/zenki_reimpl.c" -o "$TMPDIR/Zenki.dll" 2>"$ROOT/build/zenki_build.log"

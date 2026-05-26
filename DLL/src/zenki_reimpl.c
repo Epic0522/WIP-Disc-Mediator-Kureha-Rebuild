@@ -1072,8 +1072,7 @@ void STDCALL GetTrackInformation(ptr h, u32 trackNo, void* outInfo) {
     if (idx > 0) idx--;
     if (!c || idx >= c->trackCount) return;
     t = &c->tracks[idx];
-    if (track_display_text(c, idx)[0]) kureha_strcopy((char*)p, 0x400, track_display_text(c, idx));
-    else kureha_strcopy((char*)p, 0x400, t->path);
+    kureha_strcopy((char*)p, 0x400, t->path);
     ((u32*)(p + 0x400))[0] = t->pregap;
     ((u32*)(p + 0x400))[1] = t->postgap;
     ((u32*)(p + 0x400))[2] = t->flag;

@@ -616,14 +616,9 @@ Private Sub cmdAddTrack_Click()
     Set entry = New TrackEntry
     entry.TrackNo = mTrackEntries.Count + 1
     entry.FilePath = selectedPath
-    entry.EnglishText.LanguageEnabled = True
-    entry.EnglishText.TitleEnabled = True
-    entry.EnglishText.PerformerEnabled = True
-
     defaultTitle = FileTitleFromPath(selectedPath)
     If defaultTitle = "" Then defaultTitle = "Track " & Format$(entry.TrackNo, "00")
-    entry.EnglishText.Title = defaultTitle
-    entry.EnglishText.Performer = ""
+    ApplyDefaultTrackCdText entry, defaultTitle
     entry.Source = FileTypeLabel(selectedPath)
     entry.Pregap = "00:02:00"
     entry.Duration = EstimateTrackDuration(selectedPath)
@@ -663,7 +658,7 @@ Private Sub cmdImageRead_Click()
 End Sub
 
 Private Sub cmdImageWrite_Click()
-    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
+    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText(), mZenki
     DiscWriteForm.Show vbModal, Me
 End Sub
 
@@ -793,7 +788,7 @@ Private Sub cmdTrackProperties_Click()
 End Sub
 
 Private Sub cmdWriteDisc_Click()
-    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText()
+    DiscWriteForm.LoadPreview txtDiscLabel.Text, cboMediaType.Text, TrackCount(), ProjectHasCdText(), mZenki
     DiscWriteForm.Show vbModal, Me
 End Sub
 
@@ -1706,6 +1701,37 @@ Private Function FileTitleFromPath(ByVal filePath As String) As String
     If dotPos > 1 Then
         FileTitleFromPath = Left$(FileTitleFromPath, dotPos - 1)
     End If
+End Function
+
+Private Sub ApplyDefaultTrackCdText(ByVal entry As TrackEntry, ByVal titleText As String)
+    If TextLooksJapanese(titleText) Then
+        entry.JapaneseText.LanguageEnabled = True
+        entry.JapaneseText.TitleEnabled = True
+        entry.JapaneseText.Title = titleText
+        entry.EnglishText.LanguageEnabled = False
+    Else
+        entry.EnglishText.LanguageEnabled = True
+        entry.EnglishText.TitleEnabled = True
+        entry.EnglishText.Title = titleText
+        entry.EnglishText.PerformerEnabled = False
+    End If
+End Sub
+
+Private Function TextLooksJapanese(ByVal textValue As String) As Boolean
+    Dim i As Long
+    Dim codePoint As Long
+
+    For i = 1 To Len(textValue)
+        codePoint = AscW(Mid$(textValue, i, 1))
+        If codePoint < 0 Then codePoint = codePoint + 65536
+
+        If (codePoint >= &H3040 And codePoint <= &H30FF) Or _
+           (codePoint >= &H3400 And codePoint <= &H9FFF) Or _
+           (codePoint >= &HFF00 And codePoint <= &HFFEF) Then
+            TextLooksJapanese = True
+            Exit Function
+        End If
+    Next i
 End Function
 
 Private Function FileNameWithExtensionFromPath(ByVal filePath As String) As String

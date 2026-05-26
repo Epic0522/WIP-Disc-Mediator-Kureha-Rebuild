@@ -59,6 +59,38 @@ Public Function WriteSector2048(ByVal lba As Long, ByRef data() As Byte) As Bool
     WriteSector2048 = (Momiji_WriteLBA(mHandle, 2048, VarPtr(data(LBound(data))), lba) <> 0)
 End Function
 
+Public Function WriteStart(ByVal writeCommand As Long, ByVal writeFlag As Long) As Boolean
+    WriteStart = (Momiji_WriteStart(mHandle, writeCommand, writeFlag) <> 0)
+End Function
+
+Public Function WriteFlush(ByVal abortFlag As Boolean) As Boolean
+    WriteFlush = (Momiji_WriteFlush(mHandle, IIf(abortFlag, 1, 0)) <> 0)
+End Function
+
+Public Function WriteEnd(ByVal abortFlag As Boolean) As Boolean
+    WriteEnd = (Momiji_WriteEnd(mHandle, IIf(abortFlag, 1, 0)) <> 0)
+End Function
+
+Public Function EraseMedia(ByVal quickErase As Boolean) As Boolean
+    EraseMedia = (Momiji_Erase(mHandle, IIf(quickErase, 1, 0)) <> 0)
+End Function
+
+Public Function IsDiscEmpty() As Boolean
+    IsDiscEmpty = (Momiji_IsDiscEmpty(mHandle) <> 0)
+End Function
+
+Public Function SetWriteCacheBytes(ByVal bytes As Long) As Long
+    SetWriteCacheBytes = Momiji_SetWriteCacheBufferSize(mHandle, bytes)
+End Function
+
+Public Function UsedWriteCacheBytes() As Long
+    UsedWriteCacheBytes = Momiji_GetUsedWriteCacheBufferSize(mHandle)
+End Function
+
+Public Function LastWroteLBA() As Long
+    LastWroteLBA = Momiji_GetLastWroteLBA(mHandle)
+End Function
+
 Public Function LastErrorStatus() As Long
     LastErrorStatus = Momiji_GetSCSIErrorStatus(mHandle)
 End Function

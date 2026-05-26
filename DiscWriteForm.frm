@@ -85,6 +85,16 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Const SIMULATED_WRITE_SECTOR_LIMIT As Long = 32
+Private Const SIMULATED_WRITE_FILE_NAME As String = "kureha_filebacked_write_test.bin"
+
+Private mDiscLabel As String
+Private mMediaType As String
+Private mTrackCount As Long
+Private mHasCdText As Boolean
+Private mLastTestLine As String
+Private mZenki As ZenkiEngine
+
 Private Sub cmdClose_Click()
     Unload Me
 End Sub
@@ -94,7 +104,36 @@ Private Sub cmdParameters_Click()
 End Sub
 
 Private Sub cmdStartWrite_Click()
-    WellWriteForm.Show vbModal, Me
+    Dim report As String
+
+    On Error GoTo Failed
+
+    If mTrackCount <= 0 Then
+        MsgBox "Add at least one track before running the simulated write test.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    If mZenki Is Nothing Then
+        MsgBox "Zenki engine is not available. Reopen the main window and try again.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    If mZenki.Handle = 0 Then
+        MsgBox "Zenki engine is not initialized.", vbExclamation, "Kureha VB6 Rebuild"
+        Exit Sub
+    End If
+
+    EnsureNativeDllPath
+    report = RunSimulatedWriteTest()
+    mLastTestLine = "Last test: simulated write passed."
+    UpdatePreviewText
+    MsgBox report, vbInformation, "Kureha VB6 Rebuild"
+    Exit Sub
+
+Failed:
+    mLastTestLine = "Last test: simulated write failed."
+    UpdatePreviewText
+    MsgBox "Simulated write failed." & vbCrLf & vbCrLf & Err.Description, vbExclamation, "Kureha VB6 Rebuild"
 End Sub
 
 Private Sub Form_Load()
@@ -102,12 +141,114 @@ Private Sub Form_Load()
     cboWriteMode.AddItem "SAO RAW"
     cboWriteMode.AddItem "DAO RAW+96"
     cboWriteMode.ListIndex = 0
+    cmdStartWrite.Caption = "Test Write"
 End Sub
 
-Public Sub LoadPreview(ByVal discLabel As String, ByVal mediaType As String, ByVal trackCount As Long, ByVal hasCdText As Boolean)
-    lblSummary.Caption = "Label: " & discLabel & vbCrLf & _
-        "Media: " & mediaType & vbCrLf & _
-        "Tracks: " & CStr(trackCount)
+Public Sub LoadPreview(ByVal discLabel As String, ByVal mediaType As String, ByVal trackCount As Long, ByVal hasCdText As Boolean, ByVal zenkiEngine As ZenkiEngine)
+    mDiscLabel = discLabel
+    mMediaType = mediaType
+    mTrackCount = trackCount
+    mHasCdText = hasCdText
+    mLastTestLine = "Start runs a file-backed simulated write. No real drive access."
+    Set mZenki = zenkiEngine
     chkWriteCDText.Value = Abs(hasCdText)
+    UpdatePreviewText
 End Sub
+
+Private Sub UpdatePreviewText()
+    lblSummary.Caption = "Label: " & mDiscLabel & vbCrLf & _
+        "Media: " & mMediaType & vbCrLf & _
+        "Tracks: " & CStr(mTrackCount) & vbCrLf & _
+        "CD-TEXT: " & IIf(mHasCdText, "enabled", "not set") & vbCrLf & _
+        mLastTestLine
+End Sub
+
+Private Function RunSimulatedWriteTest() As String
+    Dim writer As MomijiEngine
+    Dim sector(0 To 2447) As Byte
+    Dim testPath As String
+    Dim sectorIndex As Long
+    Dim readSectors As Long
+    Dim wroteSectors As Long
+    Dim cacheBeforeFlush As Long
+    Dim cacheAfterFlush As Long
+    Dim lastLBA As Long
+    Dim emptyAfterErase As Boolean
+    Dim readStarted As Boolean
+    Dim errText As String
+
+    On Error GoTo Failed
+
+    testPath = App.Path & "\" & SIMULATED_WRITE_FILE_NAME
+    Set writer = New MomijiEngine
+
+    If Not writer.OpenDevicePath(testPath) Then
+        Err.Raise vbObjectError + 2100, "DiscWriteForm", "Momiji.OpenEx failed for: " & testPath
+    End If
+
+    writer.SetWriteCacheBytes 1048576
+
+    If Not writer.EraseMedia(True) Then
+        Err.Raise vbObjectError + 2101, "DiscWriteForm", "Momiji.Erase failed for file-backed target."
+    End If
+
+    If Not writer.WriteStart(2048, 0) Then
+        Err.Raise vbObjectError + 2102, "DiscWriteForm", "Momiji.WriteStart failed for file-backed target."
+    End If
+
+    If Not mZenki.ReadStart() Then
+        Err.Raise vbObjectError + 2103, "DiscWriteForm", "Zenki.ReadStart failed."
+    End If
+    readStarted = True
+
+    For sectorIndex = 0 To SIMULATED_WRITE_SECTOR_LIMIT - 1
+        If Not mZenki.ReadSector(sector, False) Then Exit For
+        readSectors = readSectors + 1
+
+        If Not writer.WriteSector2048(sectorIndex, sector) Then
+            Err.Raise vbObjectError + 2104, "DiscWriteForm", "Momiji.WriteLBA failed at sector " & CStr(sectorIndex) & "."
+        End If
+        wroteSectors = wroteSectors + 1
+    Next
+
+    If readSectors = 0 Or wroteSectors = 0 Then
+        Err.Raise vbObjectError + 2105, "DiscWriteForm", "No sectors were transferred from Zenki to Momiji."
+    End If
+
+    cacheBeforeFlush = writer.UsedWriteCacheBytes()
+    lastLBA = writer.LastWroteLBA()
+
+    If Not writer.WriteFlush(False) Then
+        Err.Raise vbObjectError + 2106, "DiscWriteForm", "Momiji.WriteFlush failed."
+    End If
+    cacheAfterFlush = writer.UsedWriteCacheBytes()
+
+    If Not writer.EraseMedia(True) Then
+        Err.Raise vbObjectError + 2107, "DiscWriteForm", "Momiji.Erase after test failed."
+    End If
+    emptyAfterErase = writer.IsDiscEmpty()
+
+    mZenki.ReadEnd
+    readStarted = False
+    writer.CloseDevice
+
+    RunSimulatedWriteTest = "File-backed simulated write completed." & vbCrLf & _
+        "Tracks synced: " & CStr(mTrackCount) & vbCrLf & _
+        "Sectors read: " & CStr(readSectors) & vbCrLf & _
+        "Sectors written: " & CStr(wroteSectors) & vbCrLf & _
+        "Last wrote LBA: " & CStr(lastLBA) & vbCrLf & _
+        "Cache before flush: " & CStr(cacheBeforeFlush) & " bytes" & vbCrLf & _
+        "Cache after flush: " & CStr(cacheAfterFlush) & " bytes" & vbCrLf & _
+        "Empty after erase: " & CStr(emptyAfterErase) & vbCrLf & _
+        "Target: " & testPath
+    Exit Function
+
+Failed:
+    errText = Err.Description
+    On Error Resume Next
+    If readStarted Then mZenki.ReadEnd
+    If Not (writer Is Nothing) Then writer.CloseDevice
+    On Error GoTo 0
+    Err.Raise vbObjectError + 2199, "DiscWriteForm", errText
+End Function
 

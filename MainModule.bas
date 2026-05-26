@@ -27,6 +27,8 @@ End Type
 Public Declare Function GetOpenFileName Lib "comdlg32.dll" Alias "GetOpenFileNameA" (ByRef pOpenfilename As OPENFILENAME) As Long
 Public Declare Function GetSaveFileName Lib "comdlg32.dll" Alias "GetSaveFileNameA" (ByRef pOpenfilename As OPENFILENAME) As Long
 Public Declare Function SetWindowPos Lib "user32.dll" (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, ByVal wFlags As Long) As Long
+Public Declare Function SetDllDirectory Lib "kernel32" Alias "SetDllDirectoryA" (ByVal lpPathName As String) As Long
+Public Declare Function LoadLibrary Lib "kernel32" Alias "LoadLibraryA" (ByVal lpLibFileName As String) As Long
 
 Public Const OFN_FILEMUSTEXIST As Long = &H1000
 Public Const OFN_HIDEREADONLY As Long = &H4
@@ -44,9 +46,21 @@ Public Sub Main()
     ChDrive Left$(App.Path, 1)
     ChDir App.Path
     On Error GoTo 0
+    EnsureNativeDllPath
 
     Load MainForm
     MainForm.Show
+End Sub
+
+Public Sub EnsureNativeDllPath()
+    Dim dllDir As String
+
+    dllDir = App.Path & "\DLL\bin"
+    On Error Resume Next
+    SetDllDirectory dllDir
+    LoadLibrary dllDir & "\Zenki.dll"
+    LoadLibrary dllDir & "\Momiji.dll"
+    On Error GoTo 0
 End Sub
 
 Public Function ShowOpenFileDialog(ByVal ownerHwnd As Long, ByVal filterText As String, ByVal dialogTitle As String, Optional ByVal initialDir As String = "", Optional ByVal defaultExtension As String = "") As String
