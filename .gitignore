@@ -20,12 +20,16 @@
 !DLL/**
 !DLL_stub/
 !DLL_stub/**
+!tools/
+!tools/**
 
 # But still ignore Finder metadata inside it
 DLL/.DS_Store
 DLL/**/.DS_Store
 DLL_stub/.DS_Store
 DLL_stub/**/.DS_Store
+tools/.DS_Store
+tools/**/.DS_Store
 
 # Keep the original vendor DLLs local-only
 DLL_orig/

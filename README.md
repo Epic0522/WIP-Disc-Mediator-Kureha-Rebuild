@@ -53,6 +53,7 @@ The rebuild is being developed in stages:
 - `FileEntry.cls`: file list UI model
 - `DLL/`: current working dependency workspace for reconstructed `Momiji.dll` and `Zenki.dll`
 - `DLL_stub/`: first-pass static-reconstruction workspace used to map exports, calling conventions, and early stub behavior
+- `tools/analyze_raw96.py`: helper for inspecting the file-backed DAO RAW+SUB96 test image, Q subchannel CRC, and `CD-TEXT` packs
 
 ## DLL Reconstruction Notes
 
@@ -122,6 +123,10 @@ As of the current milestone:
 - `Zenki` track reading now understands ordinary file tracks and WAV data chunks, can stream track data with pregap/postgap handling, and can wrap 2048-byte sectors into raw 2352-byte sectors for raw-mode reads
 - `Zenki` `CD-TEXT` storage now tracks whether each field was actually set, keeps album/track text separated by track number, and can return track-title text through `GetTrackInformation`
 - `Momiji` now has a safer file-backed test mode for non-hardware verification: ordinary files can be opened as simulated CD-R targets, written by LBA, flushed, erased, queried for empty/non-empty state, and inspected for last-written LBA/cache-used state
-- the native sources currently pass a 32-bit Windows-target `clang -c` syntax check, but the checked-in `DLL/bin` binaries still need to be regenerated with a real LLVM `lld-link` toolchain before XP-side behavioral testing reflects the latest source changes
+- the rebuilt DLLs can be loaded from the VB6 IDE test directory through the `DLL/bin` path, and the VB6 wrapper layer can call into both `Zenki.dll` and `Momiji.dll`
+- file-backed simulated writing has progressed from a short sector-transfer smoke test into a DAO RAW+SUB96 semantic test image: the generated image now contains lead-in, program area, and lead-out regions
+- `CD-TEXT` is now emitted into the simulated RAW+96 lead-in area as Shift-JIS-compatible bytes, and the returned test image successfully decodes a Japanese track title from the generated packs
+- the `tools/analyze_raw96.py` helper validates the returned test image structure, including sector count, logical LBA range, lead-in/program/lead-out samples, Q subchannel CRC, `CD-TEXT` pack CRC, and decoded Japanese text
+- the latest verified file-backed test image produced `4500` lead-in sectors, `4922` program sectors, `6750` lead-out sectors, zero sampled Q CRC failures, zero `CD-TEXT` CRC failures, and decoded the title `アンティーカ & ストレイライト - Killer×Mission`
 
-What is still missing is the original application's full authoring and burn pipeline: the current rebuild is suitable for UI, metadata, and workflow reconstruction, but not yet for final disc-writing equivalence.
+What is still missing is the original application's full authoring and burn pipeline. The current rebuild can validate metadata, `CD-TEXT`, and a DAO RAW+SUB96-shaped file-backed image, but the program area still needs true audio-sector generation from the original application's supported input scope: 44.1 kHz / 16-bit MP3 or WAV sources converted into proper CDDA PCM sectors before any real hardware write path should be attempted.

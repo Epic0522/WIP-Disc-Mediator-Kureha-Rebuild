@@ -59,6 +59,15 @@ Public Function WriteSector2048(ByVal lba As Long, ByRef data() As Byte) As Bool
     WriteSector2048 = (Momiji_WriteLBA(mHandle, 2048, VarPtr(data(LBound(data))), lba) <> 0)
 End Function
 
+Public Function WriteSectorByType(ByVal lba As Long, ByRef data() As Byte, ByVal dataType As Long) As Boolean
+    Dim requiredBytes As Long
+
+    requiredBytes = dataType
+    If requiredBytes <= 0 Then requiredBytes = 2048
+    If UBound(data) - LBound(data) + 1 < requiredBytes Then Err.Raise 5, , "buffer is smaller than requested sector type"
+    WriteSectorByType = (Momiji_WriteLBA(mHandle, dataType, VarPtr(data(LBound(data))), lba) <> 0)
+End Function
+
 Public Function WriteStart(ByVal writeCommand As Long, ByVal writeFlag As Long) As Boolean
     WriteStart = (Momiji_WriteStart(mHandle, writeCommand, writeFlag) <> 0)
 End Function
