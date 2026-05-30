@@ -53,7 +53,7 @@ The rebuild is being developed in stages:
 - `FileEntry.cls`: file list UI model
 - `DLL/`: current working dependency workspace for reconstructed `Momiji.dll` and `Zenki.dll`
 - `DLL_stub/`: first-pass static-reconstruction workspace used to map exports, calling conventions, and early stub behavior
-- `tools/analyze_raw96.py`: helper for inspecting the file-backed DAO RAW+SUB96 test image, Q subchannel CRC, and `CD-TEXT` packs
+- `tools/analyze_raw96.py`: helper for inspecting RAW+96 test images, exporting simulated capture bundles, capturing real discs through `drutil`/`cdrdao`, and comparing bundle-shaped outputs
 
 ## DLL Reconstruction Notes
 
@@ -100,6 +100,44 @@ The most likely path forward is:
 5. keep comparing behavior across the two public workspaces while validating against a private local original-binary reference outside the repository
 6. only after that replace the remaining UI-side placeholder logic with real DLL-backed operations module by module
 
+## Capture Bundle Workflow
+
+The project now compares generated output and physical-disc captures through the same capture-bundle shape instead of comparing incompatible raw files directly. Capture bundles are local analysis artifacts and are intentionally ignored through `captures/` because they can contain real disc audio.
+
+To inspect a generated RAW+96 debug image:
+
+```sh
+./tools/analyze_raw96.py analyze-bin path/to/kureha_filebacked_raw96_disc_test.bin
+```
+
+To export a simulated capture bundle from a generated RAW+96 debug image:
+
+```sh
+./tools/analyze_raw96.py bundle-from-raw96 path/to/kureha_filebacked_raw96_disc_test.bin captures/simulated_current
+./tools/analyze_raw96.py analyze-capture captures/simulated_current
+```
+
+To preview the physical-disc capture commands before connecting or using a drive:
+
+```sh
+./tools/analyze_raw96.py capture-disc captures --name original_good_disc --dry-run
+```
+
+To capture a known-good disc from a real drive once hardware is connected:
+
+```sh
+./tools/analyze_raw96.py capture-disc captures --name original_good_disc
+./tools/analyze_raw96.py analyze-capture captures/original_good_disc
+```
+
+To compare the known-good physical-disc bundle against the simulated bundle:
+
+```sh
+./tools/analyze_raw96.py compare-capture captures/original_good_disc captures/simulated_current
+```
+
+The main comparison target is the bundle structure: `disc.toc`, `data.bin`, optional `subchannel.bin`, `metadata.json`, and optional `raw96-debug.bin`. `raw96-debug.bin` is useful for internal diagnostics, but it should not be compared directly against a physical-disc `data.bin`.
+
 ## Status
 
 The current build is still in an early reconstruction stage, but the project has moved beyond a static mockup.
@@ -128,5 +166,7 @@ As of the current milestone:
 - `CD-TEXT` is now emitted into the simulated RAW+96 lead-in area as Shift-JIS-compatible bytes, and the returned test image successfully decodes a Japanese track title from the generated packs
 - the `tools/analyze_raw96.py` helper validates the returned test image structure, including sector count, logical LBA range, lead-in/program/lead-out samples, Q subchannel CRC, `CD-TEXT` pack CRC, and decoded Japanese text
 - the latest verified file-backed test image produced `4500` lead-in sectors, `4922` program sectors, `6750` lead-out sectors, zero sampled Q CRC failures, zero `CD-TEXT` CRC failures, and decoded the title `アンティーカ & ストレイライト - Killer×Mission`
+- comparison is being moved to a capture-bundle model so simulated output and physical-disc captures share the same shape: `disc.toc`, `data.bin`, optional `subchannel.bin`, `metadata.json`, and optional `raw96-debug.bin`
+- `captures/` is intentionally local-only because physical-disc capture bundles can contain real audio data
 
 What is still missing is the original application's full authoring and burn pipeline. The current rebuild can validate metadata, `CD-TEXT`, and a DAO RAW+SUB96-shaped file-backed image, but the program area still needs true audio-sector generation from the original application's supported input scope: 44.1 kHz / 16-bit MP3 or WAV sources converted into proper CDDA PCM sectors before any real hardware write path should be attempted.
