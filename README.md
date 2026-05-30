@@ -110,6 +110,12 @@ To inspect a generated RAW+96 debug image:
 ./tools/analyze_raw96.py analyze-bin path/to/kureha_filebacked_raw96_disc_test.bin
 ```
 
+To create deterministic local CDDA WAV fixtures without storing audio files in Git:
+
+```sh
+./tools/make_cdda_fixtures.py
+```
+
 To export a simulated capture bundle from a generated RAW+96 debug image:
 
 ```sh
@@ -158,15 +164,20 @@ As of the current milestone:
 - the major menu and toolbar entry points now open concrete rebuilt windows instead of stopping at a single placeholder message, so the next development pass can debug behavior inside each screen
 - view-menu quality-of-life actions have started to behave like application features: always-on-top now toggles through the Win32 API, Explorer opens at the selected file source or project folder, and the mastering log reports current project/DLL state
 - `Zenki` now has a more complete in-memory ISO model: normalized ISO paths, directory parent/child relationships, multi-directory directory sectors, path table generation, multi-sector path table layout, file/dummy/directory enumeration, and safer remove/rename/property behavior
-- `Zenki` track reading now understands ordinary file tracks and WAV data chunks, can stream track data with pregap/postgap handling, and can wrap 2048-byte sectors into raw 2352-byte sectors for raw-mode reads
+- `Zenki` track reading now strictly accepts CDDA-shaped WAV input for the offline write path: PCM, 44.1 kHz, 16-bit, stereo, with the final partial 2352-byte audio sector padded as silence
+- MP3 input is now deliberately blocked in the rebuilt offline write path until a real decoder stage is added, so test images do not silently contain fake audio sectors
+- the native rebuild was refreshed after the CDDA changes, and the rebuilt `Momiji.dll`/`Zenki.dll` export ordinal/name tables still match the original ABI reference used by the VB6 declares
 - `Zenki` `CD-TEXT` storage now tracks whether each field was actually set, keeps album/track text separated by track number, and can return track-title text through `GetTrackInformation`
 - `Momiji` now has a safer file-backed test mode for non-hardware verification: ordinary files can be opened as simulated CD-R targets, written by LBA, flushed, erased, queried for empty/non-empty state, and inspected for last-written LBA/cache-used state
 - the rebuilt DLLs can be loaded from the VB6 IDE test directory through the `DLL/bin` path, and the VB6 wrapper layer can call into both `Zenki.dll` and `Momiji.dll`
 - file-backed simulated writing has progressed from a short sector-transfer smoke test into a DAO RAW+SUB96 semantic test image: the generated image now contains lead-in, program area, and lead-out regions
 - `CD-TEXT` is now emitted into the simulated RAW+96 lead-in area as Shift-JIS-compatible bytes, and the returned test image successfully decodes a Japanese track title from the generated packs
-- the `tools/analyze_raw96.py` helper validates the returned test image structure, including sector count, logical LBA range, lead-in/program/lead-out samples, Q subchannel CRC, `CD-TEXT` pack CRC, and decoded Japanese text
+- the `tools/analyze_raw96.py` helper validates the returned test image structure, including sector count, logical LBA range, lead-in/program/lead-out samples, Q subchannel CRC, `CD-TEXT` pack CRC, decoded Japanese text, and whether the program `data.bin` looks like CDDA main-channel audio rather than CD-ROM data sectors
+- `tools/make_cdda_fixtures.py` can generate ignored local WAV fixtures, including silence, sine-wave audio, and a Japanese filename case, for no-drive CDDA verification
+- the no-drive verification path now has a basic anti-false-positive check: generated 2352-byte PCM fixture data is recognized as CDDA-like, while a synthetic CD-ROM-style sector with a sync header is rejected as not CDDA-like
+- a synthetic RAW+96 fixture can now be exported into a capture bundle and compared against itself, confirming that `bundle-from-raw96`, `analyze-capture`, and `compare-capture` share the same local structure before a real drive is available
 - the latest verified file-backed test image produced `4500` lead-in sectors, `4922` program sectors, `6750` lead-out sectors, zero sampled Q CRC failures, zero `CD-TEXT` CRC failures, and decoded the title `アンティーカ & ストレイライト - Killer×Mission`
 - comparison is being moved to a capture-bundle model so simulated output and physical-disc captures share the same shape: `disc.toc`, `data.bin`, optional `subchannel.bin`, `metadata.json`, and optional `raw96-debug.bin`
 - `captures/` is intentionally local-only because physical-disc capture bundles can contain real audio data
 
-What is still missing is the original application's full authoring and burn pipeline. The current rebuild can validate metadata, `CD-TEXT`, and a DAO RAW+SUB96-shaped file-backed image, but the program area still needs true audio-sector generation from the original application's supported input scope: 44.1 kHz / 16-bit MP3 or WAV sources converted into proper CDDA PCM sectors before any real hardware write path should be attempted.
+What is still missing is the original application's full authoring and burn pipeline. The current no-drive baseline can validate metadata, `CD-TEXT`, strict 44.1 kHz / 16-bit stereo WAV-to-CDDA sector streaming, and a DAO RAW+SUB96-shaped file-backed image. MP3 decoding, physical-disc capture comparison, and any real hardware write path remain intentionally deferred until the offline CDDA/capture-bundle path is stable enough to compare against a known-good disc.

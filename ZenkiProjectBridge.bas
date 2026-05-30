@@ -33,6 +33,11 @@ Public Function SyncZenkiTracks(ByVal engine As ZenkiEngine, ByVal tracks As Col
         If Trim$(entry.FilePath) = "" Then
             skippedCount = skippedCount + 1
         Else
+            If UCase$(Trim$(entry.Source)) = "MP3" Then
+                Err.Raise vbObjectError + 3301, "ZenkiProjectBridge", _
+                    "MP3 decode is not implemented in the rebuilt offline write path yet. Use a 44.1 kHz / 16-bit stereo WAV fixture for CDDA verification."
+            End If
+
             If Not engine.AddTrackFile(entry.FilePath, MsfToFramesBridge(entry.Pregap), MsfToFramesBridge(entry.Postgap), ZenkiTrackFormatFlag(entry.Source)) Then
                 Exit Function
             End If

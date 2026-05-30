@@ -34,6 +34,7 @@ typedef struct ZENKI_TRACK_TAG {
     u32 dataOffset;
     u32 dataBytes;
     u32 isWave;
+    u32 unsupported;
 } ZENKI_TRACK;
 
 typedef struct ZENKI_ISO_ITEM_TAG {
@@ -206,19 +207,33 @@ static int read_at(HANDLE32 h, u32 pos, ptr buf, u32 bytes) {
     return read_exact(h, buf, bytes);
 }
 
+static u16 read_le16(const u8* p) { return (u16)((u16)p[0] | ((u16)p[1] << 8)); }
+static u32 read_le32(const u8* p) { return (u32)p[0] | ((u32)p[1] << 8) | ((u32)p[2] << 16) | ((u32)p[3] << 24); }
+
 static void analyze_track_file(ZENKI_TRACK* t) {
     HANDLE32 h;
     u8 hdr[12];
     u8 chunk[8];
+    u8 fmt[16];
     u32 pos, fileBytes;
+    u32 haveFmt = 0, validCddaFmt = 0;
+    u32 dataOffset = 0, dataBytes = 0;
     if (!t || !t->path[0]) return;
     fileBytes = file_size_low(t->path);
     t->fileBytes = fileBytes;
     t->dataOffset = 0;
     t->dataBytes = fileBytes;
     t->isWave = 0;
+    t->unsupported = 0;
     t->sectorSize = infer_sector_size(t->flag, fileBytes);
     t->sectorCount = t->sectorSize ? (fileBytes / t->sectorSize) : 0;
+
+    if (kureha_ends_with_i(t->path, ".mp3")) {
+        t->unsupported = 1;
+        t->dataBytes = 0;
+        t->sectorCount = 0;
+        return;
+    }
 
     h = kureha_CreateFileA(t->path, K_GENERIC_READ, K_FILE_SHARE_READ | K_FILE_SHARE_WRITE, K_OPEN_EXISTING);
     if (h == K_INVALID_HANDLE) return;
@@ -228,18 +243,32 @@ static void analyze_track_file(ZENKI_TRACK* t) {
             while (pos + 8 < fileBytes && pos < 0x100000u) {
                 if (!read_at(h, pos, chunk, 8)) break;
                 {
-                    u32 sz = (u32)chunk[4] | ((u32)chunk[5]<<8) | ((u32)chunk[6]<<16) | ((u32)chunk[7]<<24);
+                    u32 sz = read_le32(chunk + 4);
+                    u32 chunkData = pos + 8;
+                    if (chunkData > fileBytes || sz > fileBytes - chunkData) sz = fileBytes - chunkData;
+                    if (chunk[0]=='f' && chunk[1]=='m' && chunk[2]=='t' && chunk[3]==' ' && sz >= 16) {
+                        if (read_at(h, chunkData, fmt, 16)) {
+                            u32 audioFormat = read_le16(fmt + 0);
+                            u32 channels = read_le16(fmt + 2);
+                            u32 sampleRate = read_le32(fmt + 4);
+                            u32 bitsPerSample = read_le16(fmt + 14);
+                            haveFmt = 1;
+                            validCddaFmt = (audioFormat == 1u && channels == 2u && sampleRate == 44100u && bitsPerSample == 16u) ? 1u : 0u;
+                        }
+                    }
                     if (chunk[0]=='d' && chunk[1]=='a' && chunk[2]=='t' && chunk[3]=='a') {
-                        t->isWave = 1;
-                        t->dataOffset = pos + 8;
-                        t->dataBytes = sz;
-                        t->sectorSize = 2352;
-                        t->sectorCount = sz / 2352u;
-                        break;
+                        dataOffset = chunkData;
+                        dataBytes = sz;
                     }
                     pos += 8 + sz + (sz & 1u);
                 }
             }
+            t->isWave = validCddaFmt && dataOffset && dataBytes ? 1u : 0u;
+            t->dataOffset = t->isWave ? dataOffset : 0u;
+            t->dataBytes = t->isWave ? dataBytes : 0u;
+            t->sectorSize = 2352;
+            t->sectorCount = t->isWave ? ((dataBytes + 2351u) / 2352u) : 0u;
+            t->unsupported = t->isWave ? 0u : (haveFmt ? 1u : 0u);
         }
     }
     kureha_CloseHandle(h);

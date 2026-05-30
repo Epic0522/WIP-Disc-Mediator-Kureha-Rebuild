@@ -84,6 +84,59 @@ def looks_like_cdrom_sector(main):
     return len(main) >= 16 and main[:12] == b"\x00" + (b"\xff" * 10) + b"\x00"
 
 
+def inspect_program_audio(path, sector_size=MAIN_SIZE, max_sample_sectors=300):
+    path = Path(path)
+    if not path.exists():
+        return {"available": False, "reason": f"missing file: {path}"}
+
+    size = path.stat().st_size
+    sectors = size // sector_size if sector_size else None
+    profile = {
+        "available": True,
+        "path": str(path),
+        "size_bytes": size,
+        "sector_size": sector_size,
+        "sectors": sectors,
+        "duration": frames_to_msf(sectors or 0),
+        "cdda_container_like": sector_size == MAIN_SIZE,
+        "sampled_sectors": 0,
+        "cdrom_sync_sector_count": 0,
+        "all_zero_sector_count": 0,
+        "nonzero_byte_count": 0,
+        "pcm_sample_min": None,
+        "pcm_sample_max": None,
+    }
+    if sector_size != MAIN_SIZE or not sectors:
+        return profile
+
+    sample_limit = min(sectors, max_sample_sectors)
+    pcm_min = None
+    pcm_max = None
+    with path.open("rb") as f:
+        for _ in range(sample_limit):
+            sec = f.read(sector_size)
+            if len(sec) < sector_size:
+                break
+            profile["sampled_sectors"] += 1
+            if looks_like_cdrom_sector(sec):
+                profile["cdrom_sync_sector_count"] += 1
+            if not any(sec):
+                profile["all_zero_sector_count"] += 1
+            profile["nonzero_byte_count"] += sum(1 for b in sec if b)
+            for i in range(0, len(sec) - 1, 2):
+                v = int.from_bytes(sec[i:i + 2], "little", signed=True)
+                pcm_min = v if pcm_min is None or v < pcm_min else pcm_min
+                pcm_max = v if pcm_max is None or v > pcm_max else pcm_max
+
+    profile["pcm_sample_min"] = pcm_min
+    profile["pcm_sample_max"] = pcm_max
+    profile["cdda_container_like"] = (
+        sector_size == MAIN_SIZE and profile["cdrom_sync_sector_count"] == 0
+    )
+    profile["has_nonzero_pcm"] = profile["nonzero_byte_count"] > 0
+    return profile
+
+
 def extract_cdtext_from_raw96(data, lead_in):
     cdtext = OrderedDict()
     crc_bad = 0
@@ -265,6 +318,7 @@ def bundle_from_raw96(raw96_path, out_dir, lead_in=LEADIN_SECTORS, lead_out=LEAD
             "sector_size": MAIN_SIZE,
             "sectors": program_sectors,
             "sha256": sha256_file(data_path),
+            "audio_profile": inspect_program_audio(data_path, MAIN_SIZE),
             "tracks": [{
                 "number": 1,
                 "mode": "AUDIO",
@@ -308,6 +362,7 @@ def read_metadata(bundle_dir):
 
 
 def analyze_capture(bundle_dir):
+    bundle_dir = Path(bundle_dir)
     meta = read_metadata(bundle_dir)
     print(f"bundle: {bundle_dir}")
     print(f"schema: {meta.get('schema')}")
@@ -315,6 +370,18 @@ def analyze_capture(bundle_dir):
     program = meta.get("program", {})
     layout = meta.get("layout", {})
     print(f"program data: {program.get('path')} ({program.get('sector_size')} bytes/sector, {program.get('sectors')} sectors)")
+    audio_profile = program.get("audio_profile")
+    if not audio_profile and program.get("path"):
+        audio_profile = inspect_program_audio(bundle_dir / program.get("path"), program.get("sector_size") or MAIN_SIZE)
+    if audio_profile:
+        print(
+            "program audio: "
+            f"cdda_like={audio_profile.get('cdda_container_like')} "
+            f"duration={audio_profile.get('duration')} "
+            f"sampled={audio_profile.get('sampled_sectors')} "
+            f"cdrom_sync={audio_profile.get('cdrom_sync_sector_count')} "
+            f"nonzero_bytes={audio_profile.get('nonzero_byte_count')}"
+        )
     print(f"layout: lead-in={layout.get('lead_in_sectors')} program={layout.get('program_sectors')} lead-out={layout.get('lead_out_sectors')}")
     sub = meta.get("subchannel", {})
     print(f"subchannel: {'available' if sub.get('available') else 'unavailable'}")
@@ -339,6 +406,16 @@ def compare_capture(left_dir, right_dir):
 
     status("program sector size", left.get("program", {}).get("sector_size"), right.get("program", {}).get("sector_size"))
     status("program sectors", left.get("program", {}).get("sectors"), right.get("program", {}).get("sectors"))
+    status(
+        "program CDDA-like",
+        left.get("program", {}).get("audio_profile", {}).get("cdda_container_like"),
+        right.get("program", {}).get("audio_profile", {}).get("cdda_container_like"),
+    )
+    status(
+        "program CD-ROM sync sectors",
+        left.get("program", {}).get("audio_profile", {}).get("cdrom_sync_sector_count"),
+        right.get("program", {}).get("audio_profile", {}).get("cdrom_sync_sector_count"),
+    )
     status("track count", len(left.get("program", {}).get("tracks", [])), len(right.get("program", {}).get("tracks", [])))
 
     left_cdtext = {(x.get("track"), x.get("language"), x.get("kind")): x.get("text") for x in left.get("cdtext", [])}
@@ -403,6 +480,7 @@ def capture_disc(out_dir, device=None, name=None, dry_run=False):
             "sector_size": sector_size,
             "sectors": data_path.stat().st_size // sector_size if data_path.exists() and sector_size else None,
             "sha256": sha256_file(data_path) if data_path.exists() else None,
+            "audio_profile": inspect_program_audio(data_path, sector_size) if data_path.exists() and sector_size else None,
             "tracks": [],
         },
         "subchannel": {
@@ -473,6 +551,16 @@ def main():
             print(f"size: {size} bytes")
             print(f"sector size: {sector_size or 'unknown'}")
             print(f"sectors: {size // sector_size if sector_size else 'unknown'}")
+            if sector_size == MAIN_SIZE:
+                audio_profile = inspect_program_audio(args.bin, MAIN_SIZE)
+                print(
+                    "program audio: "
+                    f"cdda_like={audio_profile.get('cdda_container_like')} "
+                    f"duration={audio_profile.get('duration')} "
+                    f"sampled={audio_profile.get('sampled_sectors')} "
+                    f"cdrom_sync={audio_profile.get('cdrom_sync_sector_count')} "
+                    f"nonzero_bytes={audio_profile.get('nonzero_byte_count')}"
+                )
         return 0
     if args.cmd == "bundle-from-raw96":
         metadata = bundle_from_raw96(args.raw96, args.out_dir, args.lead_in, args.lead_out, not args.no_copy_raw96)
